@@ -41,7 +41,7 @@ Your Vercel deployment should have these environment variables configured:
 | `MONGODB_URI` | `mongodb+srv://aadileetcode:3PyPy3AbgYSbTtrZ@cluster0.ppfyozj.mongodb.net/ai-chat` | Your MongoDB connection string |
 | `JWT_SECRET` | `gupsup-ai-chat-secret-key-2024` | Your JWT secret key |
 | `NODE_ENV` | `production` | Environment setting |
-| `FRONTEND_URL` | `https://your-frontend-domain.com` | Your frontend URL (update when you deploy frontend) |
+| `FRONTEND_URL` | `https://nivi.aadigarg.life` | Your frontend URL |
 
 ## 🔗 Step 3: Frontend Connected to Vercel Backend
 
@@ -59,10 +59,10 @@ Your frontend has been updated to connect to the Vercel backend at `https://nivi
 
 In your Vercel environment variables, set:
 ```
-FRONTEND_URL=https://your-frontend-domain.com
+FRONTEND_URL=https://nivi.aadigarg.life
 ```
 
-**Note**: Update this when you deploy your frontend to production.
+**Note**: This is now configured for your production frontend.
 
 ## 🧪 Step 4: Test Your Deployment
 
