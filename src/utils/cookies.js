@@ -71,5 +71,15 @@ export const cookieUtils = {
     cookieUtils.deleteCookie('ai_current_chats')
     cookieUtils.deleteCookie('ai_sidebar_open')
     cookieUtils.deleteCookie('theme')
+  },
+
+  // Debug function to check cookie status
+  debugCookies: () => {
+    console.log('=== Cookie Debug Info ===')
+    console.log('Chat History:', cookieUtils.getCookie('ai_chat_history'))
+    console.log('Current Chats:', cookieUtils.getCookie('ai_current_chats'))
+    console.log('Sidebar State:', cookieUtils.getCookie('ai_sidebar_open'))
+    console.log('All Cookies:', document.cookie)
+    console.log('========================')
   }
 }

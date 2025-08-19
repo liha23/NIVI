@@ -94,7 +94,11 @@ function App() {
 
   const deleteChat = (chatId) => {
     setChatHistory(prev => prev.filter(chat => chat.id !== chatId))
-    cookieUtils.deleteCookie(`ai_current_chats_${chatId}`)
+    
+    // Remove the chat from current chats cookie
+    const currentChats = cookieUtils.getCookie('ai_current_chats') || {}
+    delete currentChats[chatId]
+    cookieUtils.setCookie('ai_current_chats', currentChats, 30)
     
     // If we're deleting the current chat, create a new one
     if (currentChatId === chatId) {

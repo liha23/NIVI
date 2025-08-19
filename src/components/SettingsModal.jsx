@@ -1,6 +1,7 @@
 import React from 'react'
-import { X, Palette, Moon, Sun, Zap, Crown } from 'lucide-react'
+import { X, Palette, Moon, Sun, Zap, Crown, Database, Trash2 } from 'lucide-react'
 import { useTheme } from '../contexts/ThemeContext'
+import { cookieUtils } from '../utils/cookies.js'
 
 const SettingsModal = ({ isOpen, onClose }) => {
   const { currentTheme, themes, changeTheme } = useTheme()
@@ -116,6 +117,35 @@ const SettingsModal = ({ isOpen, onClose }) => {
                 <p className="text-sm" style={{ color: themes[currentTheme]?.textSecondary }}>
                   This is how your chat interface will look with the {themes[currentTheme]?.name.toLowerCase()} theme.
                 </p>
+              </div>
+            </div>
+
+            {/* Data Management */}
+            <div>
+              <h3 className="text-sm font-medium text-gray-400 mb-3">Data Management</h3>
+              <div className="space-y-2">
+                <button
+                  onClick={() => {
+                    cookieUtils.debugCookies()
+                    alert('Check browser console for cookie debug info!')
+                  }}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                >
+                  <Database size={16} />
+                  Debug Cookies
+                </button>
+                <button
+                  onClick={() => {
+                    if (confirm('Are you sure you want to clear all chat data? This cannot be undone.')) {
+                      cookieUtils.clearAllData()
+                      alert('All data cleared! Please refresh the page.')
+                    }
+                  }}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                >
+                  <Trash2 size={16} />
+                  Clear All Data
+                </button>
               </div>
             </div>
           </div>
