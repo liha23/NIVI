@@ -3,7 +3,7 @@
 
 export const config = {
   // Get your API key from: https://makersuite.google.com/app/apikey
-  GEMINI_API_KEY: 'AIzaSyANt_L3RmNppde7T4q3agp-yncbZ5WJ81k',
+  GEMINI_API_KEY: 'AIzaSyB6TgwC_T39MinVgu1taqUWT86xrIUX5LA',
   
   // API Configuration
   API_BASE_URL: 'https://generativelanguage.googleapis.com/v1beta',
