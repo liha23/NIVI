@@ -105,6 +105,14 @@ function App() {
     const saveTimeout = setTimeout(() => {
       if (isAuthenticated && token && currentChatId && shouldSave && messagesChanged) {
         console.log('Saving to MongoDB after 5s debounce...')
+        console.log('Save conditions met:', { 
+          isAuthenticated, 
+          hasToken: !!token, 
+          currentChatId, 
+          shouldSave, 
+          messagesChanged,
+          messagesCount: currentMessages.length 
+        })
         saveCurrentChatToMongoDB()
         setLastSavedMessages([...currentMessages])
       }
@@ -289,6 +297,8 @@ function App() {
                 : chat
             )
           )
+          
+          console.log('✅ Chat history updated with latest data')
           console.log('✅ Chat updated successfully in MongoDB')
           return
         } else {
@@ -336,6 +346,11 @@ function App() {
                   : chat
               )
             )
+            
+            // Update the current chat ID to the MongoDB ID
+            setCurrentChatId(newChatId)
+            
+            console.log('✅ Chat history updated with MongoDB ID:', newChatId)
             
             console.log('✅ Chat created successfully in MongoDB with ID:', newChatId)
             
@@ -539,6 +554,7 @@ function App() {
     // Update chat title for the first user message
     if (currentMessages.length === 1) {
       updateChatTitle(currentChatId, message.trim())
+      console.log('Updated chat title for first message:', message.trim())
     }
 
     // Save user message immediately to ensure it's stored
