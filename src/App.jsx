@@ -530,6 +530,9 @@ function App() {
         saveCurrentChatToMongoDB()
         setLastSavedMessages([...updatedMessages])
       }, 500)
+    } else if (!isAuthenticated && currentChatId) {
+      console.log('Saving user message to localStorage...')
+      localStorage.setItem(`chat_${currentChatId}`, JSON.stringify(updatedMessages))
     }
 
     try {
@@ -552,6 +555,11 @@ function App() {
           saveCurrentChatToMongoDB()
           setLastSavedMessages([...finalMessages])
         }, 2000) // Increased delay to avoid conflicts with debounced save
+      } else if (!isAuthenticated && currentChatId) {
+        setTimeout(() => {
+          console.log('Force saving to localStorage after bot response...')
+          localStorage.setItem(`chat_${currentChatId}`, JSON.stringify(finalMessages))
+        }, 2000)
       }
       
       return response
