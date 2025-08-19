@@ -141,6 +141,67 @@
       background-position: 0% 50%;
     }
   }
+
+  /* Voice mode wave animations */
+  .wave-animation {
+    animation: wave 1.5s ease-in-out infinite;
+  }
+
+  .wave-animation:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+
+  .wave-animation:nth-child(3) {
+    animation-delay: 0.2s;
+  }
+
+  .wave-animation:nth-child(4) {
+    animation-delay: 0.3s;
+  }
+
+  .wave-animation:nth-child(5) {
+    animation-delay: 0.4s;
+  }
+
+  @keyframes wave {
+    0%, 100% {
+      transform: scaleY(0.5);
+    }
+    50% {
+      transform: scaleY(1);
+    }
+  }
+
+  /* Voice call pulse animation */
+  .voice-pulse {
+    animation: voicePulse 2s ease-in-out infinite;
+  }
+
+  @keyframes voicePulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.8;
+    }
+  }
+
+  /* Gradient animation for voice mode */
+  .animate-gradient-x {
+    background-size: 200% 200%;
+    animation: gradient-x 3s ease infinite;
+  }
+
+  @keyframes gradient-x {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
 }
 
 /* Custom scrollbar */

@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Send, Bot, User, Sparkles, Zap, Settings, HelpCircle, ChevronLeft, ChevronRight, Plus, Mic, MicOff, Volume2 } from 'lucide-react'
+import { Send, Bot, User, Sparkles, Zap, Settings, HelpCircle, ChevronLeft, ChevronRight, Plus, Mic, MicOff, Volume2, Phone } from 'lucide-react'
 import ChatMessage from './ChatMessage'
 import TypingIndicator from './TypingIndicator'
 import { useTheme } from '../contexts/ThemeContext'
 import SettingsModal from './SettingsModal'
+import VoiceMode from './VoiceMode'
 
 const ChatArea = ({ 
   messages, 
@@ -13,10 +14,11 @@ const ChatArea = ({
   currentChatTitle,
   onToggleSidebar
 }) => {
-  const { toggleSettings, isSettingsOpen } = useTheme()
+  const { toggleSettings, isSettingsOpen, currentTheme } = useTheme()
   const [inputMessage, setInputMessage] = useState('')
   const [isListening, setIsListening] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
+  const [isVoiceModeOpen, setIsVoiceModeOpen] = useState(false)
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
   const recognitionRef = useRef(null)
@@ -42,6 +44,11 @@ const ChatArea = ({
     if (!inputMessage.trim() || isLoading) return
     onSendMessage(inputMessage.trim())
     setInputMessage('')
+  }
+
+  const handleVoiceMessage = async (message) => {
+    if (!message.trim() || isLoading) return
+    return await onSendMessage(message.trim())
   }
 
   const handleKeyPress = (e) => {
@@ -150,8 +157,7 @@ const ChatArea = ({
              </button>
            </div>
            
-           {/* Invisible spacer for mobile to keep logo centered */}
-           <div className="md:hidden w-8"></div>
+
          </div>
        </header>
 
@@ -224,6 +230,16 @@ const ChatArea = ({
                {isRecording ? <MicOff size={18} className="md:w-5 md:h-5" /> : <Mic size={18} className="md:w-5 md:h-5" />}
              </button>
              
+             {/* Voice Call Button */}
+             <button
+               onClick={() => setIsVoiceModeOpen(true)}
+               disabled={isLoading}
+               className="p-1.5 md:p-2 rounded-lg transition-colors text-gray-400 hover:text-white hover:bg-dark-700"
+               title="Voice Call Mode"
+             >
+               <Phone size={18} className="md:w-5 md:h-5" />
+             </button>
+             
              {/* Send Button */}
              <button
                onClick={handleSendMessage}
@@ -262,6 +278,15 @@ const ChatArea = ({
       
       {/* Settings Modal */}
       <SettingsModal isOpen={isSettingsOpen} onClose={toggleSettings} />
+      
+      {/* Voice Mode */}
+      <VoiceMode 
+        isOpen={isVoiceModeOpen}
+        onClose={() => setIsVoiceModeOpen(false)}
+        onSendMessage={handleVoiceMessage}
+        isLoading={isLoading}
+        currentTheme={currentTheme}
+      />
     </div>
   )
 }

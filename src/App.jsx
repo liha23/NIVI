@@ -147,6 +147,7 @@ function App() {
       }
 
       setCurrentMessages(prev => [...prev, botMessage])
+      return response // Return response for voice mode
     } catch (error) {
       console.error('Error:', error)
       const errorMessage = {
@@ -156,6 +157,7 @@ function App() {
         timestamp: new Date()
       }
       setCurrentMessages(prev => [...prev, errorMessage])
+      return errorMessage.content // Return error message for voice mode
     } finally {
       setIsLoading(false)
     }
@@ -169,14 +171,14 @@ function App() {
     )
 
     if (isCreatorQuestion) {
-      return `${config.CREATOR_NAME} is my creator! I was built with love and care by ${config.CREATOR_NAME} using the Gemini API. How can I assist you today?`
+      return `${config.CREATOR_NAME} is my creator! I was built with love and care by ${config.CREATOR_NAME} using the NIVI AI technology. How can I assist you today?`
     }
 
     // Get API key from config
     const API_KEY = config.GEMINI_API_KEY
     
     if (API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
-      return "Please configure your Gemini API key in the config.js file. Replace 'YOUR_GEMINI_API_KEY_HERE' with your actual API key from Google AI Studio."
+      return "Please configure your NIVI AI API key in the config.js file. Replace 'YOUR_GEMINI_API_KEY_HERE' with your actual API key from Google AI Studio."
     }
 
     const response = await fetch(`${config.API_BASE_URL}/models/${config.MODEL}:generateContent?key=${API_KEY}`, {
