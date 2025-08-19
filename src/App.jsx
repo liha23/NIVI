@@ -444,8 +444,9 @@ function App() {
 
   const deleteChat = async (chatId) => {
     console.log('Deleting chat:', chatId, 'Current chat ID:', currentChatId)
+    console.log('Auth state:', { isAuthenticated, hasToken: !!token, hasUser: !!user })
     
-    if (isAuthenticated && token) {
+    if (isAuthenticated && token && user) {
       try {
         console.log('Sending DELETE request to:', `${frontendConfig.getApiUrl()}/api/chat/${chatId}`)
         const response = await fetch(`${frontendConfig.getApiUrl()}/api/chat/${chatId}`, {
@@ -474,15 +475,32 @@ function App() {
           } else {
             console.error('Failed to delete chat:', data.message)
           }
+        } else if (response.status === 401) {
+          // Token is invalid, treat as unauthenticated
+          console.log('Token invalid, treating as unauthenticated user')
+          setChatHistory(prev => prev.filter(chat => chat.id !== chatId))
+          localStorage.removeItem(`chat_${chatId}`)
+          
+          if (currentChatId === chatId) {
+            createNewChat()
+          }
         } else {
           const errorText = await response.text()
           console.error('Failed to delete chat:', response.status, errorText)
         }
       } catch (error) {
         console.error('Error deleting chat from MongoDB:', error)
+        // Fallback to localStorage deletion on error
+        setChatHistory(prev => prev.filter(chat => chat.id !== chatId))
+        localStorage.removeItem(`chat_${chatId}`)
+        
+        if (currentChatId === chatId) {
+          createNewChat()
+        }
       }
     } else {
       // For non-authenticated users
+      console.log('User not authenticated, deleting from localStorage only')
       setChatHistory(prev => prev.filter(chat => chat.id !== chatId))
       localStorage.removeItem(`chat_${chatId}`)
       
