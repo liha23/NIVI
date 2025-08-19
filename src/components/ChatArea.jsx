@@ -10,7 +10,8 @@ const ChatArea = ({
   onSendMessage, 
   isLoading, 
   isSidebarOpen,
-  currentChatTitle
+  currentChatTitle,
+  onToggleSidebar
 }) => {
   const { toggleSettings, isSettingsOpen } = useTheme()
   const [inputMessage, setInputMessage] = useState('')
@@ -102,16 +103,26 @@ const ChatArea = ({
   return (
     <div className={`flex flex-col h-screen transition-all duration-300 relative ${
       isSidebarOpen ? 'ml-0 md:ml-80' : 'ml-0'
-    }`}>
+    }`} style={{ height: '100vh' }}>
       
 
-             {/* Header */}
-       <header className="bg-dark-900 border-b border-dark-700 px-4 md:px-6 py-3 md:py-4">
+                          {/* Header */}
+       <header className="bg-dark-900 border-b border-dark-700 px-4 md:px-6 py-3 md:py-4 flex-shrink-0">
          <div className="flex items-center justify-between relative">
-           {/* Left spacer to balance the layout */}
-           <div className="w-32 md:w-40"></div>
+           {/* Left Side - Mobile Toggle */}
+           <div className="flex items-center">
+             <button
+               onClick={onToggleSidebar}
+               className="md:hidden w-8 h-8 rounded-lg bg-gradient-to-r from-sunset-pink to-sunset-purple text-white hover:from-sunset-orange hover:to-sunset-yellow transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-sunset-pink/30 flex items-center justify-center"
+               title="Toggle sidebar"
+             >
+               <ChevronRight size={16} />
+             </button>
+             {/* Desktop spacer to balance layout */}
+             <div className="hidden md:block w-32"></div>
+           </div>
            
-                        {/* Centered Logo and Title */}
+           {/* Centered Logo and Title */}
            <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-2 md:space-x-3">
              <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-sunset-pink to-sunset-purple rounded-lg flex items-center justify-center shadow-lg shadow-sunset-pink/30">
                <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-white" />
@@ -121,28 +132,31 @@ const ChatArea = ({
              </div>
            </div>
            
-           {/* Right Action Buttons */}
-           <div className="flex items-center space-x-1 md:space-x-2">
-             <button className="px-2 md:px-3 py-1.5 md:py-2 bg-gradient-to-r from-sunset-orange to-sunset-yellow text-white rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-sunset-orange/30 flex items-center gap-1 md:gap-2">
-               <Zap size={14} className="md:w-4 md:h-4" />
-               <span className="hidden lg:inline text-xs md:text-sm">Upgrade to Pro(soon)</span>
+           {/* Right Action Buttons - Desktop Only */}
+           <div className="hidden md:flex items-center space-x-2">
+             <button className="px-3 py-2 bg-gradient-to-r from-sunset-orange to-sunset-yellow text-white rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-sunset-orange/30 flex items-center gap-2">
+               <Zap size={16} />
+               <span className="text-sm">Upgrade to Pro(soon)</span>
              </button>
              <button 
                onClick={toggleSettings}
-               className="p-1.5 md:p-2 text-gray-400 hover:text-white hover:bg-dark-800 rounded-lg transition-colors"
+               className="p-2 text-gray-400 hover:text-white hover:bg-dark-800 rounded-lg transition-colors"
                title="Settings"
              >
-               <Settings size={18} className="md:w-5 md:h-5" />
+               <Settings size={20} />
              </button>
-             <button className="p-1.5 md:p-2 text-gray-400 hover:text-white hover:bg-dark-800 rounded-lg transition-colors">
-               <HelpCircle size={18} className="md:w-5 md:h-5" />
+             <button className="p-2 text-gray-400 hover:text-white hover:bg-dark-800 rounded-lg transition-colors" title="Help">
+               <HelpCircle size={20} />
              </button>
            </div>
+           
+           {/* Invisible spacer for mobile to keep logo centered */}
+           <div className="md:hidden w-8"></div>
          </div>
        </header>
 
              {/* Chat Messages */}
-       <div className="flex-1 overflow-y-auto bg-dark-950">
+       <div className="flex-1 overflow-y-auto bg-dark-950 min-h-0">
          <div className="max-w-4xl mx-auto px-3 md:px-4 py-4 md:py-6">
                     {messages.length === 0 ? (
                          <div className="flex flex-col items-center justify-center h-full text-center px-4">
@@ -161,7 +175,7 @@ const ChatArea = ({
       </div>
 
              {/* Input Area */}
-       <div className="bg-dark-900 border-t border-dark-700 px-4 md:px-6 py-3 md:py-4">
+       <div className="bg-dark-900 border-t border-dark-700 px-4 md:px-6 py-3 md:py-4 flex-shrink-0">
          <div className="max-w-4xl mx-auto">
                      <div className={`flex items-center space-x-2 md:space-x-3 rounded-xl px-3 md:px-4 py-2.5 md:py-3 border transition-all duration-300 backdrop-blur-sm ${
                        isRecording 

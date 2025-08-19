@@ -41,11 +41,11 @@ const Sidebar = ({
 
      return (
      <>
-               {/* Toggle Button when sidebar is closed */}
+               {/* Toggle Button when sidebar is closed - Desktop Only */}
         {!isOpen && (
           <button
             onClick={onToggle}
-            className="fixed top-4 left-4 z-50 w-10 h-10 rounded-full bg-gradient-to-r from-sunset-pink to-sunset-purple text-white hover:from-sunset-orange hover:to-sunset-yellow transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-sunset-pink/30 flex items-center justify-center group backdrop-blur-sm"
+            className="fixed top-4 left-4 z-50 w-10 h-10 rounded-full bg-gradient-to-r from-sunset-pink to-sunset-purple text-white hover:from-sunset-orange hover:to-sunset-yellow transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-sunset-pink/30 flex items-center justify-center group backdrop-blur-sm hidden md:flex"
             title="Open sidebar"
           >
             <ChevronRight size={18} className="group-hover:scale-110 transition-transform duration-200" />
@@ -55,12 +55,12 @@ const Sidebar = ({
        
 
                {/* Sidebar */}
-        <div className={`fixed left-0 top-0 h-full bg-dark-900 border-r border-dark-700 transition-all duration-300 ease-in-out z-30 ${
+        <div className={`fixed left-0 top-0 h-screen bg-dark-900 border-r border-dark-700 transition-all duration-300 ease-in-out z-30 ${
           isOpen ? 'w-80 md:w-80 w-full translate-x-0' : 'w-0 -translate-x-full overflow-hidden'
         }`}>
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full overflow-hidden">
           {/* Header */}
-                     <div className="p-4 border-b border-dark-700">
+                     <div className="p-4 border-b border-dark-700 flex-shrink-0">
                               <div className="flex items-center justify-between mb-4">
                    <div className="flex items-center gap-2">
                      <div className="w-6 h-6 bg-gradient-to-r from-sunset-pink to-sunset-purple rounded-lg flex items-center justify-center shadow-lg shadow-sunset-pink/30">
@@ -87,7 +87,7 @@ const Sidebar = ({
           </div>
 
           {/* Search */}
-          <div className="p-4 border-b border-dark-700">
+          <div className="p-4 border-b border-dark-700 flex-shrink-0">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
               <input
@@ -99,7 +99,7 @@ const Sidebar = ({
           </div>
 
           {/* Chat History */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto min-h-0">
             <div className="p-4">
               <h3 className="text-sm font-medium text-gray-400 mb-3">Recent Chats</h3>
               <div className="space-y-1">
@@ -151,7 +151,7 @@ const Sidebar = ({
           </div>
 
                      {/* Footer */}
-           <div className="p-4 border-t border-dark-700">
+           <div className="p-4 border-t border-dark-700 flex-shrink-0">
              <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-dark-800 cursor-pointer transition-colors">
                <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
                  <Star className="w-5 h-5 text-white" />

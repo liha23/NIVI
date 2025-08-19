@@ -205,6 +205,14 @@ function App() {
     setIsSidebarOpen(!isSidebarOpen)
   }
 
+  // Make toggleSidebar available globally for mobile header
+  useEffect(() => {
+    window.toggleSidebar = toggleSidebar
+    return () => {
+      delete window.toggleSidebar
+    }
+  }, [isSidebarOpen])
+
   const getCurrentChatTitle = () => {
     const currentChat = chatHistory.find(chat => chat.id === currentChatId)
     return currentChat?.title || 'New Chat'
@@ -212,7 +220,7 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-dark-950">
+      <div className="h-screen bg-dark-950 overflow-hidden">
         <Sidebar
           isOpen={isSidebarOpen}
           onToggle={toggleSidebar}
@@ -229,6 +237,7 @@ function App() {
           isLoading={isLoading}
           isSidebarOpen={isSidebarOpen}
           currentChatTitle={getCurrentChatTitle()}
+          onToggleSidebar={toggleSidebar}
         />
       </div>
     </ThemeProvider>
