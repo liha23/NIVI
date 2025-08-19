@@ -5,8 +5,6 @@ const ChatMessage = ({ message }) => {
   const isBot = message.type === 'bot'
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [speechSynthesis, setSpeechSynthesis] = useState(null)
-  const [currentWordIndex, setCurrentWordIndex] = useState(-1)
-  const [words, setWords] = useState([])
 
   const speakText = (text) => {
     if ('speechSynthesis' in window) {
@@ -21,11 +19,6 @@ const ChatMessage = ({ message }) => {
         .replace(/Google/gi, 'NIVI')
         .replace(/Gemini/gi, 'NIVI')
         .replace(/\bNIVI\b/g, 'Nivi') // Convert NIVI to Nivi for better pronunciation
-      
-      // Split text into words for highlighting
-      const wordArray = cleanText.split(/\s+/).filter(word => word.length > 0)
-      setWords(wordArray)
-      setCurrentWordIndex(-1)
 
       const utterance = new SpeechSynthesisUtterance(cleanText)
       utterance.rate = 1.0 // Normal speed (1x)
@@ -44,47 +37,19 @@ const ChatMessage = ({ message }) => {
         utterance.voice = preferredVoice
       }
 
-      // Calculate word timing for highlighting
-      const wordCount = wordArray.length
-      const estimatedDuration = cleanText.length * 50 // Rough estimate: 50ms per character for 1x speed
-      const wordInterval = estimatedDuration / wordCount
-
       utterance.onstart = () => {
         setIsSpeaking(true)
         setSpeechSynthesis(utterance)
-        setCurrentWordIndex(0)
-        
-        // Start word-by-word highlighting
-        let wordIndex = 0
-        const highlightInterval = setInterval(() => {
-          if (wordIndex < wordCount) {
-            setCurrentWordIndex(wordIndex)
-            wordIndex++
-          } else {
-            clearInterval(highlightInterval)
-          }
-        }, wordInterval)
-        
-        // Store interval for cleanup
-        utterance.highlightInterval = highlightInterval
       }
 
       utterance.onend = () => {
         setIsSpeaking(false)
         setSpeechSynthesis(null)
-        setCurrentWordIndex(-1)
-        if (utterance.highlightInterval) {
-          clearInterval(utterance.highlightInterval)
-        }
       }
 
       utterance.onerror = () => {
         setIsSpeaking(false)
         setSpeechSynthesis(null)
-        setCurrentWordIndex(-1)
-        if (utterance.highlightInterval) {
-          clearInterval(utterance.highlightInterval)
-        }
       }
 
       window.speechSynthesis.speak(utterance)
@@ -96,10 +61,6 @@ const ChatMessage = ({ message }) => {
       window.speechSynthesis.cancel()
       setIsSpeaking(false)
       setSpeechSynthesis(null)
-      setCurrentWordIndex(-1)
-      if (speechSynthesis && speechSynthesis.highlightInterval) {
-        clearInterval(speechSynthesis.highlightInterval)
-      }
     }
   }
 
@@ -121,35 +82,23 @@ const ChatMessage = ({ message }) => {
         
         {/* Message Content */}
         <div className={`flex flex-col ${isBot ? 'items-start' : 'items-end'}`}>
-          <div className={`px-3 py-2 md:px-4 md:py-3 rounded-2xl ${
+          <div className={`px-3 py-2 md:px-4 md:py-3 rounded-2xl relative ${
             isBot 
               ? 'bg-dark-800 text-white border border-dark-700' 
               : 'bg-primary-600 text-white'
-          }`}>
-            <div className="flex items-start justify-between gap-2 md:gap-3">
+          } ${isSpeaking ? 'neon-highlight' : ''}`}>
+            {/* Neon border animation container */}
+            {isSpeaking && (
+              <div className="absolute inset-0 rounded-2xl neon-border-animation"></div>
+            )}
+            
+            <div className="flex items-start justify-between gap-2 md:gap-3 relative z-10">
               <div className="whitespace-pre-wrap break-words flex-1 text-sm md:text-base">
-                {isSpeaking && words.length > 0 ? (
-                  <div>
-                    {words.map((word, index) => (
-                      <span
-                        key={index}
-                        className={`transition-all duration-200 ${
-                          index === currentWordIndex
-                            ? 'bg-yellow-400 text-black px-1 rounded font-semibold'
-                            : ''
-                        }`}
-                      >
-                        {word}
-                        {index < words.length - 1 ? ' ' : ''}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  // Replace Google and Gemini with NIVI in display
-                  message.content
-                    .replace(/Google/gi, 'NIVI')
-                    .replace(/Gemini/gi, 'NIVI')
-                )}
+                {/* Replace Google and Gemini with NIVI in display */}
+                {message.content
+                  .replace(/Google/gi, 'NIVI')
+                  .replace(/Gemini/gi, 'NIVI')
+                }
               </div>
               
               {/* Speak Button */}

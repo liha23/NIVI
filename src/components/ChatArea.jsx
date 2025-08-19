@@ -55,25 +55,15 @@ const ChatArea = ({
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
       recognitionRef.current = new SpeechRecognition()
-      recognitionRef.current.continuous = true
-      recognitionRef.current.interimResults = true
+      recognitionRef.current.continuous = false
+      recognitionRef.current.interimResults = false
       recognitionRef.current.lang = 'en-US'
+      recognitionRef.current.maxAlternatives = 1
 
       recognitionRef.current.onresult = (event) => {
-        let finalTranscript = ''
-        let interimTranscript = ''
-
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript
-          if (event.results[i].isFinal) {
-            finalTranscript += transcript
-          } else {
-            interimTranscript += transcript
-          }
-        }
-
-        if (finalTranscript) {
-          setInputMessage(prev => prev + finalTranscript)
+        const transcript = event.results[0][0].transcript
+        if (transcript) {
+          setInputMessage(prev => prev + ' ' + transcript.trim())
           setIsListening(false)
           setIsRecording(false)
         }
@@ -117,21 +107,23 @@ const ChatArea = ({
 
              {/* Header */}
        <header className="bg-dark-900 border-b border-dark-700 px-4 md:px-6 py-3 md:py-4">
-         <div className="flex items-center justify-between">
-           <div className="flex items-center space-x-2 md:space-x-3">
-             <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
+         <div className="flex items-center justify-between relative">
+           {/* Left spacer to balance the layout */}
+           <div className="w-32 md:w-40"></div>
+           
+                        {/* Centered Logo and Title */}
+           <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-2 md:space-x-3">
+             <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-sunset-pink to-sunset-purple rounded-lg flex items-center justify-center shadow-lg shadow-sunset-pink/30">
                <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-white" />
              </div>
-             <div>
-               <h1 className="text-lg md:text-xl font-bold text-white">NIVI AI</h1>
-               <p className="text-xs md:text-sm text-gray-400">
-                 {currentChatTitle || 'New conversation'}
-               </p>
+             <div className="text-center">
+               <h1 className="text-lg md:text-xl font-bold bg-gradient-to-r from-sunset-pink to-sunset-purple bg-clip-text text-transparent">NIVI AI</h1>
              </div>
            </div>
            
+           {/* Right Action Buttons */}
            <div className="flex items-center space-x-1 md:space-x-2">
-             <button className="px-2 md:px-3 py-1.5 md:py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors flex items-center gap-1 md:gap-2">
+             <button className="px-2 md:px-3 py-1.5 md:py-2 bg-gradient-to-r from-sunset-orange to-sunset-yellow text-white rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-sunset-orange/30 flex items-center gap-1 md:gap-2">
                <Zap size={14} className="md:w-4 md:h-4" />
                <span className="hidden lg:inline text-xs md:text-sm">Upgrade to Pro(soon)</span>
              </button>
@@ -171,7 +163,11 @@ const ChatArea = ({
              {/* Input Area */}
        <div className="bg-dark-900 border-t border-dark-700 px-4 md:px-6 py-3 md:py-4">
          <div className="max-w-4xl mx-auto">
-                     <div className="flex items-center space-x-2 md:space-x-3 bg-dark-800 rounded-xl px-3 md:px-4 py-2.5 md:py-3 border border-dark-600">
+                     <div className={`flex items-center space-x-2 md:space-x-3 rounded-xl px-3 md:px-4 py-2.5 md:py-3 border transition-all duration-300 backdrop-blur-sm ${
+                       isRecording 
+                         ? 'bg-sunset-red/20 border-sunset-red/50 shadow-lg shadow-sunset-red/30' 
+                         : 'bg-dark-800/50 border-sunset-purple/30 shadow-lg shadow-sunset-purple/10'
+                     }`}>
              {/* Plus Icon */}
              <button 
                className="p-1.5 md:p-2 text-gray-400 hover:text-white transition-colors relative group"
@@ -218,9 +214,9 @@ const ChatArea = ({
              <button
                onClick={handleSendMessage}
                disabled={!inputMessage.trim() || isLoading}
-               className={`p-1.5 md:p-2 rounded-lg transition-colors ${
+               className={`p-1.5 md:p-2 rounded-lg transition-all duration-300 ${
                  inputMessage.trim() && !isLoading
-                   ? 'bg-primary-600 text-white hover:bg-primary-700'
+                   ? 'bg-gradient-to-r from-sunset-pink to-sunset-purple text-white hover:shadow-lg hover:shadow-sunset-pink/30'
                    : 'bg-dark-700 text-gray-500 cursor-not-allowed'
                }`}
              >
@@ -230,13 +226,17 @@ const ChatArea = ({
           
           {/* Voice Recording Indicator */}
           {isRecording && (
-            <div className="flex items-center justify-center mt-3 space-x-2">
-              <div className="flex space-x-1">
-                <div className="w-1 h-4 bg-red-500 rounded-full animate-pulse"></div>
-                <div className="w-1 h-6 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: '0.1s' }}></div>
-                <div className="w-1 h-3 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+            <div className="relative mt-3 p-3 rounded-xl border-2 border-transparent bg-gradient-to-r from-sunset-pink/20 via-sunset-purple/20 to-sunset-orange/20 animate-pulse">
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-sunset-pink/0 via-sunset-purple/30 to-sunset-orange/0 animate-pulse"></div>
+              <div className="absolute inset-0 rounded-xl border-2 border-transparent bg-gradient-to-r from-sunset-pink via-sunset-purple to-sunset-orange bg-[length:200%_100%] animate-gradient-x"></div>
+              <div className="relative flex items-center justify-center space-x-2">
+                <div className="flex space-x-1">
+                  <div className="w-1 h-4 bg-sunset-pink rounded-full animate-pulse"></div>
+                  <div className="w-1 h-6 bg-sunset-purple rounded-full animate-pulse" style={{ animationDelay: '0.1s' }}></div>
+                  <div className="w-1 h-3 bg-sunset-orange rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                </div>
+                <span className="text-sm text-white font-medium">Listening...</span>
               </div>
-              <span className="text-sm text-red-400">Listening...</span>
             </div>
           )}
           

@@ -45,11 +45,10 @@ const Sidebar = ({
         {!isOpen && (
           <button
             onClick={onToggle}
-            className="fixed bottom-4 left-4 z-50 px-3 py-2 rounded-lg bg-dark-800 border border-dark-600 text-gray-300 hover:text-white hover:bg-dark-700 transition-all duration-200 flex items-center gap-2 md:flex-row flex-col"
+            className="fixed top-4 left-4 z-50 w-10 h-10 rounded-full bg-gradient-to-r from-sunset-pink to-sunset-purple text-white hover:from-sunset-orange hover:to-sunset-yellow transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-sunset-pink/30 flex items-center justify-center group backdrop-blur-sm"
             title="Open sidebar"
           >
-            <ChevronRight size={16} />
-            <span className="text-xs md:text-sm font-medium">Chats</span>
+            <ChevronRight size={18} className="group-hover:scale-110 transition-transform duration-200" />
           </button>
         )}
 
@@ -64,10 +63,10 @@ const Sidebar = ({
                      <div className="p-4 border-b border-dark-700">
                               <div className="flex items-center justify-between mb-4">
                    <div className="flex items-center gap-2">
-                     <div className="w-6 h-6 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
+                     <div className="w-6 h-6 bg-gradient-to-r from-sunset-pink to-sunset-purple rounded-lg flex items-center justify-center shadow-lg shadow-sunset-pink/30">
                        <Star className="w-4 h-4 text-white" />
                      </div>
-                     <h2 className="text-lg font-semibold text-white">AI Chat</h2>
+                     <h2 className="text-lg font-semibold bg-gradient-to-r from-sunset-pink to-sunset-purple bg-clip-text text-transparent">AI Chat</h2>
                    </div>
                <button
                  onClick={onToggle}
@@ -80,7 +79,7 @@ const Sidebar = ({
             {/* New Chat Button */}
             <button
               onClick={onNewChat}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-sunset-pink to-sunset-purple hover:from-sunset-orange hover:to-sunset-yellow text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-sunset-pink/30"
             >
               <Plus size={16} />
               New Chat
@@ -114,10 +113,10 @@ const Sidebar = ({
                   chatHistory.map((chat) => (
                     <div
                       key={chat.id}
-                      className={`group flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${
+                      className={`group flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all duration-300 ${
                         currentChatId === chat.id
-                          ? 'bg-primary-600 text-white'
-                          : 'hover:bg-dark-800 text-gray-300 hover:text-white'
+                          ? 'bg-gradient-to-r from-sunset-pink to-sunset-purple text-white shadow-lg shadow-sunset-pink/30'
+                          : 'hover:bg-dark-800/50 text-gray-300 hover:text-white hover:shadow-lg hover:shadow-sunset-purple/10'
                       }`}
                       onClick={() => onSelectChat(chat.id)}
                     >
