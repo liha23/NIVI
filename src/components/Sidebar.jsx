@@ -198,7 +198,7 @@ const Sidebar = ({
                  <Star className="w-5 h-5 text-white" />
                </div>
                <div className="flex-1">
-                 <p className="text-sm font-medium text-white">Nivi</p>
+                 <p className="text-sm font-medium text-white">Gupsup</p>
                  <p className="text-xs text-gray-400">Free Tier</p>
                </div>
                <button

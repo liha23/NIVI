@@ -39,7 +39,7 @@ Your Vercel deployment should have these environment variables configured:
 | Variable | Value | Description |
 |----------|-------|-------------|
 | `MONGODB_URI` | `mongodb+srv://aadileetcode:3PyPy3AbgYSbTtrZ@cluster0.ppfyozj.mongodb.net/ai-chat` | Your MongoDB connection string |
-| `JWT_SECRET` | `nivi-ai-chat-secret-key-2024` | Your JWT secret key |
+| `JWT_SECRET` | `gupsup-ai-chat-secret-key-2024` | Your JWT secret key |
 | `NODE_ENV` | `production` | Environment setting |
 | `FRONTEND_URL` | `https://your-frontend-domain.com` | Your frontend URL (update when you deploy frontend) |
 

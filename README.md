@@ -107,7 +107,7 @@ const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/m
 ### Creator Recognition
 The chatbot has built-in recognition for questions about its creator. When users ask variations of "who made you", it responds with:
 
-> "Nivi is my creator! I was built with love and care by Nivi using the Gemini API. How can I assist you today?"
+> "Gupsup is my creator! I was built with love and care by Gupsup using the Gemini API. How can I assist you today?"
 
 ### Error Handling
 - Graceful handling of API errors
@@ -177,7 +177,7 @@ MIT License - feel free to use this project for personal or commercial purposes.
 
 ## Creator
 
-Built with ❤️ by **Nivi**
+Built with ❤️ by **Gupsup**
 
 ---
 

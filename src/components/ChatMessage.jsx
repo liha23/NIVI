@@ -13,12 +13,12 @@ const ChatMessage = ({ message }) => {
         window.speechSynthesis.cancel()
       }
 
-      // Remove asterisks and replace Google/Gemini with NIVI for cleaner speech
+      // Remove asterisks and replace Google/Gemini with Gupsup for cleaner speech
       const cleanText = text
         .replace(/\*/g, '')
-        .replace(/Google/gi, 'NIVI')
-        .replace(/Gemini/gi, 'NIVI')
-        .replace(/\bNIVI\b/g, 'Nivi') // Convert NIVI to Nivi for better pronunciation
+        .replace(/Google/gi, 'Gupsup')
+        .replace(/Gemini/gi, 'Gupsup')
+        .replace(/\bGupsup\b/g, 'Gupsup') // Keep Gupsup as is for better pronunciation
 
       const utterance = new SpeechSynthesisUtterance(cleanText)
       utterance.rate = 1.0 // Normal speed (1x)
@@ -94,10 +94,10 @@ const ChatMessage = ({ message }) => {
             
             <div className="flex items-start justify-between gap-2 md:gap-3 relative z-10">
               <div className="whitespace-pre-wrap break-words flex-1 text-sm md:text-base">
-                {/* Replace Google and Gemini with NIVI in display */}
-                {message.content
-                  .replace(/Google/gi, 'NIVI')
-                  .replace(/Gemini/gi, 'NIVI')
+                        {/* Replace Google and Gemini with Gupsup in display */}
+        {message.content
+          .replace(/Google/gi, 'Gupsup')
+          .replace(/Gemini/gi, 'Gupsup')
                 }
               </div>
               

@@ -10,8 +10,8 @@ export const config = {
   MODEL: 'gemini-2.0-flash',
   
   // App Configuration
-  APP_NAME: 'AI Chat',
-  CREATOR_NAME: 'Nivi',
+  APP_NAME: 'Gupsup AI',
+  CREATOR_NAME: 'Gupsup',
   
   // UI Configuration
   MAX_MESSAGE_LENGTH: 1000,

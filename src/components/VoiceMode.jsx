@@ -147,10 +147,10 @@ const VoiceMode = ({ isOpen, onClose, onSendMessage, isLoading, currentTheme }) 
       // Clean the text for voice mode
       let cleanedText = text
         .replace(/\*/g, '') // Remove all asterisks
-        .replace(/Gemini/g, 'NIVI') // Replace Gemini with NIVI
-        .replace(/gemini/g, 'NIVI') // Replace lowercase gemini with NIVI
-        .replace(/Google/g, 'NIVI') // Replace Google with NIVI
-        .replace(/google/g, 'NIVI') // Replace lowercase google with NIVI
+        .replace(/Gemini/g, 'Gupsup') // Replace Gemini with Gupsup
+        .replace(/gemini/g, 'Gupsup') // Replace lowercase gemini with Gupsup
+        .replace(/Google/g, 'Gupsup') // Replace Google with Gupsup
+        .replace(/google/g, 'Gupsup') // Replace lowercase google with Gupsup
         .replace(/\s+/g, ' ') // Remove extra spaces
         .trim()
       

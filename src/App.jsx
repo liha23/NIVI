@@ -127,7 +127,7 @@ function App() {
   const getWelcomeMessage = () => ({
     id: Date.now(),
     type: 'bot',
-    content: "Hello! I'm your AI assistant powered by Nivi. How can I help you today?",
+    content: "Hello! I'm your AI assistant powered by Gupsup. How can I help you today?",
     timestamp: new Date().toISOString()
   })
 
@@ -587,13 +587,13 @@ function App() {
     )
 
     if (isCreatorQuestion) {
-      return `${config.CREATOR_NAME} is my creator! I was built with love and care by ${config.CREATOR_NAME} using the NIVI AI technology. How can I assist you today?`
+      return `${config.CREATOR_NAME} is my creator! I was built with love and care by ${config.CREATOR_NAME} using the Gupsup AI technology. How can I assist you today?`
     }
 
     const API_KEY = config.GEMINI_API_KEY
     
     if (API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
-      return "Please configure your NIVI AI API key in the config.js file. Replace 'YOUR_GEMINI_API_KEY_HERE' with your actual API key from Google AI Studio."
+      return "Please configure your Gupsup AI API key in the config.js file. Replace 'YOUR_GEMINI_API_KEY_HERE' with your actual API key from Google AI Studio."
     }
 
     const response = await fetch(`${config.API_BASE_URL}/models/${config.MODEL}:generateContent?key=${API_KEY}`, {

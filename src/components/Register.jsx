@@ -99,9 +99,9 @@ const Register = ({ onSwitchToLogin, onRegister }) => {
           <div className="w-16 h-16 mx-auto bg-gradient-to-r from-sunset-pink to-sunset-purple rounded-2xl flex items-center justify-center shadow-lg shadow-sunset-pink/30 mb-4">
             <Sparkles className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-sunset-pink to-sunset-purple bg-clip-text text-transparent">
-            Join NIVI AI
-          </h1>
+                       <h1 className="text-2xl font-bold bg-gradient-to-r from-sunset-pink to-sunset-purple bg-clip-text text-transparent">
+               Join Gupsup AI
+             </h1>
           <p className="text-gray-400 mt-2">Create your account to start chatting</p>
         </div>
 

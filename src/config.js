@@ -4,8 +4,8 @@ export const frontendConfig = {
   API_BASE_URL: 'https://nivi-4l6r.vercel.app',
   
   // App Configuration
-  APP_NAME: 'NIVI AI',
-  CREATOR_NAME: 'Nivi',
+  APP_NAME: 'Gupsup AI',
+  CREATOR_NAME: 'Gupsup',
   
   // Development vs Production
   IS_PRODUCTION: true,
