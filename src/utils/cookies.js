@@ -32,17 +32,20 @@ export const cookieUtils = {
 
   // Save chat history to cookies
   saveChatHistory: (chatHistory) => {
+    console.log('Saving chat history to cookies:', chatHistory.length, 'chats')
     cookieUtils.setCookie('ai_chat_history', chatHistory, 30)
   },
 
   // Load chat history from cookies
   loadChatHistory: () => {
     const history = cookieUtils.getCookie('ai_chat_history')
+    console.log('Loading chat history from cookies:', history ? history.length : 0, 'chats')
     return history || []
   },
 
   // Save current chat messages
   saveCurrentChat: (chatId, messages) => {
+    console.log('Saving current chat to cookies:', chatId, messages.length, 'messages')
     const currentChats = cookieUtils.getCookie('ai_current_chats') || {}
     currentChats[chatId] = messages
     cookieUtils.setCookie('ai_current_chats', currentChats, 30)
@@ -51,7 +54,9 @@ export const cookieUtils = {
   // Load current chat messages
   loadCurrentChat: (chatId) => {
     const currentChats = cookieUtils.getCookie('ai_current_chats') || {}
-    return currentChats[chatId] || []
+    const messages = currentChats[chatId] || []
+    console.log('Loading current chat from cookies:', chatId, messages.length, 'messages')
+    return messages
   },
 
   // Save sidebar state

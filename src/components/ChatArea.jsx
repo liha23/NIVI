@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Send, Bot, User, Sparkles, Zap, Settings, HelpCircle, ChevronLeft, ChevronRight, Plus, Mic, MicOff, Volume2, Phone } from 'lucide-react'
+import { Send, Bot, User, Sparkles, ChevronLeft, ChevronRight, Plus, Mic, MicOff, Volume2, Phone, LogOut } from 'lucide-react'
 import ChatMessage from './ChatMessage'
 import TypingIndicator from './TypingIndicator'
 import { useTheme } from '../contexts/ThemeContext'
-import SettingsModal from './SettingsModal'
 import VoiceMode from './VoiceMode'
 
 const ChatArea = ({ 
@@ -12,9 +11,11 @@ const ChatArea = ({
   isLoading, 
   isSidebarOpen,
   currentChatTitle,
-  onToggleSidebar
+  onToggleSidebar,
+  user,
+  onLogout
 }) => {
-  const { toggleSettings, isSettingsOpen, currentTheme } = useTheme()
+  const { currentTheme } = useTheme()
   const [inputMessage, setInputMessage] = useState('')
   const [isListening, setIsListening] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
@@ -139,23 +140,21 @@ const ChatArea = ({
              </div>
            </div>
            
-           {/* Right Action Buttons - Desktop Only */}
-           <div className="hidden md:flex items-center space-x-2">
-             <button className="px-3 py-2 bg-gradient-to-r from-sunset-orange to-sunset-yellow text-white rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-sunset-orange/30 flex items-center gap-2">
-               <Zap size={16} />
-               <span className="text-sm">Upgrade to Pro(soon)</span>
-             </button>
-             <button 
-               onClick={toggleSettings}
-               className="p-2 text-gray-400 hover:text-white hover:bg-dark-800 rounded-lg transition-colors"
-               title="Settings"
-             >
-               <Settings size={20} />
-             </button>
-             <button className="p-2 text-gray-400 hover:text-white hover:bg-dark-800 rounded-lg transition-colors" title="Help">
-               <HelpCircle size={20} />
-             </button>
-           </div>
+                     {/* Right Side - Welcome and Logout */}
+          <div className="flex items-center gap-3">
+            <div className="bg-dark-800 border border-dark-700 rounded-lg px-3 py-2">
+              <p className="text-sm text-gray-300">
+                Welcome, <span className="text-sunset-pink font-medium">{user?.username}</span>
+              </p>
+            </div>
+            <button
+              onClick={onLogout}
+              className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors"
+              title="Logout"
+            >
+              <LogOut size={16} />
+            </button>
+          </div>
            
 
          </div>
@@ -276,8 +275,7 @@ const ChatArea = ({
         </div>
       </div>
       
-      {/* Settings Modal */}
-      <SettingsModal isOpen={isSettingsOpen} onClose={toggleSettings} />
+
       
       {/* Voice Mode */}
       <VoiceMode 

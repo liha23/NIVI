@@ -122,7 +122,7 @@ const ChatMessage = ({ message }) => {
           
           {/* Timestamp */}
           <span className="text-xs text-gray-500 mt-1 px-1">
-            {message.timestamp.toLocaleTimeString([], { 
+            {new Date(message.timestamp).toLocaleTimeString([], { 
               hour: '2-digit', 
               minute: '2-digit' 
             })}

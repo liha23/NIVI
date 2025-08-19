@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { 
   MessageSquare, 
   Plus, 
@@ -23,6 +23,8 @@ const Sidebar = ({
   currentChatId 
 }) => {
   const { toggleSettings, isSettingsOpen } = useTheme()
+  const [searchQuery, setSearchQuery] = useState('')
+  
   const formatDate = (date) => {
     const now = new Date()
     const chatDate = new Date(date)
@@ -38,6 +40,12 @@ const Sidebar = ({
   const truncateText = (text, maxLength = 30) => {
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text
   }
+
+  // Filter chats based on search query
+  const filteredChats = chatHistory.filter(chat => 
+    chat.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (chat.lastMessage && chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase()))
+  )
 
      return (
      <>
@@ -78,7 +86,11 @@ const Sidebar = ({
             
             {/* New Chat Button */}
             <button
-              onClick={onNewChat}
+              onClick={(e) => {
+                e.preventDefault()
+                console.log('New chat button clicked')
+                onNewChat()
+              }}
               className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-sunset-pink to-sunset-purple hover:from-sunset-orange hover:to-sunset-yellow text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-sunset-pink/30"
             >
               <Plus size={16} />
@@ -93,6 +105,8 @@ const Sidebar = ({
               <input
                 type="text"
                 placeholder="Search chats..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 bg-dark-800 border border-dark-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
             </div>
@@ -101,16 +115,22 @@ const Sidebar = ({
           {/* Chat History */}
           <div className="flex-1 overflow-y-auto min-h-0">
             <div className="p-4">
-              <h3 className="text-sm font-medium text-gray-400 mb-3">Recent Chats</h3>
+              <h3 className="text-sm font-medium text-gray-400 mb-3">
+                {searchQuery ? `Search Results (${filteredChats.length})` : 'Recent Chats'}
+              </h3>
               <div className="space-y-1">
-                {chatHistory.length === 0 ? (
+                {filteredChats.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     <MessageSquare size={32} className="mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">No chat history yet</p>
-                    <p className="text-xs">Start a new conversation!</p>
+                    <p className="text-sm">
+                      {searchQuery ? 'No chats found matching your search' : 'No chat history yet'}
+                    </p>
+                    <p className="text-xs">
+                      {searchQuery ? 'Try a different search term' : 'Start a new conversation!'}
+                    </p>
                   </div>
                 ) : (
-                  chatHistory.map((chat) => (
+                  filteredChats.map((chat) => (
                     <div
                       key={chat.id}
                       className={`group flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all duration-300 ${
@@ -118,7 +138,12 @@ const Sidebar = ({
                           ? 'bg-gradient-to-r from-sunset-pink to-sunset-purple text-white shadow-lg shadow-sunset-pink/30'
                           : 'hover:bg-dark-800/50 text-gray-300 hover:text-white hover:shadow-lg hover:shadow-sunset-purple/10'
                       }`}
-                      onClick={() => onSelectChat(chat.id)}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        console.log('Chat clicked:', chat.id)
+                        onSelectChat(chat.id)
+                      }}
                     >
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         <MessageSquare size={16} />
@@ -126,17 +151,33 @@ const Sidebar = ({
                           <p className="text-sm font-medium truncate">
                             {truncateText(chat.title || 'New Chat')}
                           </p>
-                          <p className="text-xs opacity-70 truncate">
-                            {formatDate(chat.timestamp)}
-                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <p className="text-xs opacity-70">
+                              {formatDate(chat.timestamp)}
+                            </p>
+                            {chat.messageCount > 0 && (
+                              <span className="text-xs bg-dark-700 px-1.5 py-0.5 rounded-full opacity-70">
+                                {chat.messageCount} msg{chat.messageCount !== 1 ? 's' : ''}
+                              </span>
+                            )}
+                          </div>
+                          {chat.lastMessage && (
+                            <p className="text-xs opacity-60 truncate mt-1">
+                              {truncateText(chat.lastMessage, 40)}
+                            </p>
+                          )}
                         </div>
                       </div>
                       
                       {/* Delete Button */}
                       <button
                         onClick={(e) => {
+                          e.preventDefault()
                           e.stopPropagation()
-                          onDeleteChat(chat.id)
+                          console.log('Delete chat clicked:', chat.id)
+                          if (window.confirm('Are you sure you want to delete this chat?')) {
+                            onDeleteChat(chat.id)
+                          }
                         }}
                         className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500 hover:text-white transition-all"
                         title="Delete chat"
