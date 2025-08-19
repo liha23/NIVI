@@ -20,6 +20,7 @@ function App() {
   const [currentMessages, setCurrentMessages] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [lastSavedMessages, setLastSavedMessages] = useState([])
+  const [responseCache, setResponseCache] = useState(new Map()) // Simple cache for responses
 
   console.log('Auth state:', { user, isAuthenticated, authLoading })
 
@@ -602,7 +603,7 @@ function App() {
       const errorMessage = {
         id: Date.now() + 1,
         type: 'bot',
-        content: "I'm sorry, I encountered an error. Please try again or check your API key configuration.",
+        content: "Our servers are currently experiencing high traffic. Please try again in a few minutes. Thank you for your patience!",
         timestamp: new Date().toISOString()
       }
       const finalMessages = [...updatedMessages, errorMessage]
@@ -624,36 +625,135 @@ function App() {
       return `${config.CREATOR_NAME} is my creator! I was built with love and care by ${config.CREATOR_NAME} using the Gupsup AI technology. How can I assist you today?`
     }
 
+    // Check cache first
+    const cacheKey = message.toLowerCase().trim()
+    if (responseCache.has(cacheKey)) {
+      console.log('Returning cached response for:', cacheKey)
+      return responseCache.get(cacheKey)
+    }
+
+    // Add fallback responses for common questions to reduce API calls
+    const fallbackResponses = {
+      'hello': 'Hello! How can I help you today?',
+      'hi': 'Hi there! What can I assist you with?',
+      'how are you': 'I\'m doing great, thank you for asking! How can I help you?',
+      'what can you do': 'I can help you with various tasks like answering questions, writing, analysis, and more. What would you like to know?',
+      'help': 'I\'m here to help! You can ask me questions, get writing assistance, or just chat. What do you need?',
+      'thanks': 'You\'re welcome! Is there anything else I can help you with?',
+      'thank you': 'You\'re welcome! Feel free to ask if you need anything else.',
+      'bye': 'Goodbye! Have a great day!',
+      'goodbye': 'See you later! Take care!'
+    }
+
+    // Check for simple greetings or common phrases
+    const lowerMessage = message.toLowerCase().trim()
+    for (const [key, response] of Object.entries(fallbackResponses)) {
+      if (lowerMessage.includes(key)) {
+        // Cache the fallback response
+        setResponseCache(prev => new Map(prev).set(cacheKey, response))
+        return response
+      }
+    }
+
     const API_KEY = config.GEMINI_API_KEY
     
     if (API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
       return "Please configure your Gupsup AI API key in the config.js file. Replace 'YOUR_GEMINI_API_KEY_HERE' with your actual API key from Google AI Studio."
     }
 
-    const response = await fetch(`${config.API_BASE_URL}/models/${config.MODEL}:generateContent?key=${API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
+    // Retry logic with exponential backoff
+    const maxRetries = 3
+    let lastError
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        // Create a timeout promise
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('Request timeout')), 15000) // 15 second timeout
+        })
+
+        // Create the fetch promise
+        const fetchPromise = fetch(`${config.API_BASE_URL}/models/${config.MODEL}:generateContent?key=${API_KEY}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [
               {
-                text: message
+                parts: [
+                  {
+                    text: message
+                  }
+                ]
               }
             ]
-          }
-        ]
-      })
-    })
+          })
+        })
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+        // Race between fetch and timeout
+        const response = await Promise.race([fetchPromise, timeoutPromise])
+
+        if (response.ok) {
+          const data = await response.json()
+          if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
+            const responseText = data.candidates[0].content.parts[0].text
+            // Cache successful responses (limit cache size to 100 entries)
+            setResponseCache(prev => {
+              const newCache = new Map(prev)
+              if (newCache.size >= 100) {
+                // Remove oldest entries if cache is full
+                const firstKey = newCache.keys().next().value
+                newCache.delete(firstKey)
+              }
+              newCache.set(cacheKey, responseText)
+              return newCache
+            })
+            return responseText
+          } else {
+            throw new Error('Invalid response format from API')
+          }
+        } else {
+          // Handle specific HTTP status codes
+          if (response.status === 429) {
+            throw new Error('Rate limit exceeded. Please wait a moment and try again.')
+          } else if (response.status === 403) {
+            throw new Error('API key is invalid or has insufficient permissions.')
+          } else if (response.status >= 500) {
+            throw new Error('Server error. Please try again later.')
+          } else {
+            throw new Error(`HTTP error! status: ${response.status}`)
+          }
+        }
+      } catch (error) {
+        lastError = error
+        console.error(`API attempt ${attempt} failed:`, error.message)
+        
+        // If this is the last attempt, throw the error
+        if (attempt === maxRetries) {
+          break
+        }
+        
+        // Wait before retrying (exponential backoff)
+        const delay = Math.pow(2, attempt) * 1000 // 2s, 4s, 8s
+        await new Promise(resolve => setTimeout(resolve, delay))
+      }
     }
 
-    const data = await response.json()
-    return data.candidates[0].content.parts[0].text
+    // If all retries failed, return a user-friendly error message
+    if (lastError.message.includes('Rate limit')) {
+      return "I'm currently experiencing high traffic. Please wait a moment and try again. Thank you for your patience!"
+    } else if (lastError.message.includes('API key')) {
+      return "There's an issue with the API configuration. Please contact support if this persists."
+    } else if (lastError.message.includes('Server error')) {
+      return "Our servers are temporarily unavailable. Please try again in a few minutes."
+    } else if (lastError.message.includes('Request timeout')) {
+      return "The request is taking longer than expected. Please try again in a moment."
+    } else if (lastError.message.includes('Network') || lastError.message.includes('fetch')) {
+      return "Network connection issue. Please check your internet connection and try again."
+    } else {
+      return "I'm having trouble processing your request right now. Please try again in a moment."
+    }
   }
 
   const toggleSidebar = () => {

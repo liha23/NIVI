@@ -39,38 +39,22 @@ const VoiceMode = ({ isOpen, onClose, onSendMessage, isLoading, currentTheme }) 
         return
       }
 
-
-      
       // Initialize speech recognition
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
       recognitionRef.current = new SpeechRecognition()
-      recognitionRef.current.continuous = true
-      recognitionRef.current.interimResults = true
+      recognitionRef.current.continuous = false // Changed to false to prevent repetition
+      recognitionRef.current.interimResults = false // Changed to false for cleaner results
       recognitionRef.current.lang = 'en-US'
       recognitionRef.current.maxAlternatives = 1
 
       recognitionRef.current.onresult = (event) => {
-        let finalTranscript = ''
-        let interimTranscript = ''
-
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript
-          if (event.results[i].isFinal) {
-            finalTranscript += transcript
-          } else {
-            interimTranscript += transcript
-          }
-        }
-
-        setTranscript(prev => prev + finalTranscript)
-        
-        if (finalTranscript) {
+        const transcript = event.results[0][0].transcript
+        if (transcript && transcript.trim()) {
+          setTranscript(transcript.trim())
           // Auto-send when user stops speaking
           setTimeout(() => {
-            if (finalTranscript.trim()) {
-              handleVoiceMessage(finalTranscript.trim())
-            }
-          }, 1000)
+            handleVoiceMessage(transcript.trim())
+          }, 500) // Reduced delay
         }
       }
 
@@ -86,8 +70,6 @@ const VoiceMode = ({ isOpen, onClose, onSendMessage, isLoading, currentTheme }) 
         setIsListening(false)
       }
 
-
-      
       // Start the call and immediately start listening
       setCallStatus('active')
       startListening()
@@ -113,8 +95,6 @@ const VoiceMode = ({ isOpen, onClose, onSendMessage, isLoading, currentTheme }) 
     setAiResponse('')
   }
 
-
-
   const handleVoiceMessage = async (message) => {
     if (!message.trim() || isLoading) return
     
@@ -139,7 +119,7 @@ const VoiceMode = ({ isOpen, onClose, onSendMessage, isLoading, currentTheme }) 
     }
   }
 
-    const speakResponse = (text) => {
+  const speakResponse = (text) => {
     if ('speechSynthesis' in window) {
       // Cancel any ongoing speech
       window.speechSynthesis.cancel()
@@ -227,8 +207,6 @@ const VoiceMode = ({ isOpen, onClose, onSendMessage, isLoading, currentTheme }) 
     }, 1000)
   }
 
-
-
   if (!isOpen) return null
 
   return (
@@ -241,16 +219,16 @@ const VoiceMode = ({ isOpen, onClose, onSendMessage, isLoading, currentTheme }) 
       
       {/* Voice Call Interface */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-dark-900 border border-dark-700 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+        <div className="bg-dark-900 border border-dark-700 rounded-2xl shadow-2xl w-full max-w-sm md:max-w-md overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-dark-700">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-sunset-pink to-sunset-purple rounded-full flex items-center justify-center">
-                <Waves className="w-5 h-5 text-white" />
+          <div className="flex items-center justify-between p-4 md:p-6 border-b border-dark-700">
+            <div className="flex items-center gap-2 md:gap-3">
+              <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-sunset-pink to-sunset-purple rounded-full flex items-center justify-center">
+                <Waves className="w-4 h-4 md:w-5 md:h-5 text-white" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-white">Voice Call</h2>
-                <p className="text-sm text-gray-400">
+                <h2 className="text-base md:text-lg font-semibold text-white">Voice Call</h2>
+                <p className="text-xs md:text-sm text-gray-400">
                   {callStatus === 'connecting' && 'Connecting...'}
                   {callStatus === 'active' && 'Active'}
                   {callStatus === 'ended' && 'Call ended'}
@@ -261,141 +239,141 @@ const VoiceMode = ({ isOpen, onClose, onSendMessage, isLoading, currentTheme }) 
               onClick={endCall}
               className="p-2 rounded-lg hover:bg-dark-800 text-gray-400 hover:text-white transition-colors"
             >
-              <X size={20} />
+              <X size={18} className="md:w-5 md:h-5" />
             </button>
           </div>
 
           {/* Call Status */}
-          <div className="p-6 text-center">
-                         {callStatus === 'connecting' && (
-               <div className="space-y-4">
-                 <div className="w-16 h-16 mx-auto bg-gradient-to-r from-sunset-pink to-sunset-purple rounded-full flex items-center justify-center animate-pulse">
-                   <Waves className="w-8 h-8 text-white" />
-                 </div>
-                 <p className="text-white">Initializing voice call...</p>
-               </div>
-             )}
+          <div className="p-4 md:p-6 text-center">
+            {callStatus === 'connecting' && (
+              <div className="space-y-4">
+                <div className="w-12 h-12 md:w-16 md:h-16 mx-auto bg-gradient-to-r from-sunset-pink to-sunset-purple rounded-full flex items-center justify-center animate-pulse">
+                  <Waves className="w-6 h-6 md:w-8 md:h-8 text-white" />
+                </div>
+                <p className="text-sm md:text-base text-white">Initializing voice call...</p>
+              </div>
+            )}
 
-                         {callStatus === 'active' && (
-               <div className="space-y-6">
-                 {/* AI Speaking Indicator */}
-                 {isSpeaking && (
-                   <div className="space-y-4">
-                     <div className="flex justify-center">
-                       <div className="flex space-x-1">
-                         <div className="w-2 h-8 bg-sunset-pink rounded-full wave-animation"></div>
-                         <div className="w-2 h-12 bg-sunset-purple rounded-full wave-animation"></div>
-                         <div className="w-2 h-6 bg-sunset-orange rounded-full wave-animation"></div>
-                         <div className="w-2 h-10 bg-sunset-pink rounded-full wave-animation"></div>
-                         <div className="w-2 h-7 bg-sunset-purple rounded-full wave-animation"></div>
-                       </div>
-                     </div>
-                     <p className="text-sm text-gray-400">AI is speaking...</p>
-                     {aiResponse && (
-                       <div className="bg-dark-800 rounded-lg p-3 max-h-20 overflow-y-auto">
-                         <p className="text-sm text-gray-300">{aiResponse}</p>
-                       </div>
-                     )}
-                   </div>
-                 )}
+            {callStatus === 'active' && (
+              <div className="space-y-4 md:space-y-6">
+                {/* AI Speaking Indicator */}
+                {isSpeaking && (
+                  <div className="space-y-3 md:space-y-4">
+                    <div className="flex justify-center">
+                      <div className="flex space-x-1">
+                        <div className="w-1.5 h-6 md:w-2 md:h-8 bg-sunset-pink rounded-full wave-animation"></div>
+                        <div className="w-1.5 h-10 md:w-2 md:h-12 bg-sunset-purple rounded-full wave-animation"></div>
+                        <div className="w-1.5 h-4 md:w-2 md:h-6 bg-sunset-orange rounded-full wave-animation"></div>
+                        <div className="w-1.5 h-8 md:w-2 md:h-10 bg-sunset-pink rounded-full wave-animation"></div>
+                        <div className="w-1.5 h-5 md:w-2 md:h-7 bg-sunset-purple rounded-full wave-animation"></div>
+                      </div>
+                    </div>
+                    <p className="text-xs md:text-sm text-gray-400">AI is speaking...</p>
+                    {aiResponse && (
+                      <div className="bg-dark-800 rounded-lg p-2 md:p-3 max-h-16 md:max-h-20 overflow-y-auto">
+                        <p className="text-xs md:text-sm text-gray-300">{aiResponse}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
 
-                 {/* AI Thinking Indicator */}
-                 {isThinking && (
-                   <div className="space-y-4">
-                     <div className="flex justify-center">
-                       <div className="w-16 h-16 bg-gradient-to-r from-sunset-orange to-sunset-yellow rounded-full flex items-center justify-center animate-pulse">
-                         <div className="flex space-x-1">
-                           <div className="w-2 h-4 bg-white rounded-full animate-bounce"></div>
-                           <div className="w-2 h-4 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                           <div className="w-2 h-4 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                         </div>
-                       </div>
-                     </div>
-                     <p className="text-sm text-gray-400">AI is thinking...</p>
-                   </div>
-                 )}
+                {/* AI Thinking Indicator */}
+                {isThinking && (
+                  <div className="space-y-3 md:space-y-4">
+                    <div className="flex justify-center">
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-sunset-orange to-sunset-yellow rounded-full flex items-center justify-center animate-pulse">
+                        <div className="flex space-x-1">
+                          <div className="w-1.5 h-3 md:w-2 md:h-4 bg-white rounded-full animate-bounce"></div>
+                          <div className="w-1.5 h-3 md:w-2 md:h-4 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                          <div className="w-1.5 h-3 md:w-2 md:h-4 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-xs md:text-sm text-gray-400">AI is thinking...</p>
+                  </div>
+                )}
 
-                 {/* User Listening Indicator */}
-                 {isListening && !isSpeaking && !isThinking && (
-                   <div className="space-y-4">
-                     <div className="flex justify-center">
-                       <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center voice-pulse">
-                         <Mic className="w-8 h-8 text-white" />
-                       </div>
-                     </div>
-                     <p className="text-sm text-gray-400">Listening...</p>
-                     {transcript && (
-                       <div className="bg-dark-800 rounded-lg p-3">
-                         <p className="text-sm text-gray-300">{transcript}</p>
-                       </div>
-                     )}
-                   </div>
-                 )}
+                {/* User Listening Indicator */}
+                {isListening && !isSpeaking && !isThinking && (
+                  <div className="space-y-3 md:space-y-4">
+                    <div className="flex justify-center">
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center voice-pulse">
+                        <Mic className="w-6 h-6 md:w-8 md:h-8 text-white" />
+                      </div>
+                    </div>
+                    <p className="text-xs md:text-sm text-gray-400">Listening...</p>
+                    {transcript && (
+                      <div className="bg-dark-800 rounded-lg p-2 md:p-3">
+                        <p className="text-xs md:text-sm text-gray-300">{transcript}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
 
-                 {/* Idle State */}
-                 {!isListening && !isSpeaking && !isThinking && (
-                   <div className="space-y-4">
-                     <div className="w-16 h-16 mx-auto bg-gradient-to-r from-sunset-pink to-sunset-purple rounded-full flex items-center justify-center">
-                       <Mic className="w-8 h-8 text-white" />
-                     </div>
-                     <p className="text-white">Ready to listen</p>
-                     <button
-                       onClick={startListening}
-                       className="px-6 py-3 bg-gradient-to-r from-sunset-pink to-sunset-purple text-white rounded-lg hover:shadow-lg transition-all"
-                     >
-                       Resume Listening
-                     </button>
-                   </div>
-                 )}
+                {/* Idle State */}
+                {!isListening && !isSpeaking && !isThinking && (
+                  <div className="space-y-3 md:space-y-4">
+                    <div className="w-12 h-12 md:w-16 md:h-16 mx-auto bg-gradient-to-r from-sunset-pink to-sunset-purple rounded-full flex items-center justify-center">
+                      <Mic className="w-6 h-6 md:w-8 md:h-8 text-white" />
+                    </div>
+                    <p className="text-sm md:text-base text-white">Ready to listen</p>
+                    <button
+                      onClick={startListening}
+                      className="px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-sunset-pink to-sunset-purple text-white rounded-lg hover:shadow-lg transition-all text-sm md:text-base"
+                    >
+                      Resume Listening
+                    </button>
+                  </div>
+                )}
 
                 {/* Control Buttons */}
-                <div className="flex justify-center space-x-4">
+                <div className="flex justify-center space-x-3 md:space-x-4">
                   <button
                     onClick={toggleMute}
-                    className={`p-3 rounded-full transition-all ${
+                    className={`p-2 md:p-3 rounded-full transition-all ${
                       isMuted 
                         ? 'bg-red-500 text-white' 
                         : 'bg-dark-700 text-gray-400 hover:text-white hover:bg-dark-600'
                     }`}
                     title={isMuted ? 'Unmute' : 'Mute'}
                   >
-                    {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                    {isMuted ? <VolumeX size={16} className="md:w-5 md:h-5" /> : <Volume2 size={16} className="md:w-5 md:h-5" />}
                   </button>
                   
                   <button
                     onClick={isListening ? stopListening : startListening}
-                    className={`p-3 rounded-full transition-all ${
+                    className={`p-2 md:p-3 rounded-full transition-all ${
                       isListening 
                         ? 'bg-red-500 text-white' 
                         : 'bg-gradient-to-r from-sunset-pink to-sunset-purple text-white'
                     }`}
                     title={isListening ? 'Stop listening' : 'Start listening'}
                   >
-                    {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+                    {isListening ? <MicOff size={16} className="md:w-5 md:h-5" /> : <Mic size={16} className="md:w-5 md:h-5" />}
                   </button>
                 </div>
               </div>
             )}
 
             {callStatus === 'ended' && (
-              <div className="space-y-4">
-                <div className="w-16 h-16 mx-auto bg-red-500 rounded-full flex items-center justify-center">
-                  <PhoneOff className="w-8 h-8 text-white" />
+              <div className="space-y-3 md:space-y-4">
+                <div className="w-12 h-12 md:w-16 md:h-16 mx-auto bg-red-500 rounded-full flex items-center justify-center">
+                  <PhoneOff className="w-6 h-6 md:w-8 md:h-8 text-white" />
                 </div>
-                <p className="text-white">Call ended</p>
+                <p className="text-sm md:text-base text-white">Call ended</p>
               </div>
             )}
           </div>
 
-                     {/* Instructions */}
-           <div className="p-4 bg-dark-800 border-t border-dark-700">
-             <p className="text-xs text-gray-400 text-center">
-               {callStatus === 'active' 
-                 ? 'Speak naturally. The AI will respond automatically.' 
-                 : 'Initializing voice call...'
-               }
-             </p>
-           </div>
+          {/* Instructions */}
+          <div className="p-3 md:p-4 bg-dark-800 border-t border-dark-700">
+            <p className="text-xs text-gray-400 text-center">
+              {callStatus === 'active' 
+                ? 'Speak naturally. The AI will respond automatically.' 
+                : 'Initializing voice call...'
+              }
+            </p>
+          </div>
         </div>
       </div>
     </>

@@ -47,42 +47,48 @@ const Sidebar = ({
     (chat.lastMessage && chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase()))
   )
 
-     return (
-     <>
-               {/* Toggle Button when sidebar is closed - Desktop Only */}
-        {!isOpen && (
-          <button
-            onClick={onToggle}
-            className="fixed top-4 left-4 z-50 w-10 h-10 rounded-full bg-gradient-to-r from-sunset-pink to-sunset-purple text-white hover:from-sunset-orange hover:to-sunset-yellow transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-sunset-pink/30 flex items-center justify-center group backdrop-blur-sm hidden md:flex"
-            title="Open sidebar"
-          >
-            <ChevronRight size={18} className="group-hover:scale-110 transition-transform duration-200" />
-          </button>
-        )}
+  return (
+    <>
+      {/* Toggle Button when sidebar is closed - Desktop Only */}
+      {!isOpen && (
+        <button
+          onClick={onToggle}
+          className="fixed top-4 left-4 z-50 w-10 h-10 rounded-full bg-gradient-to-r from-sunset-pink to-sunset-purple text-white hover:from-sunset-orange hover:to-sunset-yellow transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-sunset-pink/30 flex items-center justify-center group backdrop-blur-sm hidden md:flex"
+          title="Open sidebar"
+        >
+          <ChevronRight size={18} className="group-hover:scale-110 transition-transform duration-200" />
+        </button>
+      )}
 
-       
+      {/* Mobile Backdrop */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
+          onClick={onToggle}
+        />
+      )}
 
-               {/* Sidebar */}
-        <div className={`fixed left-0 top-0 h-screen bg-dark-900 border-r border-dark-700 transition-all duration-300 ease-in-out z-30 ${
-          isOpen ? 'w-80 md:w-80 w-full translate-x-0' : 'w-0 -translate-x-full overflow-hidden'
-        }`}>
+      {/* Sidebar */}
+      <div className={`fixed left-0 top-0 h-screen bg-dark-900 border-r border-dark-700 transition-all duration-300 ease-in-out z-30 ${
+        isOpen ? 'w-full md:w-80 translate-x-0' : 'w-0 -translate-x-full overflow-hidden'
+      }`}>
         <div className="flex flex-col h-full overflow-hidden">
           {/* Header */}
-                     <div className="p-4 border-b border-dark-700 flex-shrink-0">
-                              <div className="flex items-center justify-between mb-4">
-                   <div className="flex items-center gap-2">
-                     <div className="w-6 h-6 bg-gradient-to-r from-sunset-pink to-sunset-purple rounded-lg flex items-center justify-center shadow-lg shadow-sunset-pink/30">
-                       <Star className="w-4 h-4 text-white" />
-                     </div>
-                     <h2 className="text-lg font-semibold bg-gradient-to-r from-sunset-pink to-sunset-purple bg-clip-text text-transparent">AI Chat</h2>
-                   </div>
-               <button
-                 onClick={onToggle}
-                 className="p-1 rounded hover:bg-dark-800 text-gray-400 hover:text-white"
-               >
-                 <ChevronLeft size={16} />
-               </button>
-             </div>
+          <div className="p-3 md:p-4 border-b border-dark-700 flex-shrink-0">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 md:w-6 md:h-6 bg-gradient-to-r from-sunset-pink to-sunset-purple rounded-lg flex items-center justify-center shadow-lg shadow-sunset-pink/30">
+                  <Star className="w-3 h-3 md:w-4 md:h-4 text-white" />
+                </div>
+                <h2 className="text-base md:text-lg font-semibold bg-gradient-to-r from-sunset-pink to-sunset-purple bg-clip-text text-transparent">AI Chat</h2>
+              </div>
+              <button
+                onClick={onToggle}
+                className="p-1 rounded hover:bg-dark-800 text-gray-400 hover:text-white"
+              >
+                <ChevronLeft size={16} />
+              </button>
+            </div>
             
             {/* New Chat Button */}
             <button
@@ -91,38 +97,38 @@ const Sidebar = ({
                 console.log('New chat button clicked')
                 onNewChat()
               }}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-sunset-pink to-sunset-purple hover:from-sunset-orange hover:to-sunset-yellow text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-sunset-pink/30"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-sunset-pink to-sunset-purple hover:from-sunset-orange hover:to-sunset-yellow text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-sunset-pink/30 text-sm md:text-base"
             >
-              <Plus size={16} />
+              <Plus size={14} />
               New Chat
             </button>
           </div>
 
           {/* Search */}
-          <div className="p-4 border-b border-dark-700 flex-shrink-0">
+          <div className="p-3 md:p-4 border-b border-dark-700 flex-shrink-0">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 md:w-4 md:h-4" size={14} />
               <input
                 type="text"
                 placeholder="Search chats..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-dark-800 border border-dark-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full pl-8 md:pl-10 pr-4 py-2 bg-dark-800 border border-dark-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm md:text-base"
               />
             </div>
           </div>
 
           {/* Chat History */}
           <div className="flex-1 overflow-y-auto min-h-0">
-            <div className="p-4">
-              <h3 className="text-sm font-medium text-gray-400 mb-3">
+            <div className="p-3 md:p-4">
+              <h3 className="text-xs md:text-sm font-medium text-gray-400 mb-2 md:mb-3">
                 {searchQuery ? `Search Results (${filteredChats.length})` : 'Recent Chats'}
               </h3>
               <div className="space-y-1">
                 {filteredChats.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <MessageSquare size={32} className="mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">
+                  <div className="text-center py-6 md:py-8 text-gray-500">
+                    <MessageSquare size={24} className="mx-auto mb-2 opacity-50" />
+                    <p className="text-xs md:text-sm">
                       {searchQuery ? 'No chats found matching your search' : 'No chat history yet'}
                     </p>
                     <p className="text-xs">
@@ -133,7 +139,7 @@ const Sidebar = ({
                   filteredChats.map((chat) => (
                     <div
                       key={chat.id}
-                      className={`group flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all duration-300 ${
+                      className={`group flex items-center justify-between p-2 md:p-2 rounded-lg cursor-pointer transition-all duration-300 ${
                         currentChatId === chat.id
                           ? 'bg-gradient-to-r from-sunset-pink to-sunset-purple text-white shadow-lg shadow-sunset-pink/30'
                           : 'hover:bg-dark-800/50 text-gray-300 hover:text-white hover:shadow-lg hover:shadow-sunset-purple/10'
@@ -143,27 +149,31 @@ const Sidebar = ({
                         e.stopPropagation()
                         console.log('Chat clicked:', chat.id)
                         onSelectChat(chat.id)
+                        // Close sidebar on mobile after selecting chat
+                        if (window.innerWidth < 768) {
+                          onToggle()
+                        }
                       }}
                     >
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <MessageSquare size={16} />
+                      <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
+                        <MessageSquare size={14} />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">
+                          <p className="text-xs md:text-sm font-medium truncate">
                             {truncateText(chat.title || 'New Chat')}
                           </p>
-                          <div className="flex items-center gap-2 mt-1">
+                          <div className="flex items-center gap-1 md:gap-2 mt-1">
                             <p className="text-xs opacity-70">
                               {formatDate(chat.timestamp)}
                             </p>
                             {chat.messageCount > 0 && (
-                              <span className="text-xs bg-dark-700 px-1.5 py-0.5 rounded-full opacity-70">
+                              <span className="text-xs bg-dark-700 px-1 md:px-1.5 py-0.5 rounded-full opacity-70">
                                 {chat.messageCount} msg{chat.messageCount !== 1 ? 's' : ''}
                               </span>
                             )}
                           </div>
                           {chat.lastMessage && (
                             <p className="text-xs opacity-60 truncate mt-1">
-                              {truncateText(chat.lastMessage, 40)}
+                              {truncateText(chat.lastMessage, 35)}
                             </p>
                           )}
                         </div>
@@ -182,7 +192,7 @@ const Sidebar = ({
                         className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500 hover:text-white transition-all"
                         title="Delete chat"
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={12} />
                       </button>
                     </div>
                   ))
@@ -191,32 +201,32 @@ const Sidebar = ({
             </div>
           </div>
 
-                     {/* Footer */}
-           <div className="p-4 border-t border-dark-700 flex-shrink-0">
-             <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-dark-800 cursor-pointer transition-colors">
-               <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
-                 <Star className="w-5 h-5 text-white" />
-               </div>
-               <div className="flex-1">
-                 <p className="text-sm font-medium text-white">Gupsup</p>
-                 <p className="text-xs text-gray-400">Free Tier</p>
-               </div>
-               <button
-                 onClick={toggleSettings}
-                 className="p-1 rounded hover:bg-dark-700 text-gray-400 hover:text-white transition-colors"
-                 title="Settings(soon)"
-               >
-                 <Settings size={16} />
-               </button>
-             </div>
-           </div>
-                 </div>
-       </div>
-       
-       {/* Settings Modal */}
-       <SettingsModal isOpen={isSettingsOpen} onClose={toggleSettings} />
-     </>
-   )
- }
+          {/* Footer */}
+          <div className="p-3 md:p-4 border-t border-dark-700 flex-shrink-0">
+            <div className="flex items-center gap-2 md:gap-3 p-2 rounded-lg hover:bg-dark-800 cursor-pointer transition-colors">
+              <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
+                <Star className="w-3 h-3 md:w-5 md:h-5 text-white" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs md:text-sm font-medium text-white">Gupsup</p>
+                <p className="text-xs text-gray-400">Free Tier</p>
+              </div>
+              <button
+                onClick={toggleSettings}
+                className="p-1 rounded hover:bg-dark-700 text-gray-400 hover:text-white transition-colors"
+                title="Settings(soon)"
+              >
+                                 <Settings size={14} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Settings Modal */}
+      <SettingsModal isOpen={isSettingsOpen} onClose={toggleSettings} />
+    </>
+  )
+}
 
 export default Sidebar
