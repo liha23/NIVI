@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Eye, EyeOff, Mail, Lock, User, Sparkles, ArrowRight } from 'lucide-react'
+import { frontendConfig } from '../config.js'
 
 const Register = ({ onSwitchToLogin, onRegister }) => {
   const [formData, setFormData] = useState({
@@ -60,7 +61,7 @@ const Register = ({ onSwitchToLogin, onRegister }) => {
     setError('')
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch(`${frontendConfig.getApiUrl()}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

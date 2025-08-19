@@ -6,6 +6,7 @@ import Sidebar from './components/Sidebar'
 import ChatArea from './components/ChatArea'
 import AuthPage from './components/AuthPage'
 import { config } from '../config.js'
+import { frontendConfig } from './config.js'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 
@@ -134,7 +135,7 @@ function App() {
   const loadChatsFromMongoDB = async () => {
     try {
       console.log('Loading chats from MongoDB...')
-      const response = await fetch('http://localhost:5000/api/chat', {
+      const response = await fetch(`${frontendConfig.getApiUrl()}/api/chat`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -183,7 +184,7 @@ function App() {
   const loadChatFromMongoDB = async (chatId) => {
     try {
       console.log('Loading chat from MongoDB:', chatId)
-      const response = await fetch(`http://localhost:5000/api/chat/${chatId}`, {
+      const response = await fetch(`${frontendConfig.getApiUrl()}/api/chat/${chatId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -256,7 +257,7 @@ function App() {
       console.log('Saving chat to MongoDB:', currentChatId, 'with', currentMessages.length, 'messages')
       
       // First, try to update the chat (in case it exists)
-      const updateResponse = await fetch(`http://localhost:5000/api/chat/${currentChatId}`, {
+      const updateResponse = await fetch(`${frontendConfig.getApiUrl()}/api/chat/${currentChatId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -296,7 +297,7 @@ function App() {
       } else if (updateResponse.status === 404) {
         // Chat doesn't exist, create a new one
         console.log('Chat not found, creating new chat in MongoDB')
-        const createResponse = await fetch('http://localhost:5000/api/chat', {
+        const createResponse = await fetch(`${frontendConfig.getApiUrl()}/api/chat`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -446,8 +447,8 @@ function App() {
     
     if (isAuthenticated && token) {
       try {
-        console.log('Sending DELETE request to:', `http://localhost:5000/api/chat/${chatId}`)
-        const response = await fetch(`http://localhost:5000/api/chat/${chatId}`, {
+        console.log('Sending DELETE request to:', `${frontendConfig.getApiUrl()}/api/chat/${chatId}`)
+        const response = await fetch(`${frontendConfig.getApiUrl()}/api/chat/${chatId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`,

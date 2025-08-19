@@ -1,82 +1,73 @@
-# 🚀 Deployment Guide: AI Chat Server to Render
+# 🚀 Deployment Guide: AI Chat Server to Northflank
 
 ## 📋 Prerequisites
 
-1. **Render Account**: Sign up at [render.com](https://render.com)
+1. **Northflank Account**: Sign up at [northflank.com](https://northflank.com)
 2. **MongoDB Atlas**: Your MongoDB database (already configured)
 3. **GitHub Repository**: Your code should be in a GitHub repo
 
 ## 🔧 Step 1: Prepare Your Repository
 
 ### 1.1 Update Frontend API URL
-Update your frontend to use the Render URL once deployed:
+Update your frontend to use the Vercel URL:
 
 ```javascript
 // In your frontend config or environment variables
-const API_BASE_URL = 'https://your-app-name.onrender.com'
+const API_BASE_URL = 'https://nivi-4l6r.vercel.app'
 ```
 
 ### 1.2 Commit and Push Your Changes
 ```bash
 git add .
-git commit -m "Prepare for Render deployment"
+git commit -m "Prepare for Northflank deployment"
 git push origin main
 ```
 
-## 🌐 Step 2: Deploy to Render
+## 🌐 Step 2: Backend Already Deployed to Vercel
 
-### 2.1 Create New Web Service
+Your backend is already deployed at: **https://nivi-4l6r.vercel.app**
 
-1. **Login to Render**: Go to [dashboard.render.com](https://dashboard.render.com)
-2. **Click "New +"** → **"Web Service"**
-3. **Connect Repository**: Connect your GitHub repository
-4. **Configure Service**:
-   - **Name**: `ai-chat-server` (or your preferred name)
-   - **Root Directory**: `server` (since your server code is in the server folder)
-   - **Runtime**: `Node`
-   - **Build Command**: `npm install`
-   - **Start Command**: `npm start`
-   - **Plan**: Choose "Free" for testing
+### 2.1 Verify Backend Deployment
 
-### 2.2 Environment Variables
+1. **Test the health endpoint**: Visit `https://nivi-4l6r.vercel.app/api/health`
+2. **Check if the server is responding correctly**
 
-Add these environment variables in Render:
+### 2.2 Environment Variables (Already Configured)
+
+Your Vercel deployment should have these environment variables configured:
 
 | Variable | Value | Description |
 |----------|-------|-------------|
 | `MONGODB_URI` | `mongodb+srv://aadileetcode:3PyPy3AbgYSbTtrZ@cluster0.ppfyozj.mongodb.net/ai-chat` | Your MongoDB connection string |
-| `JWT_SECRET` | `your-super-secret-jwt-key-here` | A secure random string for JWT |
+| `JWT_SECRET` | `nivi-ai-chat-secret-key-2024` | Your JWT secret key |
 | `NODE_ENV` | `production` | Environment setting |
-| `FRONTEND_URL` | `https://your-frontend-domain.com` | Your frontend URL (update later) |
+| `FRONTEND_URL` | `https://your-frontend-domain.com` | Your frontend URL (update when you deploy frontend) |
 
-### 2.3 Deploy
+## 🔗 Step 3: Frontend Connected to Vercel Backend
 
-1. **Click "Create Web Service"**
-2. **Wait for deployment** (usually 2-5 minutes)
-3. **Copy the URL** (e.g., `https://ai-chat-server.onrender.com`)
+✅ **Frontend Configuration Updated**
 
-## 🔗 Step 3: Update Frontend Configuration
+Your frontend has been updated to connect to the Vercel backend at `https://nivi-4l6r.vercel.app`. The following changes were made:
 
-### 3.1 Update API Base URL
+### 3.1 API Configuration Updated
 
-Update your frontend to use the Render URL:
+- Created `src/config.js` with centralized API configuration
+- Updated all API calls in `App.jsx`, `Login.jsx`, and `Register.jsx`
+- Frontend now uses: `https://nivi-4l6r.vercel.app`
 
-```javascript
-// In your frontend config file
-const API_BASE_URL = 'https://your-app-name.onrender.com'
-```
+### 3.2 CORS Settings
 
-### 3.2 Update CORS Settings
-
-In your Render environment variables, set:
+In your Vercel environment variables, set:
 ```
 FRONTEND_URL=https://your-frontend-domain.com
 ```
 
+**Note**: Update this when you deploy your frontend to production.
+
 ## 🧪 Step 4: Test Your Deployment
 
 ### 4.1 Health Check
-Visit: `https://your-app-name.onrender.com/api/health`
+Visit: `https://nivi-4l6r.vercel.app/api/health`
 
 Expected response:
 ```json
@@ -101,21 +92,25 @@ Use tools like Postman or curl to test:
 1. **Build Fails**:
    - Check if `package.json` is in the correct directory
    - Verify all dependencies are listed
+   - Check Node.js version compatibility
 
 2. **Runtime Errors**:
-   - Check Render logs in the dashboard
+   - Check Vercel logs in the dashboard
    - Verify environment variables are set correctly
+   - Check if your server is configured for Vercel's serverless environment
 
 3. **CORS Errors**:
    - Update `FRONTEND_URL` environment variable
    - Check if frontend URL is correct
+   - Verify CORS configuration in your server code
 
 4. **MongoDB Connection Issues**:
    - Verify `MONGODB_URI` is correct
-   - Check if MongoDB Atlas allows connections from Render
+   - Check if MongoDB Atlas allows connections from Vercel
+   - Ensure network access is properly configured
 
 ### View Logs:
-1. Go to your Render dashboard
+1. Go to your Northflank dashboard
 2. Click on your service
 3. Go to "Logs" tab
 4. Check for any error messages
@@ -124,29 +119,33 @@ Use tools like Postman or curl to test:
 
 ### 6.1 Security
 - Use a strong `JWT_SECRET`
-- Enable HTTPS (automatic on Render)
+- Enable HTTPS (automatic on Northflank)
 - Set up proper CORS origins
+- Configure proper network policies
 
 ### 6.2 Performance
-- Consider upgrading to a paid plan for better performance
 - Monitor your service usage
+- Set up resource limits and scaling rules
+- Configure health checks
 - Set up alerts for downtime
 
 ### 6.3 Monitoring
-- Use Render's built-in monitoring
+- Use Northflank's built-in monitoring
 - Set up health checks
 - Monitor API response times
+- Configure logging and metrics
 
 ## 📞 Support
 
 If you encounter issues:
-1. Check Render documentation: [docs.render.com](https://docs.render.com)
+1. Check Northflank documentation: [docs.northflank.com](https://docs.northflank.com)
 2. Check your application logs
 3. Verify all environment variables are set correctly
+4. Review Northflank's troubleshooting guides
 
 ## 🎉 Success!
 
 Once deployed, your AI chat server will be available at:
-`https://your-app-name.onrender.com`
+`https://your-app-name.northflank.app`
 
 Your frontend can now communicate with the deployed backend! 🚀
