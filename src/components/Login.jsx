@@ -31,7 +31,10 @@ const Login = ({ onSwitchToRegister, onLogin }) => {
     setError('')
 
     try {
-      const response = await fetch(`${frontendConfig.getApiUrl()}/api/auth/login`, {
+      const apiUrl = `${frontendConfig.getApiUrl()}/api/auth/login`
+      console.log('Attempting login to:', apiUrl)
+      
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -39,7 +42,11 @@ const Login = ({ onSwitchToRegister, onLogin }) => {
         body: JSON.stringify(formData)
       })
 
+      console.log('Login response status:', response.status)
+      console.log('Login response headers:', response.headers)
+
       const data = await response.json()
+      console.log('Login response data:', data)
 
       if (data.success) {
         // Store token and user data
@@ -51,7 +58,12 @@ const Login = ({ onSwitchToRegister, onLogin }) => {
       }
     } catch (error) {
       console.error('Login error:', error)
-      setError('Network error. Please try again.')
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      })
+      setError(`Network error: ${error.message}. Please try again.`)
     } finally {
       setIsLoading(false)
     }

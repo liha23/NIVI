@@ -13,7 +13,7 @@ const app = express()
 app.use(helmet())
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? [config.FRONTEND_URL, 'http://localhost:3000', 'http://localhost:5173'] 
+    ? [config.FRONTEND_URL, 'https://nivi.aadigarg.life', 'http://localhost:3000', 'http://localhost:5173'] 
     : true, // Allow all origins in development
   credentials: true
 }))
