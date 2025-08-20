@@ -53,7 +53,7 @@ const Sidebar = ({
       {!isOpen && (
         <button
           onClick={onToggle}
-          className="fixed top-4 left-4 z-50 w-10 h-10 rounded-full bg-gradient-to-r from-sunset-pink to-sunset-purple text-white hover:from-sunset-orange hover:to-sunset-yellow transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-sunset-pink/30 flex items-center justify-center group backdrop-blur-sm hidden md:flex"
+          className="fixed top-4 left-4 z-50 w-10 h-10 rounded-lg bg-dark-800 hover:bg-dark-700 text-gray-400 hover:text-white transition-all duration-300 flex items-center justify-center group backdrop-blur-sm hidden md:flex border border-dark-600"
           title="Open sidebar"
         >
           <ChevronRight size={18} className="group-hover:scale-110 transition-transform duration-200" />
@@ -77,14 +77,14 @@ const Sidebar = ({
           <div className="p-3 md:p-4 border-b border-dark-700 flex-shrink-0">
             <div className="flex items-center justify-between mb-3 md:mb-4">
               <div className="flex items-center gap-2">
-                <div className="w-5 h-5 md:w-6 md:h-6 bg-gradient-to-r from-sunset-pink to-sunset-purple rounded-lg flex items-center justify-center shadow-lg shadow-sunset-pink/30">
+                <div className="w-5 h-5 md:w-6 md:h-6 bg-primary-500 rounded-lg flex items-center justify-center">
                   <Star className="w-3 h-3 md:w-4 md:h-4 text-white" />
                 </div>
-                <h2 className="text-base md:text-lg font-semibold bg-gradient-to-r from-sunset-pink to-sunset-purple bg-clip-text text-transparent">AI Chat</h2>
+                <h2 className="text-base md:text-lg font-semibold text-white">deepseek</h2>
               </div>
               <button
                 onClick={onToggle}
-                className="p-1 rounded hover:bg-dark-800 text-gray-400 hover:text-white"
+                className="p-1 rounded hover:bg-dark-700 text-gray-400 hover:text-white"
               >
                 <ChevronLeft size={16} />
               </button>
@@ -97,10 +97,10 @@ const Sidebar = ({
                 console.log('New chat button clicked')
                 onNewChat()
               }}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-sunset-pink to-sunset-purple hover:from-sunset-orange hover:to-sunset-yellow text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-sunset-pink/30 text-sm md:text-base"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-all duration-300 text-sm md:text-base"
             >
               <Plus size={14} />
-              New Chat
+              New chat
             </button>
           </div>
 
@@ -141,8 +141,8 @@ const Sidebar = ({
                       key={chat.id}
                       className={`group flex items-center justify-between p-2 md:p-2 rounded-lg cursor-pointer transition-all duration-300 ${
                         currentChatId === chat.id
-                          ? 'bg-gradient-to-r from-sunset-pink to-sunset-purple text-white shadow-lg shadow-sunset-pink/30'
-                          : 'hover:bg-dark-800/50 text-gray-300 hover:text-white hover:shadow-lg hover:shadow-sunset-purple/10'
+                          ? 'bg-dark-700 text-white'
+                          : 'hover:bg-dark-800 text-gray-300 hover:text-white'
                       }`}
                       onClick={(e) => {
                         e.preventDefault()
@@ -204,11 +204,11 @@ const Sidebar = ({
           {/* Footer */}
           <div className="p-3 md:p-4 border-t border-dark-700 flex-shrink-0">
             <div className="flex items-center gap-2 md:gap-3 p-2 rounded-lg hover:bg-dark-800 cursor-pointer transition-colors">
-              <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
+              <div className="w-6 h-6 md:w-8 md:h-8 bg-primary-500 rounded-full flex items-center justify-center">
                 <Star className="w-3 h-3 md:w-5 md:h-5 text-white" />
               </div>
               <div className="flex-1">
-                <p className="text-xs md:text-sm font-medium text-white">Gupsup</p>
+                <p className="text-xs md:text-sm font-medium text-white">My Profile</p>
                 <p className="text-xs text-gray-400">Free Tier</p>
               </div>
               <button

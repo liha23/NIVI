@@ -4,19 +4,19 @@
 
 @layer base {
   :root {
-    --color-primary: #ec4899;
-    --color-background: #0f0f23;
-    --color-surface: #1a1a2e;
+    --color-primary: #4f7df3;
+    --color-background: #1a1a1a;
+    --color-surface: #2a2a2a;
     --color-text: #ffffff;
     --color-text-secondary: #a1a1aa;
     --color-sunset-orange: #f97316;
-    --color-sunset-pink: #ec4899;
-    --color-sunset-purple: #a855f7;
+    --color-sunset-pink: #4f7df3;
+    --color-sunset-purple: #4f7df3;
     --color-sunset-yellow: #fbbf24;
   }
   
   body {
-    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #2d1b69 100%);
+    background: #1a1a1a;
     color: var(--color-text);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
       'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -25,32 +25,6 @@
     -moz-osx-font-smoothing: grayscale;
     position: relative;
     overflow-x: hidden;
-  }
-
-  /* Floating stars background */
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: 
-      radial-gradient(2px 2px at 20px 30px, #ffffff, transparent),
-      radial-gradient(2px 2px at 40px 70px, #ffffff, transparent),
-      radial-gradient(1px 1px at 90px 40px, #ffffff, transparent),
-      radial-gradient(1px 1px at 130px 80px, #ffffff, transparent),
-      radial-gradient(2px 2px at 160px 30px, #ffffff, transparent);
-    background-repeat: repeat;
-    background-size: 200px 100px;
-    animation: float 20s linear infinite;
-    opacity: 0.3;
-    z-index: -1;
-  }
-
-  @keyframes float {
-    0% { transform: translateY(0px); }
-    100% { transform: translateY(-100px); }
   }
 
   /* Mobile-specific improvements */
