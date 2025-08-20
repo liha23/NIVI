@@ -661,6 +661,37 @@ function App() {
       return "Please configure your Gupsup AI API key in the config.js file. Replace 'YOUR_GEMINI_API_KEY_HERE' with your actual API key from Google AI Studio."
     }
 
+    // Prepare conversation history for context
+    const conversationHistory = currentMessages
+      .filter(msg => msg.type !== 'bot' || !msg.content.includes("Hello! I'm your AI assistant")) // Exclude welcome message
+      .slice(-10) // Only include last 10 messages for context (to avoid token limits)
+      .map(msg => ({
+        role: msg.type === 'user' ? 'user' : 'model',
+        parts: [{ text: msg.content }]
+      }))
+
+    // Add current message
+    conversationHistory.push({
+      role: 'user',
+      parts: [{ text: message }]
+    })
+
+    // Enhanced system prompt for better code formatting and follow-up questions
+    const systemPrompt = `You are a helpful AI assistant. When answering coding questions:
+1. Format code using proper markdown code blocks with language specification (e.g., \`\`\`javascript, \`\`\`python, etc.)
+2. Provide clear explanations before and after code examples
+3. Always end your response with a follow-up question to encourage further discussion
+4. Use the conversation history to provide contextual responses
+
+Examples of good follow-up questions:
+- "Would you like me to explain any specific part of this code?"
+- "Do you need help implementing this in a different programming language?"
+- "Are there any specific use cases you'd like to explore?"
+- "Would you like to see more advanced examples of this concept?"
+- "Do you have any questions about how this works?"
+
+Remember to be conversational and helpful!`
+
     // Retry logic with exponential backoff
     const maxRetries = 3
     let lastError
@@ -672,22 +703,23 @@ function App() {
           setTimeout(() => reject(new Error('Request timeout')), 15000) // 15 second timeout
         })
 
-        // Create the fetch promise
+        // Create the fetch promise with conversation history
         const fetchPromise = fetch(`${config.API_BASE_URL}/models/${config.MODEL}:generateContent?key=${API_KEY}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  {
-                    text: message
-                  }
-                ]
-              }
-            ]
+            contents: conversationHistory,
+            systemInstruction: {
+              parts: [{ text: systemPrompt }]
+            },
+            generationConfig: {
+              temperature: 0.7,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 2048,
+            }
           })
         })
 
@@ -697,7 +729,23 @@ function App() {
         if (response.ok) {
           const data = await response.json()
           if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
-            const responseText = data.candidates[0].content.parts[0].text
+            let responseText = data.candidates[0].content.parts[0].text
+            
+            // Ensure code formatting is properly applied
+            responseText = responseText.replace(/```(\w+)?\n/g, '```$1\n')
+            
+            // If response doesn't end with a follow-up question, add one
+            if (!responseText.includes('?') || !responseText.toLowerCase().includes('would you like') && !responseText.toLowerCase().includes('do you') && !responseText.toLowerCase().includes('any questions')) {
+              const followUpQuestions = [
+                "\n\nWould you like me to explain any part of this in more detail?",
+                "\n\nDo you have any questions about this approach?",
+                "\n\nWould you like to see more examples or explore related concepts?",
+                "\n\nIs there anything specific you'd like me to clarify?",
+                "\n\nWould you like help with implementing this or any variations?"
+              ]
+              responseText += followUpQuestions[Math.floor(Math.random() * followUpQuestions.length)]
+            }
+            
             // Cache successful responses (limit cache size to 100 entries)
             setResponseCache(prev => {
               const newCache = new Map(prev)

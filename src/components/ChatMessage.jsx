@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
-import { Bot, User, Volume2, VolumeX } from 'lucide-react'
+import { Bot, User, Volume2, VolumeX, Copy, Check } from 'lucide-react'
 
 const ChatMessage = ({ message }) => {
   const isBot = message.type === 'bot'
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [speechSynthesis, setSpeechSynthesis] = useState(null)
+  const [copiedCode, setCopiedCode] = useState(null)
 
   const speakText = (text) => {
     if ('speechSynthesis' in window) {
@@ -64,6 +65,76 @@ const ChatMessage = ({ message }) => {
     }
   }
 
+  const copyToClipboard = async (text, codeIndex) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopiedCode(codeIndex)
+      setTimeout(() => setCopiedCode(null), 2000)
+    } catch (err) {
+      console.error('Failed to copy text: ', err)
+    }
+  }
+
+  const formatMessageContent = (content) => {
+    // Replace Google and Gemini with Gupsup in display
+    const processedContent = content
+      .replace(/Google/gi, 'Gupsup')
+      .replace(/Gemini/gi, 'Gupsup')
+
+    // Split content by code blocks (```language or ```)
+    const parts = processedContent.split(/(```[\s\S]*?```)/g)
+    
+    return parts.map((part, index) => {
+      // Check if this part is a code block
+      if (part.startsWith('```') && part.endsWith('```')) {
+        // Extract language and code
+        const lines = part.split('\n')
+        const firstLine = lines[0].replace('```', '').trim()
+        const language = firstLine || 'text'
+        const code = lines.slice(1, -1).join('\n')
+        
+        return (
+          <div key={index} className="my-3 rounded-lg overflow-hidden border border-dark-600">
+            {/* Code header */}
+            <div className="flex items-center justify-between bg-dark-700 px-3 py-2 border-b border-dark-600">
+              <span className="text-xs font-medium text-gray-300 uppercase">{language}</span>
+              <button
+                onClick={() => copyToClipboard(code, index)}
+                className="flex items-center gap-1 px-2 py-1 text-xs bg-dark-600 hover:bg-dark-500 text-gray-300 hover:text-white rounded transition-colors"
+                title="Copy code"
+              >
+                {copiedCode === index ? (
+                  <>
+                    <Check size={12} />
+                    Copied
+                  </>
+                ) : (
+                  <>
+                    <Copy size={12} />
+                    Copy
+                  </>
+                )}
+              </button>
+            </div>
+            {/* Code content */}
+            <pre className="bg-dark-800 p-3 overflow-x-auto">
+              <code className="text-sm text-gray-100 font-mono whitespace-pre">
+                {code}
+              </code>
+            </pre>
+          </div>
+        )
+      } else {
+        // Regular text content
+        return (
+          <span key={index} className="whitespace-pre-wrap break-words">
+            {part}
+          </span>
+        )
+      }
+    })
+  }
+
   return (
     <div className={`flex ${isBot ? 'justify-start' : 'justify-end'} chat-message`}>
       <div className={`flex max-w-[85%] md:max-w-[80%] ${isBot ? 'flex-row' : 'flex-row-reverse'} items-start space-x-2 md:space-x-3`}>
@@ -93,12 +164,8 @@ const ChatMessage = ({ message }) => {
             )}
             
             <div className="flex items-start justify-between gap-2 md:gap-3 relative z-10">
-              <div className="whitespace-pre-wrap break-words flex-1 text-sm md:text-base">
-                        {/* Replace Google and Gemini with Gupsup in display */}
-        {message.content
-          .replace(/Google/gi, 'Gupsup')
-          .replace(/Gemini/gi, 'Gupsup')
-                }
+              <div className="flex-1 text-sm md:text-base">
+                {formatMessageContent(message.content)}
               </div>
               
               {/* Speak Button */}
