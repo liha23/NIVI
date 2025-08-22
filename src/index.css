@@ -73,6 +73,63 @@
     animation-delay: 0.4s;
   }
 
+  /* Modern button styles */
+  .btn-primary {
+    @apply bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition-all duration-200 font-medium;
+  }
+
+  .btn-secondary {
+    @apply bg-dark-700 hover:bg-dark-600 text-gray-300 hover:text-white px-4 py-2 rounded-lg transition-all duration-200;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent hover:bg-dark-700 text-gray-400 hover:text-white px-3 py-2 rounded-lg transition-all duration-200;
+  }
+
+  /* Modern input styles */
+  .input-modern {
+    @apply bg-dark-800 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200;
+  }
+
+  /* Modern card styles */
+  .card-modern {
+    @apply bg-dark-800 border border-dark-600 rounded-xl p-6 shadow-lg;
+  }
+
+  /* Glass morphism effect */
+  .glass {
+    @apply bg-white/5 backdrop-blur-md border border-white/10;
+  }
+
+  /* Subtle hover effects */
+  .hover-lift {
+    @apply transition-all duration-200 hover:transform hover:scale-105 hover:shadow-lg;
+  }
+
+  /* Modern scrollbar */
+  .scrollbar-modern {
+    scrollbar-width: thin;
+    scrollbar-color: #4f7df3 #2a2a2a;
+  }
+
+  .scrollbar-modern::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-modern::-webkit-scrollbar-track {
+    background: #2a2a2a;
+    border-radius: 3px;
+  }
+
+  .scrollbar-modern::-webkit-scrollbar-thumb {
+    background: #4f7df3;
+    border-radius: 3px;
+  }
+
+  .scrollbar-modern::-webkit-scrollbar-thumb:hover {
+    background: #3b5fd9;
+  }
+
   /* Neon border animation for text-to-speech */
   .neon-highlight {
     position: relative;
@@ -201,41 +258,225 @@
     }
   }
 
-  /* Mobile-specific animations */
-  @media (max-width: 768px) {
-    .animate-slide-up {
-      animation: slideUpMobile 0.3s ease-out;
+  /* Modern slide-up animation */
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
     }
-    
-    @keyframes slideUpMobile {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
+  }
+
+  /* Modern fade-in animation */
+  .animate-fade-in {
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Modern pulse animation */
+  .animate-pulse-slow {
+    animation: pulseSlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulseSlow {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  /* Modern focus styles */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-dark-900;
+  }
+
+  /* Modern border radius */
+  .rounded-modern {
+    border-radius: 12px;
+  }
+
+  /* Modern shadows */
+  .shadow-modern {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .shadow-modern-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Modern transitions */
+  .transition-modern {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Modern hover states */
+  .hover-modern {
+    @apply transition-modern hover:transform hover:scale-105;
+  }
+
+  /* Modern text styles */
+  .text-modern {
+    @apply text-gray-100 leading-relaxed;
+  }
+
+  .text-modern-secondary {
+    @apply text-gray-400 leading-relaxed;
+  }
+
+  /* Modern spacing */
+  .space-modern {
+    @apply space-y-4;
+  }
+
+  .space-modern-lg {
+    @apply space-y-6;
+  }
+
+  /* Modern container */
+  .container-modern {
+    @apply max-w-4xl mx-auto px-4;
+  }
+
+  /* Modern responsive design */
+  .responsive-modern {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Modern button group */
+  .button-group {
+    @apply flex items-center space-x-2;
+  }
+
+  .button-group-vertical {
+    @apply flex flex-col space-y-2;
+  }
+
+  /* Modern form elements */
+  .form-modern {
+    @apply space-modern;
+  }
+
+  .form-group {
+    @apply space-y-2;
+  }
+
+  .form-label {
+    @apply text-sm font-medium text-gray-300;
+  }
+
+  .form-input {
+    @apply input-modern w-full;
+  }
+
+  .form-textarea {
+    @apply input-modern w-full resize-none;
+  }
+
+  .form-select {
+    @apply input-modern w-full;
+  }
+
+  /* Modern modal styles */
+  .modal-overlay {
+    @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-50;
+  }
+
+  .modal-content {
+    @apply card-modern max-w-md mx-auto mt-20;
+  }
+
+  /* Modern navigation */
+  .nav-modern {
+    @apply flex items-center space-x-4;
+  }
+
+  .nav-link {
+    @apply btn-ghost;
+  }
+
+  .nav-link-active {
+    @apply bg-primary-500 text-white;
+  }
+
+  /* Modern sidebar */
+  .sidebar-modern {
+    @apply bg-dark-900 border-r border-dark-700;
+  }
+
+  .sidebar-item {
+    @apply flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-dark-800 rounded-lg transition-modern;
+  }
+
+  .sidebar-item-active {
+    @apply bg-primary-500 text-white;
+  }
+
+  /* Modern chat message */
+  .message-modern {
+    @apply rounded-2xl px-4 py-3 max-w-[85%];
+  }
+
+  .message-bot {
+    @apply bg-dark-800 border border-dark-700;
+  }
+
+  .message-user {
+    @apply bg-primary-600 text-white;
+  }
+
+  /* Modern code block */
+  .code-block {
+    @apply bg-dark-800 border border-dark-600 rounded-lg overflow-hidden;
+  }
+
+  .code-header {
+    @apply flex items-center justify-between bg-dark-700 px-3 py-2 border-b border-dark-600;
+  }
+
+  .code-content {
+    @apply bg-dark-800 p-3 overflow-x-auto;
+  }
+
+  /* Modern tooltip */
+  .tooltip {
+    @apply absolute z-10 px-2 py-1 text-xs bg-dark-700 text-white rounded opacity-0 pointer-events-none transition-opacity duration-200;
+  }
+
+  .tooltip::after {
+    content: '';
+    @apply absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-dark-700;
+  }
+
+  .tooltip-trigger:hover .tooltip {
+    @apply opacity-100;
   }
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(26, 26, 46, 0.5);
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #ec4899, #a855f7);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #f97316, #ec4899);
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .text-pretty {
+    text-wrap: pretty;
+  }
 }
 
 /* Smooth transitions */

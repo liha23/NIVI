@@ -3,12 +3,12 @@ import {
   MessageSquare, 
   Plus, 
   Search, 
-  BookOpen, 
   Trash2, 
   Settings,
   ChevronLeft,
   ChevronRight,
-  Star
+  User,
+  Sparkles
 } from 'lucide-react'
 import { useTheme } from '../contexts/ThemeContext'
 import SettingsModal from './SettingsModal'
@@ -53,17 +53,17 @@ const Sidebar = ({
       {!isOpen && (
         <button
           onClick={onToggle}
-          className="fixed top-4 left-4 z-50 w-10 h-10 rounded-lg bg-dark-800 hover:bg-dark-700 text-gray-400 hover:text-white transition-all duration-300 flex items-center justify-center group backdrop-blur-sm hidden md:flex border border-dark-600"
+          className="fixed top-4 left-4 z-50 w-10 h-10 rounded-lg bg-dark-800 hover:bg-dark-700 text-gray-400 hover:text-white transition-all duration-200 flex items-center justify-center border border-dark-600 shadow-lg hidden md:flex"
           title="Open sidebar"
         >
-          <ChevronRight size={18} className="group-hover:scale-110 transition-transform duration-200" />
+          <ChevronRight size={18} />
         </button>
       )}
 
       {/* Mobile Backdrop */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-20 md:hidden"
           onClick={onToggle}
         />
       )}
@@ -74,17 +74,17 @@ const Sidebar = ({
       }`}>
         <div className="flex flex-col h-full overflow-hidden">
           {/* Header */}
-          <div className="p-3 md:p-4 border-b border-dark-700 flex-shrink-0">
-            <div className="flex items-center justify-between mb-3 md:mb-4">
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 md:w-6 md:h-6 bg-primary-500 rounded-lg flex items-center justify-center">
-                  <Star className="w-3 h-3 md:w-4 md:h-4 text-white" />
+          <div className="p-4 border-b border-dark-700 flex-shrink-0">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-base md:text-lg font-semibold text-white">NIVI</h2>
+                <h2 className="text-lg font-semibold text-white">Gupsup AI</h2>
               </div>
               <button
                 onClick={onToggle}
-                className="p-1 rounded hover:bg-dark-700 text-gray-400 hover:text-white"
+                className="p-2 rounded-lg hover:bg-dark-700 text-gray-400 hover:text-white transition-colors"
               >
                 <ChevronLeft size={16} />
               </button>
@@ -97,41 +97,41 @@ const Sidebar = ({
                 console.log('New chat button clicked')
                 onNewChat()
               }}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-all duration-300 text-sm md:text-base"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-all duration-200 font-medium"
             >
-              <Plus size={14} />
-              New chat
+              <Plus size={16} />
+              New Chat
             </button>
           </div>
 
           {/* Search */}
-          <div className="p-3 md:p-4 border-b border-dark-700 flex-shrink-0">
+          <div className="p-4 border-b border-dark-700 flex-shrink-0">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 md:w-4 md:h-4" size={14} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
               <input
                 type="text"
                 placeholder="Search chats..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-8 md:pl-10 pr-4 py-2 bg-dark-800 border border-dark-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm md:text-base"
+                className="w-full pl-10 pr-4 py-3 bg-dark-800 border border-dark-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
               />
             </div>
           </div>
 
           {/* Chat History */}
-          <div className="flex-1 overflow-y-auto min-h-0">
-            <div className="p-3 md:p-4">
-              <h3 className="text-xs md:text-sm font-medium text-gray-400 mb-2 md:mb-3">
+          <div className="flex-1 overflow-y-auto min-h-0 scrollbar-modern">
+            <div className="p-4">
+              <h3 className="text-sm font-medium text-gray-400 mb-3">
                 {searchQuery ? `Search Results (${filteredChats.length})` : 'Recent Chats'}
               </h3>
-              <div className="space-y-1">
+              <div className="space-y-2">
                 {filteredChats.length === 0 ? (
-                  <div className="text-center py-6 md:py-8 text-gray-500">
-                    <MessageSquare size={24} className="mx-auto mb-2 opacity-50" />
-                    <p className="text-xs md:text-sm">
+                  <div className="text-center py-8 text-gray-500">
+                    <MessageSquare size={32} className="mx-auto mb-3 opacity-50" />
+                    <p className="text-sm">
                       {searchQuery ? 'No chats found matching your search' : 'No chat history yet'}
                     </p>
-                    <p className="text-xs">
+                    <p className="text-xs mt-1">
                       {searchQuery ? 'Try a different search term' : 'Start a new conversation!'}
                     </p>
                   </div>
@@ -139,9 +139,9 @@ const Sidebar = ({
                   filteredChats.map((chat, index) => (
                     <div
                       key={`${chat.id}-${index}`}
-                      className={`group flex items-center justify-between p-2 md:p-2 rounded-lg cursor-pointer transition-all duration-300 ${
+                      className={`group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all duration-200 ${
                         currentChatId === chat.id
-                          ? 'bg-dark-700 text-white'
+                          ? 'bg-primary-500/10 border border-primary-500/20 text-white'
                           : 'hover:bg-dark-800 text-gray-300 hover:text-white'
                       }`}
                       onClick={(e) => {
@@ -155,24 +155,30 @@ const Sidebar = ({
                         }
                       }}
                     >
-                      <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
-                        <MessageSquare size={14} />
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                          currentChatId === chat.id 
+                            ? 'bg-primary-500' 
+                            : 'bg-dark-700'
+                        }`}>
+                          <MessageSquare size={16} className="text-white" />
+                        </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs md:text-sm font-medium truncate">
+                          <p className="text-sm font-medium truncate">
                             {truncateText(chat.title || 'New Chat')}
                           </p>
-                          <div className="flex items-center gap-1 md:gap-2 mt-1">
-                            <p className="text-xs opacity-70">
+                          <div className="flex items-center gap-2 mt-1">
+                            <p className="text-xs text-gray-400">
                               {formatDate(chat.timestamp)}
                             </p>
                             {chat.messageCount > 0 && (
-                              <span className="text-xs bg-dark-700 px-1 md:px-1.5 py-0.5 rounded-full opacity-70">
+                              <span className="text-xs bg-dark-700 px-2 py-1 rounded-full text-gray-300">
                                 {chat.messageCount} msg{chat.messageCount !== 1 ? 's' : ''}
                               </span>
                             )}
                           </div>
                           {chat.lastMessage && (
-                            <p className="text-xs opacity-60 truncate mt-1">
+                            <p className="text-xs text-gray-500 truncate mt-1">
                               {truncateText(chat.lastMessage, 35)}
                             </p>
                           )}
@@ -189,10 +195,10 @@ const Sidebar = ({
                             onDeleteChat(chat.id)
                           }
                         }}
-                        className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500 hover:text-white transition-all"
+                        className="opacity-0 group-hover:opacity-100 p-2 rounded-lg hover:bg-red-500 hover:text-white transition-all duration-200"
                         title="Delete chat"
                       >
-                        <Trash2 size={12} />
+                        <Trash2 size={14} />
                       </button>
                     </div>
                   ))
@@ -202,21 +208,21 @@ const Sidebar = ({
           </div>
 
           {/* Footer */}
-          <div className="p-3 md:p-4 border-t border-dark-700 flex-shrink-0">
-            <div className="flex items-center gap-2 md:gap-3 p-2 rounded-lg hover:bg-dark-800 cursor-pointer transition-colors">
-              <div className="w-6 h-6 md:w-8 md:h-8 bg-primary-500 rounded-full flex items-center justify-center">
-                <Star className="w-3 h-3 md:w-5 md:h-5 text-white" />
+          <div className="p-4 border-t border-dark-700 flex-shrink-0">
+            <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-dark-800 cursor-pointer transition-colors">
+              <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
+                <User className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
-                <p className="text-xs md:text-sm font-medium text-white">My Profile</p>
+                <p className="text-sm font-medium text-white">My Profile</p>
                 <p className="text-xs text-gray-400">Free Tier</p>
               </div>
               <button
                 onClick={toggleSettings}
-                className="p-1 rounded hover:bg-dark-700 text-gray-400 hover:text-white transition-colors"
-                title="Settings(soon)"
+                className="p-2 rounded-lg hover:bg-dark-700 text-gray-400 hover:text-white transition-colors"
+                title="Settings"
               >
-                                 <Settings size={14} />
+                <Settings size={16} />
               </button>
             </div>
           </div>

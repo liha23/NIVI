@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react'
-import { Send, Bot, User, Trash2, Sparkles } from 'lucide-react'
+import { Send, Bot, User, Trash2, Sparkles, Download, BarChart3, Search, Bookmark } from 'lucide-react'
 import ChatMessage from './components/ChatMessage'
 import TypingIndicator from './components/TypingIndicator'
 import Sidebar from './components/Sidebar'
 import ChatArea from './components/ChatArea'
 import AuthPage from './components/AuthPage'
+import ExportModal from './components/ExportModal'
+import AnalyticsModal from './components/AnalyticsModal'
+import SearchModal from './components/SearchModal'
 import { config } from '../config.js'
 import { frontendConfig } from './config.js'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
+import { keyboardShortcuts } from './utils/keyboardShortcuts'
+import { analyticsUtils } from './utils/analyticsUtils'
 
 function App() {
   console.log('App component rendering...')
@@ -21,6 +26,16 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [lastSavedMessages, setLastSavedMessages] = useState([])
   const [responseCache, setResponseCache] = useState(new Map()) // Simple cache for responses
+  
+  // New feature states
+  const [showExportModal, setShowExportModal] = useState(false)
+  const [showAnalyticsModal, setShowAnalyticsModal] = useState(false)
+  const [showSearchModal, setShowSearchModal] = useState(false)
+  const [bookmarkedMessages, setBookmarkedMessages] = useState([])
+  const [messageReactions, setMessageReactions] = useState({})
+  const [messageLikes, setMessageLikes] = useState({})
+  const [messageDislikes, setMessageDislikes] = useState({})
+  const [replyToMessage, setReplyToMessage] = useState(null)
 
   console.log('Auth state:', { user, isAuthenticated, authLoading })
 
@@ -145,6 +160,66 @@ function App() {
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
     }, [currentMessages, currentChatId, chatHistory, isAuthenticated, token])
+
+  // Initialize keyboard shortcuts
+  useEffect(() => {
+    const appFunctions = {
+      createNewChat,
+      toggleSidebar: () => setIsSidebarOpen(!isSidebarOpen),
+      closeModals: () => {
+        setShowExportModal(false)
+        setShowAnalyticsModal(false)
+        setShowSearchModal(false)
+      },
+      openSearch: () => setShowSearchModal(true),
+      saveChat: forceSaveCurrentChat,
+      exportChat: () => setShowExportModal(true),
+      sendMessage: () => {
+        // This would need to be implemented with a ref to the input
+        console.log('Send message shortcut triggered')
+      },
+      previousMessage: () => {
+        // Navigate to previous message
+        console.log('Previous message shortcut triggered')
+      },
+      nextMessage: () => {
+        // Navigate to next message
+        console.log('Next message shortcut triggered')
+      },
+      toggleTheme: () => {
+        // This would need to be implemented with theme context
+        console.log('Toggle theme shortcut triggered')
+      },
+      toggleVoiceMode: () => {
+        // This would need to be implemented with voice mode
+        console.log('Toggle voice mode shortcut triggered')
+      },
+      openSettings: () => {
+        // This would need to be implemented with settings modal
+        console.log('Open settings shortcut triggered')
+      },
+      showHelp: () => {
+        // Show keyboard shortcuts help
+        console.log('Show help shortcut triggered')
+      }
+    }
+
+    keyboardShortcuts.initialize(appFunctions)
+
+    return () => {
+      keyboardShortcuts.cleanup()
+    }
+  }, [isSidebarOpen])
+
+  // Track user behavior
+  useEffect(() => {
+    if (currentMessages.length > 0) {
+      analyticsUtils.trackUserBehavior('message_sent', {
+        messageCount: currentMessages.length,
+        chatId: currentChatId
+      })
+    }
+  }, [currentMessages.length, currentChatId])
 
   // Force save function for critical saves
   const forceSaveCurrentChat = async () => {
@@ -624,7 +699,10 @@ function App() {
     }
 
     try {
+      const startTime = Date.now()
       const response = await fetchGeminiResponse(message.trim(), attachedFiles)
+      const endTime = Date.now()
+      const responseTime = endTime - startTime
       
       // If this is enhance mode, return the response directly without adding to chat
       if (isEnhanceMode) {
@@ -635,7 +713,8 @@ function App() {
         id: Date.now() + 1,
         type: 'bot',
         content: response,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        responseTime: responseTime
       }
 
       const finalMessages = [...updatedMessages, botMessage]
@@ -668,7 +747,8 @@ function App() {
         id: Date.now() + 1,
         type: 'bot',
         content: "Our servers are currently experiencing high traffic. Please try again in a few minutes. Thank you for your patience!",
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        responseTime: null
       }
       const finalMessages = [...updatedMessages, errorMessage]
       setCurrentMessages(finalMessages)
@@ -904,6 +984,178 @@ Remember to be conversational and helpful!`
     setCurrentMessages([])
   }
 
+  // New feature handlers
+  const handleMessageReaction = (messageId, reactionType) => {
+    console.log('App: handleMessageReaction called with:', messageId, reactionType)
+    setMessageReactions(prev => ({
+      ...prev,
+      [messageId]: {
+        ...prev[messageId],
+        [reactionType]: (prev[messageId]?.[reactionType] || 0) + 1
+      }
+    }))
+    
+    analyticsUtils.trackUserBehavior('message_reaction', {
+      messageId,
+      reactionType
+    })
+  }
+
+  const handleMessageBookmark = (messageId, isBookmarked) => {
+    console.log('App: handleMessageBookmark called with:', messageId, isBookmarked)
+    if (isBookmarked) {
+      const message = currentMessages.find(m => m.id === messageId)
+      if (message) {
+        setBookmarkedMessages(prev => [...prev, { ...message, bookmarkedAt: new Date().toISOString() }])
+      }
+    } else {
+      setBookmarkedMessages(prev => prev.filter(m => m.id !== messageId))
+    }
+    
+    analyticsUtils.trackUserBehavior('message_bookmark', {
+      messageId,
+      isBookmarked
+    })
+  }
+
+  const handleMessageReply = (message) => {
+    console.log('App: handleMessageReply called with:', message.id)
+    setReplyToMessage(message)
+    // Focus on input field to start typing reply
+    const inputElement = document.querySelector('textarea[placeholder*="message"]')
+    if (inputElement) {
+      inputElement.focus()
+    }
+    
+    analyticsUtils.trackUserBehavior('message_reply', {
+      messageId: message.id
+    })
+  }
+
+  const handleMessageLike = (messageId, isLiked) => {
+    console.log('App: handleMessageLike called with:', messageId, isLiked)
+    setMessageLikes(prev => ({
+      ...prev,
+      [messageId]: isLiked
+    }))
+    
+    // Remove dislike if liking
+    if (isLiked) {
+      setMessageDislikes(prev => ({
+        ...prev,
+        [messageId]: false
+      }))
+    }
+    
+    analyticsUtils.trackUserBehavior('message_like', {
+      messageId,
+      isLiked
+    })
+  }
+
+  const handleMessageDislike = (messageId, isDisliked) => {
+    console.log('App: handleMessageDislike called with:', messageId, isDisliked)
+    setMessageDislikes(prev => ({
+      ...prev,
+      [messageId]: isDisliked
+    }))
+    
+    // Remove like if disliking
+    if (isDisliked) {
+      setMessageLikes(prev => ({
+        ...prev,
+        [messageId]: false
+      }))
+    }
+    
+    analyticsUtils.trackUserBehavior('message_dislike', {
+      messageId,
+      isDisliked
+    })
+  }
+
+  const handleRegenerateAnswer = async (messageId) => {
+    console.log('App: handleRegenerateAnswer called with:', messageId)
+    
+    // Find the message to regenerate
+    const messageIndex = currentMessages.findIndex(m => m.id === messageId)
+    if (messageIndex === -1) return
+    
+    // Find the user message that prompted this response
+    const userMessageIndex = messageIndex - 1
+    if (userMessageIndex < 0) return
+    
+    const userMessage = currentMessages[userMessageIndex]
+    if (userMessage.type !== 'user') return
+    
+    // Remove the current bot response
+    const updatedMessages = currentMessages.slice(0, messageIndex)
+    setCurrentMessages(updatedMessages)
+    
+    // Regenerate the response by calling the AI API directly
+    try {
+      const startTime = Date.now()
+      const response = await fetchGeminiResponse(userMessage.content, userMessage.files || [])
+      const endTime = Date.now()
+      const responseTime = endTime - startTime
+      
+      // Add the new response with response time
+      const newBotMessage = {
+        id: Date.now(),
+        type: 'bot',
+        content: response,
+        timestamp: new Date().toISOString(),
+        responseTime: responseTime
+      }
+      
+      const finalMessages = [...updatedMessages, newBotMessage]
+      setCurrentMessages(finalMessages)
+      
+      // Save the updated chat
+      if (isAuthenticated && token && currentChatId) {
+        try {
+          await saveCurrentChatToMongoDB()
+          setLastSavedMessages([...finalMessages])
+        } catch (error) {
+          console.error('Failed to save regenerated response:', error)
+        }
+      } else if (!isAuthenticated && currentChatId) {
+        localStorage.setItem(`chat_${currentChatId}`, JSON.stringify(finalMessages))
+      }
+      
+      analyticsUtils.trackUserBehavior('message_regenerate', {
+        messageId,
+        responseTime
+      })
+    } catch (error) {
+      console.error('Failed to regenerate answer:', error)
+      // Restore the original message if regeneration fails
+      setCurrentMessages(currentMessages)
+    }
+  }
+
+  const handleExportChat = () => {
+    setShowExportModal(true)
+    analyticsUtils.trackUserBehavior('export_chat', {
+      chatId: currentChatId,
+      messageCount: currentMessages.length
+    })
+  }
+
+  const handleShowAnalytics = () => {
+    setShowAnalyticsModal(true)
+    analyticsUtils.trackUserBehavior('view_analytics', {
+      chatId: currentChatId
+    })
+  }
+
+  const handleSearchMessages = () => {
+    setShowSearchModal(true)
+    analyticsUtils.trackUserBehavior('search_messages', {
+      chatId: currentChatId
+    })
+  }
+
   // Show loading screen while checking authentication
   if (authLoading) {
     return (
@@ -959,6 +1211,38 @@ Remember to be conversational and helpful!`
           onToggleSidebar={toggleSidebar}
           user={user}
           onLogout={handleLogout}
+          onExportChat={handleExportChat}
+          onShowAnalytics={handleShowAnalytics}
+          onSearchMessages={handleSearchMessages}
+          onMessageReaction={handleMessageReaction}
+          onMessageBookmark={handleMessageBookmark}
+          onMessageReply={handleMessageReply}
+          onMessageLike={handleMessageLike}
+          onMessageDislike={handleMessageDislike}
+          onRegenerateAnswer={handleRegenerateAnswer}
+        />
+
+        {/* Modals */}
+        <ExportModal
+          isOpen={showExportModal}
+          onClose={() => setShowExportModal(false)}
+          messages={currentMessages}
+          chatTitle={getCurrentChatTitle()}
+          chatId={currentChatId}
+        />
+
+        <AnalyticsModal
+          isOpen={showAnalyticsModal}
+          onClose={() => setShowAnalyticsModal(false)}
+          messages={currentMessages}
+          chatHistory={chatHistory}
+        />
+
+        <SearchModal
+          isOpen={showSearchModal}
+          onClose={() => setShowSearchModal(false)}
+          messages={currentMessages}
+          chatHistory={chatHistory}
         />
       </div>
     </ThemeProvider>
