@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Send, Bot, User, Sparkles, ChevronLeft, ChevronRight, Plus, Mic, MicOff, Volume2, Phone, LogOut } from 'lucide-react'
+import { Send, Bot, User, Sparkles, ChevronLeft, ChevronRight, Plus, Mic, MicOff, Volume2, Phone, LogOut, Paperclip, FileText, Wand2 } from 'lucide-react'
 import ChatMessage from './ChatMessage'
 import TypingIndicator from './TypingIndicator'
 import { useTheme } from '../contexts/ThemeContext'
 import VoiceMode from './VoiceMode'
+import FileUploadModal from './FileUploadModal'
 
 const ChatArea = ({ 
   messages, 
@@ -20,6 +21,9 @@ const ChatArea = ({
   const [isListening, setIsListening] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
   const [isVoiceModeOpen, setIsVoiceModeOpen] = useState(false)
+  const [isFileUploadOpen, setIsFileUploadOpen] = useState(false)
+  const [attachedFiles, setAttachedFiles] = useState([])
+  const [isEnhancing, setIsEnhancing] = useState(false)
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
   const recognitionRef = useRef(null)
@@ -43,8 +47,9 @@ const ChatArea = ({
 
   const handleSendMessage = () => {
     if (!inputMessage.trim() || isLoading) return
-    onSendMessage(inputMessage.trim())
+    onSendMessage(inputMessage.trim(), attachedFiles)
     setInputMessage('')
+    setAttachedFiles([]) // Clear attached files after sending
   }
 
   const handleVoiceMessage = async (message) => {
@@ -52,10 +57,45 @@ const ChatArea = ({
     return await onSendMessage(message.trim())
   }
 
+  const handleFileUpload = (files) => {
+    console.log('Files uploaded:', files)
+    setAttachedFiles(prev => [...prev, ...files])
+    setIsFileUploadOpen(false)
+  }
+
+  const removeAttachedFile = (fileId) => {
+    setAttachedFiles(prev => prev.filter(file => file.id !== fileId))
+  }
+
+  const enhancePrompt = async () => {
+    if (!inputMessage.trim() || isEnhancing) return
+    
+    setIsEnhancing(true)
+    try {
+      // Create a temporary message for enhancement only
+      const enhancementRequest = `Please enhance this prompt to make it more detailed, clear, and effective. Return only the enhanced prompt without any explanations or additional text: "${inputMessage.trim()}"`
+      
+      // Call AI directly without adding to chat
+      const enhancedPrompt = await onSendMessage(enhancementRequest, [], true)
+      
+      if (enhancedPrompt && enhancedPrompt.trim()) {
+        // Update the text area with the enhanced prompt
+        setInputMessage(enhancedPrompt.trim())
+      }
+    } catch (error) {
+      console.error('Failed to enhance prompt:', error)
+    } finally {
+      setIsEnhancing(false)
+    }
+  }
+
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleSendMessage()
+    } else if (e.key === 'Enter' && e.ctrlKey) {
+      e.preventDefault()
+      enhancePrompt()
     }
   }
 
@@ -176,80 +216,148 @@ const ChatArea = ({
         </div>
       </div>
 
-      {/* Input Area */}
-      <div className="bg-dark-900 border-t border-dark-700 px-3 md:px-6 py-2 md:py-4 flex-shrink-0">
-        <div className="max-w-4xl mx-auto">
-          <div className={`flex items-center space-x-2 md:space-x-3 rounded-xl px-2 md:px-4 py-2 md:py-3 border transition-all duration-300 backdrop-blur-sm ${
-            isRecording 
-              ? 'bg-sunset-red/20 border-sunset-red/50 shadow-lg shadow-sunset-red/30' 
-              : 'bg-dark-800/50 border-sunset-purple/30 shadow-lg shadow-sunset-purple/10'
-          }`}>
-            {/* Plus Icon */}
-            <button 
-              className="p-1 md:p-2 text-gray-400 hover:text-white transition-colors relative group"
-              title="Coming Soon!"
-            >
-              <Plus size={16} className="md:w-5 md:h-5" />
-              {/* Tooltip */}
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-dark-700 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
-                Coming Soon!
-                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-dark-700"></div>
-              </div>
-            </button>
-            
-            {/* Input Field */}
-            <div className="flex-1">
-              <textarea
-                ref={inputRef}
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Ask anything"
-                className="w-full bg-transparent border-none outline-none text-white placeholder-gray-400 resize-none text-sm md:text-base"
-                rows="1"
-                style={{ minHeight: '20px', maxHeight: '120px' }}
-                disabled={isLoading}
-              />
-            </div>
-            
-            {/* Voice Input Button */}
-            <button
-              onClick={toggleVoiceInput}
-              disabled={isLoading}
-              className={`p-1 md:p-2 rounded-lg transition-colors ${
-                isRecording 
-                  ? 'bg-red-500 text-white' 
-                  : 'text-gray-400 hover:text-white hover:bg-dark-700'
-              }`}
-              title={isRecording ? 'Stop recording' : 'Start voice input'}
-            >
-              {isRecording ? <MicOff size={16} className="md:w-5 md:h-5" /> : <Mic size={16} className="md:w-5 md:h-5" />}
-            </button>
-            
-            {/* Voice Call Button */}
-            <button
-              onClick={() => setIsVoiceModeOpen(true)}
-              disabled={isLoading}
-              className="p-1 md:p-2 rounded-lg transition-colors text-gray-400 hover:text-white hover:bg-dark-700"
-              title="Voice Call Mode"
-            >
-              <Phone size={16} className="md:w-5 md:h-5" />
-            </button>
-            
-            {/* Send Button */}
-            <button
-              onClick={handleSendMessage}
-              disabled={!inputMessage.trim() || isLoading}
-              className={`p-1 md:p-2 rounded-lg transition-all duration-300 ${
-                inputMessage.trim() && !isLoading
-                  ? 'bg-gradient-to-r from-sunset-pink to-sunset-purple text-white hover:shadow-lg hover:shadow-sunset-pink/30'
-                  : 'bg-dark-700 text-gray-500 cursor-not-allowed'
-              }`}
-            >
-              <Send size={16} className="md:w-5 md:h-5" />
-            </button>
+             {/* Input Area */}
+       <div className="bg-dark-900 border-t border-dark-700 px-3 md:px-6 py-3 md:py-4 flex-shrink-0">
+         <div className="max-w-4xl mx-auto">
+           <div className={`flex flex-col space-y-2 rounded-xl px-3 md:px-4 py-3 md:py-4 border transition-all duration-300 backdrop-blur-sm ${
+             isRecording 
+               ? 'bg-sunset-red/20 border-sunset-red/50 shadow-lg shadow-sunset-red/30' 
+               : 'bg-dark-800/50 border-sunset-purple/30 shadow-lg shadow-sunset-purple/10'
+           }`}>
+                         {/* Top Row - Buttons and Input */}
+             <div className="flex items-center space-x-2 md:space-x-3">
+               {/* File Upload Button */}
+               <button 
+                 onClick={() => setIsFileUploadOpen(true)}
+                 className="p-1 md:p-2 text-gray-400 hover:text-white transition-colors relative group"
+                 title="Upload files"
+               >
+                 <Paperclip size={16} className="md:w-5 md:h-5" />
+                 {/* Tooltip */}
+                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-dark-700 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
+                   Upload files
+                   <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-dark-700"></div>
+                 </div>
+               </button>
+               
+               {/* Input Field */}
+               <div className="flex-1">
+                 <textarea
+                   ref={inputRef}
+                   value={inputMessage}
+                   onChange={(e) => setInputMessage(e.target.value)}
+                   onKeyPress={handleKeyPress}
+                   placeholder="Ask anything... (Press Ctrl+Enter to enhance your prompt)"
+                   className="w-full bg-transparent border-none outline-none text-white placeholder-gray-400 resize-none text-sm md:text-base"
+                   rows="3"
+                   style={{ minHeight: '60px', maxHeight: '200px' }}
+                   disabled={isLoading}
+                 />
+               </div>
+               
+               {/* Voice Input Button */}
+               <button
+                 onClick={toggleVoiceInput}
+                 disabled={isLoading}
+                 className={`p-1 md:p-2 rounded-lg transition-colors ${
+                   isRecording 
+                     ? 'bg-red-500 text-white' 
+                     : 'text-gray-400 hover:text-white hover:bg-dark-700'
+                 }`}
+                 title={isRecording ? 'Stop recording' : 'Start voice input'}
+               >
+                 {isRecording ? <MicOff size={16} className="md:w-5 md:h-5" /> : <Mic size={16} className="md:w-5 md:h-5" />}
+               </button>
+               
+               {/* Voice Call Button */}
+               <button
+                 onClick={() => setIsVoiceModeOpen(true)}
+                 disabled={isLoading}
+                 className="p-1 md:p-2 rounded-lg transition-colors text-gray-400 hover:text-white hover:bg-dark-700"
+                 title="Voice Call Mode"
+               >
+                 <Phone size={16} className="md:w-5 md:h-5" />
+               </button>
+               
+               {/* Send Button */}
+               <button
+                 onClick={handleSendMessage}
+                 disabled={!inputMessage.trim() || isLoading}
+                 className={`p-1 md:p-2 rounded-lg transition-all duration-300 ${
+                   inputMessage.trim() && !isLoading
+                     ? 'bg-gradient-to-r from-sunset-pink to-sunset-purple text-white hover:shadow-lg hover:shadow-sunset-pink/30'
+                     : 'bg-dark-700 text-gray-500 cursor-not-allowed'
+                 }`}
+               >
+                 <Send size={16} className="md:w-5 md:h-5" />
+               </button>
+             </div>
+             
+             {/* Bottom Row - Enhance Button and Character Count */}
+             <div className="flex items-center justify-between">
+               {/* Enhance Prompt Button */}
+               <button
+                 onClick={enhancePrompt}
+                 disabled={!inputMessage.trim() || isLoading || isEnhancing}
+                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-300 ${
+                   inputMessage.trim() && !isLoading && !isEnhancing
+                     ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:shadow-lg hover:shadow-purple-500/30'
+                     : 'bg-dark-700 text-gray-500 cursor-not-allowed'
+                 }`}
+                 title="Enhance your prompt with AI"
+               >
+                 <Wand2 size={14} className="md:w-4 md:h-4" />
+                 <span className="text-xs md:text-sm font-medium">
+                   {isEnhancing ? 'Enhancing...' : 'Enhance Prompt'}
+                 </span>
+               </button>
+               
+               {/* Character Count */}
+               <div className="text-xs text-gray-400">
+                 {inputMessage.length} characters
+               </div>
+             </div>
           </div>
           
+          {/* Attached Files Display */}
+          {attachedFiles.length > 0 && (
+            <div className="mt-2 md:mt-3 p-3 bg-dark-800 rounded-lg border border-dark-600">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-gray-400">Attached Files ({attachedFiles.length})</span>
+                <button
+                  onClick={() => setAttachedFiles([])}
+                  className="text-xs text-red-400 hover:text-red-300"
+                >
+                  Clear all
+                </button>
+              </div>
+              <div className="space-y-2">
+                {attachedFiles.map((file) => (
+                  <div key={file.id} className="flex items-center gap-2 p-2 bg-dark-700 rounded">
+                    {file.preview ? (
+                      <img
+                        src={file.preview}
+                        alt={file.name}
+                        className="w-8 h-8 object-cover rounded"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 bg-dark-600 rounded flex items-center justify-center">
+                        <FileText className="w-4 h-4 text-gray-400" />
+                      </div>
+                    )}
+                    <span className="text-xs text-white flex-1 truncate">{file.name}</span>
+                    <button
+                      onClick={() => removeAttachedFile(file.id)}
+                      className="text-xs text-red-400 hover:text-red-300"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Voice Recording Indicator */}
           {isRecording && (
             <div className="relative mt-2 md:mt-3 p-2 md:p-3 rounded-xl border-2 border-transparent bg-gradient-to-r from-sunset-pink/20 via-sunset-purple/20 to-sunset-orange/20 animate-pulse">
@@ -266,9 +374,9 @@ const ChatArea = ({
             </div>
           )}
           
-          <p className="text-xs text-gray-500 mt-1 md:mt-2 text-center px-2">
-            Press Enter to send, Shift+Enter for new line
-          </p>
+                     <p className="text-xs text-gray-500 mt-1 md:mt-2 text-center px-2">
+             Press Enter to send, Shift+Enter for new line, Ctrl+Enter to enhance prompt
+           </p>
         </div>
       </div>
       
@@ -279,6 +387,13 @@ const ChatArea = ({
         onSendMessage={handleVoiceMessage}
         isLoading={isLoading}
         currentTheme={currentTheme}
+      />
+
+      {/* File Upload Modal */}
+      <FileUploadModal
+        isOpen={isFileUploadOpen}
+        onClose={() => setIsFileUploadOpen(false)}
+        onFileUpload={handleFileUpload}
       />
     </div>
   )

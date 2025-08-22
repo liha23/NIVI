@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Bot, User, Volume2, VolumeX, Copy, Check } from 'lucide-react'
+import { Bot, User, Volume2, VolumeX, Copy, Check, FileText } from 'lucide-react'
 
 const ChatMessage = ({ message }) => {
   const isBot = message.type === 'bot'
@@ -75,7 +75,7 @@ const ChatMessage = ({ message }) => {
     }
   }
 
-  const formatMessageContent = (content) => {
+  const formatMessageContent = (content, files = []) => {
     // Replace Google and Gemini with Gupsup in display
     const processedContent = content
       .replace(/Google/gi, 'Gupsup')
@@ -164,9 +164,31 @@ const ChatMessage = ({ message }) => {
             )}
             
             <div className="flex items-start justify-between gap-2 md:gap-3 relative z-10">
-              <div className="flex-1 text-sm md:text-base">
-                {formatMessageContent(message.content)}
-              </div>
+                          <div className="flex-1 text-sm md:text-base">
+              {formatMessageContent(message.content, message.files)}
+              
+              {/* Display attached files */}
+              {message.files && message.files.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  {message.files.map((file, index) => (
+                    <div key={index} className="flex items-center gap-2 p-2 bg-dark-700 rounded">
+                      {file.preview ? (
+                        <img
+                          src={file.preview}
+                          alt={file.name}
+                          className="w-8 h-8 object-cover rounded"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 bg-dark-600 rounded flex items-center justify-center">
+                          <FileText className="w-4 h-4 text-gray-400" />
+                        </div>
+                      )}
+                      <span className="text-xs text-white flex-1 truncate">{file.name}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
               
               {/* Speak Button */}
               <button

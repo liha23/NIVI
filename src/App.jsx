@@ -85,7 +85,7 @@ function App() {
     }
   }, [isAuthenticated, token])
 
-  // Single useEffect for saving data - with much more aggressive debouncing
+  // Single useEffect for saving data - with immediate save for important changes
   useEffect(() => {
     console.log('Save effect triggered:', { 
       isAuthenticated, 
@@ -97,29 +97,23 @@ function App() {
     
     // Only save if we have meaningful changes and the messages have actually changed
     const messagesChanged = JSON.stringify(currentMessages) !== JSON.stringify(lastSavedMessages)
-    const shouldSave = currentMessages.length > 1 || 
-                      (currentMessages.length === 1 && currentMessages[0].type === 'user')
+    const shouldSave = currentMessages.length > 0
     
     console.log('Save conditions:', { messagesChanged, shouldSave, currentChatId: !!currentChatId })
     
-    // Much more aggressive debouncing - only save after 5 seconds of inactivity
-    const saveTimeout = setTimeout(() => {
-      if (isAuthenticated && token && currentChatId && shouldSave && messagesChanged) {
-        console.log('Saving to MongoDB after 5s debounce...')
-        console.log('Save conditions met:', { 
-          isAuthenticated, 
-          hasToken: !!token, 
-          currentChatId, 
-          shouldSave, 
-          messagesChanged,
-          messagesCount: currentMessages.length 
+    if (shouldSave && messagesChanged) {
+      // Immediate save for important changes (user messages, bot responses)
+      if (isAuthenticated && token && currentChatId) {
+        console.log('Saving to MongoDB immediately...')
+        saveCurrentChatToMongoDB().then(() => {
+          setLastSavedMessages([...currentMessages])
+        }).catch(error => {
+          console.error('Failed to save to MongoDB:', error)
         })
-        saveCurrentChatToMongoDB()
-        setLastSavedMessages([...currentMessages])
       }
       
-      if (!isAuthenticated && currentChatId && currentMessages.length > 0) {
-        console.log('Saving to localStorage...')
+      if (!isAuthenticated && currentChatId) {
+        console.log('Saving to localStorage immediately...')
         localStorage.setItem(`chat_${currentChatId}`, JSON.stringify(currentMessages))
       }
       
@@ -127,11 +121,65 @@ function App() {
         console.log('Saving chat history to localStorage...')
         localStorage.setItem('ai_chat_history', JSON.stringify(chatHistory))
       }
-    }, 5000) // 5 second debounce to drastically reduce API calls
-    
-    return () => clearTimeout(saveTimeout)
+    }
   }, [currentMessages, currentChatId, chatHistory, isAuthenticated, token, lastSavedMessages])
 
+  // Save on page unload/close
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      console.log('Page unloading, saving current chat...')
+      if (isAuthenticated && token && currentChatId && currentMessages.length > 0) {
+        // Use sendBeacon for reliable saving on page unload
+        const data = JSON.stringify({
+          messages: currentMessages
+        })
+        navigator.sendBeacon(`${frontendConfig.getApiUrl()}/api/chat/${currentChatId}`, data)
+      }
+      
+      if (!isAuthenticated && currentChatId && currentMessages.length > 0) {
+        localStorage.setItem(`chat_${currentChatId}`, JSON.stringify(currentMessages))
+        localStorage.setItem('ai_chat_history', JSON.stringify(chatHistory))
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+    }, [currentMessages, currentChatId, chatHistory, isAuthenticated, token])
+
+  // Force save function for critical saves
+  const forceSaveCurrentChat = async () => {
+    if (isAuthenticated && token && currentChatId && currentMessages.length > 0) {
+      try {
+        console.log('Force saving current chat...')
+        await saveCurrentChatToMongoDB()
+        setLastSavedMessages([...currentMessages])
+        console.log('✅ Force save completed successfully')
+      } catch (error) {
+        console.error('❌ Force save failed:', error)
+      }
+    } else if (!isAuthenticated && currentChatId && currentMessages.length > 0) {
+      console.log('Force saving to localStorage...')
+      localStorage.setItem(`chat_${currentChatId}`, JSON.stringify(currentMessages))
+      localStorage.setItem('ai_chat_history', JSON.stringify(chatHistory))
+      console.log('✅ Force save to localStorage completed')
+    }
+  }
+
+  // Periodic save to ensure messages are saved
+  useEffect(() => {
+    if (currentMessages.length > 0 && currentChatId) {
+      const interval = setInterval(() => {
+        const messagesChanged = JSON.stringify(currentMessages) !== JSON.stringify(lastSavedMessages)
+        if (messagesChanged) {
+          console.log('Periodic save triggered...')
+          forceSaveCurrentChat()
+        }
+      }, 10000) // Save every 10 seconds if there are unsaved changes
+      
+      return () => clearInterval(interval)
+    }
+  }, [currentMessages, currentChatId, lastSavedMessages, isAuthenticated, token])
+  
   // Helper function to create welcome message
   const getWelcomeMessage = () => ({
     id: Date.now(),
@@ -538,14 +586,15 @@ function App() {
     )
   }
 
-  const sendMessage = async (message) => {
+  const sendMessage = async (message, attachedFiles = [], isEnhanceMode = false) => {
     if (!message.trim() || isLoading) return
 
     const userMessage = {
       id: Date.now(),
       type: 'user',
       content: message.trim(),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      files: attachedFiles
     }
 
     const updatedMessages = [...currentMessages, userMessage]
@@ -558,20 +607,29 @@ function App() {
       console.log('Updated chat title for first message:', message.trim())
     }
 
-    // Save user message immediately to ensure it's stored
-    if (isAuthenticated && token && currentChatId) {
-      console.log('Saving user message immediately...')
-      setTimeout(() => {
-        saveCurrentChatToMongoDB()
-        setLastSavedMessages([...updatedMessages])
-      }, 500)
-    } else if (!isAuthenticated && currentChatId) {
-      console.log('Saving user message to localStorage...')
-      localStorage.setItem(`chat_${currentChatId}`, JSON.stringify(updatedMessages))
+    // Save user message immediately to ensure it's stored (only if not enhance mode)
+    if (!isEnhanceMode) {
+      if (isAuthenticated && token && currentChatId) {
+        console.log('Saving user message immediately...')
+        try {
+          await saveCurrentChatToMongoDB()
+          setLastSavedMessages([...updatedMessages])
+        } catch (error) {
+          console.error('Failed to save user message:', error)
+        }
+      } else if (!isAuthenticated && currentChatId) {
+        console.log('Saving user message to localStorage...')
+        localStorage.setItem(`chat_${currentChatId}`, JSON.stringify(updatedMessages))
+      }
     }
 
     try {
-      const response = await fetchGeminiResponse(message.trim())
+      const response = await fetchGeminiResponse(message.trim(), attachedFiles)
+      
+      // If this is enhance mode, return the response directly without adding to chat
+      if (isEnhanceMode) {
+        return response
+      }
       
       const botMessage = {
         id: Date.now() + 1,
@@ -583,22 +641,28 @@ function App() {
       const finalMessages = [...updatedMessages, botMessage]
       setCurrentMessages(finalMessages)
       
-      // Force save after bot response to ensure conversation is saved
-      if (isAuthenticated && token && currentChatId) {
-        setTimeout(() => {
+      // Force save after bot response to ensure conversation is saved (only if not enhance mode)
+      if (!isEnhanceMode) {
+        if (isAuthenticated && token && currentChatId) {
           console.log('Force saving after bot response...')
-          saveCurrentChatToMongoDB()
-          setLastSavedMessages([...finalMessages])
-        }, 2000) // Increased delay to avoid conflicts with debounced save
-      } else if (!isAuthenticated && currentChatId) {
-        setTimeout(() => {
+          try {
+            await saveCurrentChatToMongoDB()
+            setLastSavedMessages([...finalMessages])
+          } catch (error) {
+            console.error('Failed to save bot response:', error)
+          }
+        } else if (!isAuthenticated && currentChatId) {
           console.log('Force saving to localStorage after bot response...')
           localStorage.setItem(`chat_${currentChatId}`, JSON.stringify(finalMessages))
-        }, 2000)
+        }
       }
       
       return response
     } catch (error) {
+      // If this is enhance mode, return error message directly
+      if (isEnhanceMode) {
+        return "Sorry, I couldn't enhance your prompt right now. Please try again."
+      }
       console.error('Error:', error)
       const errorMessage = {
         id: Date.now() + 1,
@@ -615,7 +679,7 @@ function App() {
     }
   }
 
-  const fetchGeminiResponse = async (message) => {
+  const fetchGeminiResponse = async (message, attachedFiles = []) => {
     const creatorKeywords = ['who made you', 'who created you', 'who is your creator', 'who built you', 'who developed you']
     const isCreatorQuestion = creatorKeywords.some(keyword => 
       message.toLowerCase().includes(keyword.toLowerCase())
@@ -625,35 +689,17 @@ function App() {
       return `${config.CREATOR_NAME} is my creator! I was built with love and care by ${config.CREATOR_NAME} using the Gupsup AI technology. How can I assist you today?`
     }
 
-    // Check cache first
-    const cacheKey = message.toLowerCase().trim()
+    // Check cache first (include files in cache key if present)
+    const cacheKey = attachedFiles.length > 0 
+      ? `${message.toLowerCase().trim()}-with-files-${attachedFiles.length}`
+      : message.toLowerCase().trim()
+    
     if (responseCache.has(cacheKey)) {
       console.log('Returning cached response for:', cacheKey)
       return responseCache.get(cacheKey)
     }
 
-    // Add fallback responses for common questions to reduce API calls
-    const fallbackResponses = {
-      'hello': 'Hello! How can I help you today?',
-      'hi': 'Hi there! What can I assist you with?',
-      'how are you': 'I\'m doing great, thank you for asking! How can I help you?',
-      'what can you do': 'I can help you with various tasks like answering questions, writing, analysis, and more. What would you like to know?',
-      'help': 'I\'m here to help! You can ask me questions, get writing assistance, or just chat. What do you need?',
-      'thanks': 'You\'re welcome! Is there anything else I can help you with?',
-      'thank you': 'You\'re welcome! Feel free to ask if you need anything else.',
-      'bye': 'Goodbye! Have a great day!',
-      'goodbye': 'See you later! Take care!'
-    }
 
-    // Check for simple greetings or common phrases
-    const lowerMessage = message.toLowerCase().trim()
-    for (const [key, response] of Object.entries(fallbackResponses)) {
-      if (lowerMessage.includes(key)) {
-        // Cache the fallback response
-        setResponseCache(prev => new Map(prev).set(cacheKey, response))
-        return response
-      }
-    }
 
     const API_KEY = config.GEMINI_API_KEY
     
@@ -667,13 +713,51 @@ function App() {
       .slice(-10) // Only include last 10 messages for context (to avoid token limits)
       .map(msg => ({
         role: msg.type === 'user' ? 'user' : 'model',
-        parts: [{ text: msg.content }]
+        parts: msg.files && msg.files.length > 0 
+          ? [
+              { text: msg.content },
+              ...msg.files.map(file => ({
+                inlineData: {
+                  mimeType: file.type,
+                  data: file.dataUrl ? file.dataUrl.split(',')[1] : null
+                }
+              })).filter(file => file.inlineData.data)
+            ]
+          : [{ text: msg.content }]
       }))
+
+    // Prepare current message parts
+    const currentMessageParts = [{ text: message }]
+    
+    // Add file data if present
+    if (attachedFiles.length > 0) {
+      attachedFiles.forEach(file => {
+        if (file.dataUrl) {
+          if (file.type.startsWith('image/')) {
+            // Handle images
+            currentMessageParts.push({
+              inlineData: {
+                mimeType: file.type,
+                data: file.dataUrl.split(',')[1]
+              }
+            })
+          } else if (file.type === 'text/plain' || file.type === 'application/pdf') {
+            // Handle text files and PDFs
+            currentMessageParts.push({
+              inlineData: {
+                mimeType: file.type,
+                data: file.dataUrl.split(',')[1]
+              }
+            })
+          }
+        }
+      })
+    }
 
     // Add current message
     conversationHistory.push({
       role: 'user',
-      parts: [{ text: message }]
+      parts: currentMessageParts
     })
 
     // Enhanced system prompt for better code formatting and follow-up questions

@@ -136,9 +136,9 @@ const Sidebar = ({
                     </p>
                   </div>
                 ) : (
-                  filteredChats.map((chat) => (
+                  filteredChats.map((chat, index) => (
                     <div
-                      key={chat.id}
+                      key={`${chat.id}-${index}`}
                       className={`group flex items-center justify-between p-2 md:p-2 rounded-lg cursor-pointer transition-all duration-300 ${
                         currentChatId === chat.id
                           ? 'bg-dark-700 text-white'
