@@ -21,7 +21,10 @@ import {
   Share2,
   Edit3,
   Code,
-  Image
+  Image,
+  File,
+  Download,
+  Eye
 } from 'lucide-react'
 
 const ChatMessage = ({ message, onReply, onBookmark, onReaction, onMessageLike, onMessageDislike, onRegenerateAnswer }) => {
@@ -39,6 +42,64 @@ const ChatMessage = ({ message, onReply, onBookmark, onReaction, onMessageLike, 
   const [responseTime, setResponseTime] = useState(message.responseTime || null)
   const [copiedText, setCopiedText] = useState(false)
   const messageRef = useRef(null)
+
+  // File helper functions
+  const getFileIcon = (file) => {
+    if (!file || !file.type) {
+      return <File size={16} className="text-neutral-400" />
+    }
+    
+    if (file.type.startsWith('image/')) {
+      return <Image size={16} className="text-blue-400" />
+    } else if (file.type === 'application/pdf') {
+      return <FileText size={16} className="text-red-400" />
+    } else if (file.type.includes('document') || file.type === 'text/plain') {
+      return <FileText size={16} className="text-green-400" />
+    } else {
+      return <File size={16} className="text-neutral-400" />
+    }
+  }
+
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  }
+
+  const handleFileClick = (file) => {
+    if (file.dataUrl || file.preview) {
+      // Open file in new tab
+      const fileUrl = file.dataUrl || file.preview
+      const newWindow = window.open()
+      newWindow.document.write(`
+        <html>
+          <head>
+            <title>${file.name}</title>
+            <style>
+              body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #000; }
+              img { max-width: 100%; max-height: 100%; object-fit: contain; }
+              embed { width: 100%; height: 100vh; }
+            </style>
+          </head>
+          <body>
+            ${file.type && file.type.startsWith('image/') 
+              ? `<img src="${fileUrl}" alt="${file.name}" />`
+              : `<embed src="${fileUrl}" type="${file.type || 'application/octet-stream'}" />`
+            }
+          </body>
+        </html>
+      `)
+      newWindow.document.close()
+    } else if (file.file) {
+      // If we have the original file object, create a temporary URL
+      const url = URL.createObjectURL(file.file)
+      window.open(url, '_blank')
+      // Clean up the URL after a delay
+      setTimeout(() => URL.revokeObjectURL(url), 100)
+    }
+  }
 
   // Close menus when clicking outside
   useEffect(() => {
@@ -314,6 +375,54 @@ const ChatMessage = ({ message, onReply, onBookmark, onReaction, onMessageLike, 
             renderCodeBlock(block.code, block.language, index)
           )}
         </div>
+
+        {/* File Attachments */}
+        {message.files && message.files.length > 0 && (
+          <div className="mt-3">
+            <div className="text-xs text-neutral-400 mb-2 font-medium">
+              Attachments ({message.files.length})
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {message.files.map((file, index) => (
+                <div
+                  key={file.id || index}
+                  className="flex items-center gap-3 p-3 bg-neutral-800/50 border border-neutral-700/50 rounded-lg hover:bg-neutral-700/50 transition-all duration-200 cursor-pointer group"
+                  onClick={() => handleFileClick(file)}
+                >
+                  {file.preview || (file.type && file.type.startsWith('image/')) ? (
+                    <div className="relative">
+                      <img 
+                        src={file.preview || file.dataUrl} 
+                        alt={file.name}
+                        className="w-12 h-12 rounded object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded flex items-center justify-center transition-all">
+                        <Eye className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-12 h-12 bg-neutral-700 rounded flex items-center justify-center group-hover:bg-neutral-600 transition-colors">
+                      {getFileIcon(file)}
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm text-neutral-300 font-medium truncate">
+                      {file.name}
+                    </div>
+                    {file.size && (
+                      <div className="text-xs text-neutral-500">
+                        {formatFileSize(file.size)}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-shrink-0">
+                    <Download className="w-4 h-4 text-neutral-400 group-hover:text-neutral-200 transition-colors" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Reactions */}
         {Object.keys(reactions).length > 0 && (

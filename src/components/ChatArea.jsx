@@ -14,6 +14,9 @@ import {
   LogOut, 
   Paperclip, 
   FileText, 
+  Image,
+  File,
+  X,
   Wand2, 
   Search, 
   BarChart3, 
@@ -91,6 +94,7 @@ const ChatArea = ({
 
   const handleSendMessage = () => {
     if (!inputMessage.trim() || isLoading) return
+    console.log('Sending message with attached files:', attachedFiles)
     onSendMessage(inputMessage.trim(), attachedFiles)
     setInputMessage('')
     setAttachedFiles([])
@@ -110,12 +114,41 @@ const ChatArea = ({
 
   const handleFileUpload = (files) => {
     console.log('Files uploaded:', files)
-    setAttachedFiles(prev => [...prev, ...files])
+    console.log('Current attached files before:', attachedFiles)
+    setAttachedFiles(prev => {
+      const newFiles = [...prev, ...files]
+      console.log('New attached files:', newFiles)
+      return newFiles
+    })
     setIsFileUploadOpen(false)
   }
 
   const removeAttachedFile = (fileId) => {
     setAttachedFiles(prev => prev.filter(file => file.id !== fileId))
+  }
+
+  const getFileIcon = (file) => {
+    if (!file || !file.type) {
+      return <File size={16} className="text-neutral-400" />
+    }
+    
+    if (file.type.startsWith('image/')) {
+      return <Image size={16} className="text-blue-400" />
+    } else if (file.type === 'application/pdf') {
+      return <FileText size={16} className="text-red-400" />
+    } else if (file.type.includes('document') || file.type === 'text/plain') {
+      return <FileText size={16} className="text-green-400" />
+    } else {
+      return <File size={16} className="text-neutral-400" />
+    }
+  }
+
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   }
 
   const enhancePrompt = async () => {
@@ -363,24 +396,45 @@ const ChatArea = ({
         <div className="max-w-4xl mx-auto">
           {/* Attached Files */}
           {attachedFiles.length > 0 && (
-            <div className="mb-4 flex flex-wrap gap-2">
-              {attachedFiles.map((file) => (
-                <div
-                  key={file.id}
-                  className="flex items-center gap-2 px-3 py-2 bg-neutral-800/50 border border-neutral-700/50 rounded-lg"
-                >
-                  <FileText size={16} className="text-brand-400" />
-                  <span className="text-sm text-neutral-300 truncate max-w-32">
-                    {file.name}
-                  </span>
-                  <button
-                    onClick={() => removeAttachedFile(file.id)}
-                    className="text-neutral-400 hover:text-error-400 transition-colors"
+            <div className="mb-4">
+              <div className="text-xs text-neutral-400 mb-2 font-medium">
+                Attached Files ({attachedFiles.length})
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {attachedFiles.map((file) => (
+                  <div
+                    key={file.id}
+                    className="flex items-center gap-2 px-3 py-2 bg-neutral-800/50 border border-neutral-700/50 rounded-lg hover:bg-neutral-700/50 transition-colors"
                   >
-                    ×
-                  </button>
-                </div>
-              ))}
+                    {file.preview ? (
+                      <img 
+                        src={file.preview} 
+                        alt={file.name}
+                        className="w-4 h-4 rounded object-cover"
+                      />
+                    ) : (
+                      getFileIcon(file)
+                    )}
+                    <div className="flex flex-col">
+                      <span className="text-sm text-neutral-300 truncate max-w-32">
+                        {file.name}
+                      </span>
+                      {file.size && (
+                        <span className="text-xs text-neutral-500">
+                          {formatFileSize(file.size)}
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => removeAttachedFile(file.id)}
+                      className="text-neutral-400 hover:text-error-400 transition-colors ml-1"
+                      title="Remove file"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
