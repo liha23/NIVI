@@ -24,15 +24,35 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [])
 
-  // Apply theme to document
+  // Apply theme to document with modern CSS variables
   useEffect(() => {
     const theme = config.THEMES[currentTheme]
     if (theme) {
-      document.documentElement.style.setProperty('--color-primary', theme.primary)
-      document.documentElement.style.setProperty('--color-background', theme.background)
-      document.documentElement.style.setProperty('--color-surface', theme.surface)
-      document.documentElement.style.setProperty('--color-text', theme.text)
-      document.documentElement.style.setProperty('--color-text-secondary', theme.textSecondary)
+      const root = document.documentElement
+      
+      // Apply theme colors
+      root.style.setProperty('--color-primary', theme.primary)
+      root.style.setProperty('--color-primary-hover', theme.primary + 'dd')
+      root.style.setProperty('--color-secondary', theme.secondary)
+      root.style.setProperty('--color-background', theme.background)
+      root.style.setProperty('--color-surface', theme.surface)
+      root.style.setProperty('--color-surface-hover', theme.surfaceHover)
+      root.style.setProperty('--color-border', theme.border)
+      root.style.setProperty('--color-text', theme.text)
+      root.style.setProperty('--color-text-secondary', theme.textSecondary)
+      root.style.setProperty('--color-text-muted', theme.textMuted)
+      root.style.setProperty('--color-accent', theme.accent)
+      root.style.setProperty('--color-success', theme.success)
+      root.style.setProperty('--color-warning', theme.warning)
+      root.style.setProperty('--color-error', theme.error)
+      
+      // Generate gradients
+      root.style.setProperty('--gradient-primary', `linear-gradient(135deg, ${theme.primary} 0%, ${theme.accent} 100%)`)
+      root.style.setProperty('--gradient-accent', `linear-gradient(135deg, ${theme.secondary} 0%, ${theme.primary} 100%)`)
+      root.style.setProperty('--gradient-surface', `linear-gradient(135deg, ${theme.surface} 0%, ${theme.surfaceHover} 100%)`)
+      
+      // Add theme class to body for additional styling
+      document.body.className = `theme-${currentTheme}`
       
       // Save to cookies
       cookieUtils.setCookie('theme', currentTheme)
@@ -49,12 +69,17 @@ export const ThemeProvider = ({ children }) => {
     setIsSettingsOpen(!isSettingsOpen)
   }
 
+  const getCurrentThemeData = () => {
+    return config.THEMES[currentTheme]
+  }
+
   const value = {
     currentTheme,
     themes: config.THEMES,
     changeTheme,
     isSettingsOpen,
-    toggleSettings
+    toggleSettings,
+    getCurrentThemeData
   }
 
   return (

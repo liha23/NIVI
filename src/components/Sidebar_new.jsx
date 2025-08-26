@@ -207,8 +207,11 @@ const Sidebar = ({
           <div className="flex-shrink-0 p-6 border-b border-neutral-800/50">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-brand-500 to-accent-purple rounded-xl flex items-center justify-center shadow-glow">
-                  <Zap className="w-5 h-5 text-white" />
+                <div className="relative">
+                  <div className="w-10 h-10 bg-gradient-to-br from-brand-500 to-accent-purple rounded-xl flex items-center justify-center shadow-glow">
+                    <Zap className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-accent-emerald rounded-full border-2 border-neutral-900 animate-pulse-soft" />
                 </div>
                 <div>
                   <h2 className="text-lg font-bold text-gradient-primary">NIVI AI</h2>
@@ -315,6 +318,11 @@ const Sidebar = ({
                 <Settings size={16} />
                 Settings
               </button>
+              
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 bg-accent-emerald rounded-full animate-pulse-soft" />
+                <span className="text-xs text-neutral-500">Online</span>
+              </div>
             </div>
           </div>
         </div>

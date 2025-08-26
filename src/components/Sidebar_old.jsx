@@ -207,8 +207,11 @@ const Sidebar = ({
           <div className="flex-shrink-0 p-6 border-b border-neutral-800/50">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-brand-500 to-accent-purple rounded-xl flex items-center justify-center shadow-glow">
-                  <Zap className="w-5 h-5 text-white" />
+                <div className="relative">
+                  <div className="w-10 h-10 bg-gradient-to-br from-brand-500 to-accent-purple rounded-xl flex items-center justify-center shadow-glow">
+                    <Zap className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-accent-emerald rounded-full border-2 border-neutral-900 animate-pulse-soft" />
                 </div>
                 <div>
                   <h2 className="text-lg font-bold text-gradient-primary">NIVI AI</h2>
@@ -315,6 +318,11 @@ const Sidebar = ({
                 <Settings size={16} />
                 Settings
               </button>
+              
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 bg-accent-emerald rounded-full animate-pulse-soft" />
+                <span className="text-xs text-neutral-500">Online</span>
+              </div>
             </div>
           </div>
         </div>
@@ -322,6 +330,144 @@ const Sidebar = ({
 
       {/* Settings Modal */}
       {isSettingsOpen && <SettingsModal />}
+    </>
+  )
+}
+
+export default Sidebar
+            >
+              <Plus size={16} />
+              New Chat
+            </button>
+          </div>
+
+          {/* Search */}
+          <div className="p-4 border-b border-dark-700 flex-shrink-0">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+              <input
+                type="text"
+                placeholder="Search chats..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-dark-800 border border-dark-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
+              />
+            </div>
+          </div>
+
+          {/* Chat History */}
+          <div className="flex-1 overflow-y-auto min-h-0 scrollbar-modern">
+            <div className="p-4">
+              <h3 className="text-sm font-medium text-gray-400 mb-3">
+                {searchQuery ? `Search Results (${filteredChats.length})` : 'Recent Chats'}
+              </h3>
+              <div className="space-y-2">
+                {filteredChats.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <MessageSquare size={32} className="mx-auto mb-3 opacity-50" />
+                    <p className="text-sm">
+                      {searchQuery ? 'No chats found matching your search' : 'No chat history yet'}
+                    </p>
+                    <p className="text-xs mt-1">
+                      {searchQuery ? 'Try a different search term' : 'Start a new conversation!'}
+                    </p>
+                  </div>
+                ) : (
+                  filteredChats.map((chat, index) => (
+                    <div
+                      key={`${chat.id}-${index}`}
+                      className={`group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                        currentChatId === chat.id
+                          ? 'bg-primary-500/10 border border-primary-500/20 text-white'
+                          : 'hover:bg-dark-800 text-gray-300 hover:text-white'
+                      }`}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        console.log('Chat clicked:', chat.id)
+                        onSelectChat(chat.id)
+                        // Close sidebar on mobile after selecting chat
+                        if (window.innerWidth < 768) {
+                          onToggle()
+                        }
+                      }}
+                    >
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                          currentChatId === chat.id 
+                            ? 'bg-primary-500' 
+                            : 'bg-dark-700'
+                        }`}>
+                          <MessageSquare size={16} className="text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {truncateText(chat.title || 'New Chat')}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <p className="text-xs text-gray-400">
+                              {formatDate(chat.timestamp)}
+                            </p>
+                            {chat.messageCount > 0 && (
+                              <span className="text-xs bg-dark-700 px-2 py-1 rounded-full text-gray-300">
+                                {chat.messageCount} msg{chat.messageCount !== 1 ? 's' : ''}
+                              </span>
+                            )}
+                          </div>
+                          {chat.lastMessage && (
+                            <p className="text-xs text-gray-500 truncate mt-1">
+                              {truncateText(chat.lastMessage, 35)}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Delete Button */}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          console.log('Delete chat clicked:', chat.id)
+                          if (window.confirm('Are you sure you want to delete this chat?')) {
+                            onDeleteChat(chat.id)
+                          }
+                        }}
+                        className="opacity-0 group-hover:opacity-100 p-2 rounded-lg hover:bg-red-500 hover:text-white transition-all duration-200"
+                        title="Delete chat"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="p-4 border-t border-dark-700 flex-shrink-0">
+            <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-dark-800 cursor-pointer transition-colors">
+              <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
+                <User className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-white">My Profile</p>
+                <p className="text-xs text-gray-400">Free Tier</p>
+              </div>
+              <button
+                onClick={toggleSettings}
+                className="p-2 rounded-lg hover:bg-dark-700 text-gray-400 hover:text-white transition-colors"
+                title="Settings"
+              >
+                <Settings size={16} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Settings Modal */}
+      <SettingsModal isOpen={isSettingsOpen} onClose={toggleSettings} />
     </>
   )
 }

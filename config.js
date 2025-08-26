@@ -10,51 +10,117 @@ export const config = {
   MODEL: 'gemini-2.0-flash',
   
   // App Configuration
-  APP_NAME: 'Gupsup AI',
-  CREATOR_NAME: 'Gupsup',
+  APP_NAME: 'NIVI AI',
+  CREATOR_NAME: 'NIVI',
   
   // UI Configuration
   MAX_MESSAGE_LENGTH: 1000,
-  TYPING_DELAY: 1000, // milliseconds
+  TYPING_DELAY: 800, // milliseconds
   
   // Theme Configuration
   THEMES: {
-    dark: {
-      name: 'Dark',
-      description: 'Classic dark theme',
-      primary: '#6366f1',
+    midnight: {
+      name: 'Midnight',
+      description: 'Deep dark theme with modern aesthetics',
+      primary: '#0ea5e9',
+      secondary: '#8b5cf6',
       background: '#0a0a0a',
-      surface: '#1a1a1a',
-      text: '#ffffff',
-      textSecondary: '#9ca3af'
+      surface: '#171717',
+      surfaceHover: '#262626',
+      border: '#404040',
+      text: '#fafafa',
+      textSecondary: '#a3a3a3',
+      textMuted: '#737373',
+      accent: '#3b82f6',
+      success: '#10b981',
+      warning: '#f59e0b',
+      error: '#ef4444'
+    },
+    aurora: {
+      name: 'Aurora',
+      description: 'Dark theme with vibrant gradient accents',
+      primary: '#6366f1',
+      secondary: '#ec4899',
+      background: '#0f0f23',
+      surface: '#1a1a2e',
+      surfaceHover: '#2d2d3f',
+      border: '#404969',
+      text: '#f8fafc',
+      textSecondary: '#94a3b8',
+      textMuted: '#64748b',
+      accent: '#8b5cf6',
+      success: '#10b981',
+      warning: '#f59e0b',
+      error: '#f43f5e'
+    },
+    ocean: {
+      name: 'Ocean',
+      description: 'Cool blue theme inspired by deep waters',
+      primary: '#0ea5e9',
+      secondary: '#06b6d4',
+      background: '#0c1420',
+      surface: '#1e293b',
+      surfaceHover: '#334155',
+      border: '#475569',
+      text: '#f1f5f9',
+      textSecondary: '#94a3b8',
+      textMuted: '#64748b',
+      accent: '#3b82f6',
+      success: '#14b8a6',
+      warning: '#f59e0b',
+      error: '#ef4444'
+    },
+    forest: {
+      name: 'Forest',
+      description: 'Nature-inspired green theme',
+      primary: '#10b981',
+      secondary: '#059669',
+      background: '#0d1b0f',
+      surface: '#1a2e1a',
+      surfaceHover: '#2d4a2d',
+      border: '#3a5a3a',
+      text: '#f0fdf4',
+      textSecondary: '#86efac',
+      textMuted: '#4ade80',
+      accent: '#22c55e',
+      success: '#10b981',
+      warning: '#eab308',
+      error: '#ef4444'
+    },
+    sunset: {
+      name: 'Sunset',
+      description: 'Warm orange and pink gradient theme',
+      primary: '#f97316',
+      secondary: '#ec4899',
+      background: '#1a0f0a',
+      surface: '#2a1a0f',
+      surfaceHover: '#3a2a1f',
+      border: '#5a4a3f',
+      text: '#fef7ed',
+      textSecondary: '#fdba74',
+      textMuted: '#fb923c',
+      accent: '#f59e0b',
+      success: '#10b981',
+      warning: '#f59e0b',
+      error: '#ef4444'
     },
     light: {
       name: 'Light',
-      description: 'Clean light theme',
-      primary: '#6366f1',
+      description: 'Clean modern light theme',
+      primary: '#0ea5e9',
+      secondary: '#8b5cf6',
       background: '#ffffff',
-      surface: '#f9fafb',
-      text: '#111827',
-      textSecondary: '#6b7280'
-    },
-    blue: {
-      name: 'Blue',
-      description: 'Ocean blue theme',
-      primary: '#3b82f6',
-      background: '#0f172a',
-      surface: '#1e293b',
-      text: '#f8fafc',
-      textSecondary: '#94a3b8'
-    },
-    purple: {
-      name: 'Purple',
-      description: 'Royal purple theme',
-      primary: '#8b5cf6',
-      background: '#1a1a2e',
-      surface: '#16213e',
-      text: '#ffffff',
-      textSecondary: '#a1a1aa'
+      surface: '#fafafa',
+      surfaceHover: '#f5f5f5',
+      border: '#e5e5e5',
+      text: '#0a0a0a',
+      textSecondary: '#525252',
+      textMuted: '#737373',
+      accent: '#3b82f6',
+      success: '#10b981',
+      warning: '#f59e0b',
+      error: '#ef4444'
     }
   },
-  DEFAULT_THEME: 'dark'
+  DEFAULT_THEME: 'midnight'
 }
