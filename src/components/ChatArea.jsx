@@ -477,8 +477,9 @@ const ChatArea = ({
 
       {isFileUploadOpen && (
         <FileUploadModal
+          isOpen={isFileUploadOpen}
           onClose={() => setIsFileUploadOpen(false)}
-          onUpload={handleFileUpload}
+          onFileUpload={handleFileUpload}
         />
       )}
     </div>

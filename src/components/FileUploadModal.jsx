@@ -168,13 +168,13 @@ const FileUploadModal = ({ isOpen, onClose, onFileUpload }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-dark-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden">
+      <div className="bg-neutral-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-dark-600">
+        <div className="flex items-center justify-between p-6 border-b border-neutral-600">
           <h2 className="text-xl font-semibold text-white">Upload Files</h2>
           <button
             onClick={handleClose}
-            className="p-2 rounded-lg hover:bg-dark-700 text-gray-400 hover:text-white transition-colors"
+            className="p-2 rounded-lg hover:bg-neutral-700 text-gray-400 hover:text-white transition-colors"
           >
             <X size={20} />
           </button>
@@ -186,8 +186,8 @@ const FileUploadModal = ({ isOpen, onClose, onFileUpload }) => {
           <div
             className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 ${
               isDragOver
-                ? 'border-primary-500 bg-primary-500/10'
-                : 'border-dark-600 hover:border-dark-500'
+                ? 'border-brand-500 bg-brand-500/10'
+                : 'border-neutral-600 hover:border-neutral-500'
             }`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -201,7 +201,7 @@ const FileUploadModal = ({ isOpen, onClose, onFileUpload }) => {
               or{' '}
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="text-primary-500 hover:text-primary-400 underline"
+                className="text-brand-500 hover:text-brand-400 underline"
               >
                 browse files
               </button>
@@ -228,7 +228,7 @@ const FileUploadModal = ({ isOpen, onClose, onFileUpload }) => {
                 {uploadedFiles.map((fileData) => (
                   <div
                     key={fileData.id}
-                    className="flex items-center gap-3 p-3 bg-dark-700 rounded-lg"
+                    className="flex items-center gap-3 p-3 bg-neutral-700 rounded-lg"
                   >
                     {fileData.preview ? (
                       <img
@@ -237,7 +237,7 @@ const FileUploadModal = ({ isOpen, onClose, onFileUpload }) => {
                         className="w-12 h-12 object-cover rounded"
                       />
                     ) : (
-                      <div className="w-12 h-12 bg-dark-600 rounded flex items-center justify-center">
+                      <div className="w-12 h-12 bg-neutral-600 rounded flex items-center justify-center">
                         {getFileIcon(fileData)}
                       </div>
                     )}
@@ -262,7 +262,7 @@ const FileUploadModal = ({ isOpen, onClose, onFileUpload }) => {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-dark-600">
+        <div className="flex items-center justify-end gap-3 p-6 border-t border-neutral-600">
           <button
             onClick={handleClose}
             className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
@@ -274,8 +274,8 @@ const FileUploadModal = ({ isOpen, onClose, onFileUpload }) => {
             disabled={uploadedFiles.length === 0 || isUploading}
             className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
               uploadedFiles.length === 0 || isUploading
-                ? 'bg-dark-600 text-gray-500 cursor-not-allowed'
-                : 'bg-primary-500 hover:bg-primary-600 text-white'
+                ? 'bg-neutral-600 text-gray-500 cursor-not-allowed'
+                : 'bg-brand-500 hover:bg-brand-600 text-white'
             }`}
           >
             {isUploading ? 'Uploading...' : `Upload ${uploadedFiles.length} file${uploadedFiles.length !== 1 ? 's' : ''}`}
