@@ -50,12 +50,15 @@ const ChatMessage = ({ message, onReply, onBookmark, onReaction, onMessageLike, 
         window.speechSynthesis.cancel()
       }
 
-      // Remove asterisks and replace Google/Gemini with Gupsup for cleaner speech
+      // Remove asterisks and replace Google/Gemini with NIVII for cleaner speech
       const cleanText = text
         .replace(/\*/g, '')
-        .replace(/Google/gi, 'Gupsup')
-        .replace(/Gemini/gi, 'Gupsup')
-        .replace(/\bGupsup\b/g, 'Gupsup') // Keep Gupsup as is for better pronunciation
+        .replace(/Google/gi, 'NIVII')
+        .replace(/Gemini/gi, 'NIVII')
+        .replace(/Google AI/gi, 'NIVII AI')
+        .replace(/Google's/gi, 'NIVII\'s')
+        .replace(/Google Assistant/gi, 'NIVII Assistant')
+        .replace(/\bNIVII\b/g, 'NIVII') // Keep NIVII as is for better pronunciation
 
       const utterance = new SpeechSynthesisUtterance(cleanText)
       utterance.rate = 1.0 // Normal speed (1x)
@@ -202,10 +205,13 @@ const ChatMessage = ({ message, onReply, onBookmark, onReaction, onMessageLike, 
   ]
 
   const formatMessageContent = (content, files = []) => {
-    // Replace Google and Gemini with Gupsup in display
+    // Replace Google and Gemini with NIVII in display
     const processedContent = content
-      .replace(/Google/gi, 'Gupsup')
-      .replace(/Gemini/gi, 'Gupsup')
+      .replace(/Google/gi, 'NIVII')
+      .replace(/Gemini/gi, 'NIVII')
+      .replace(/Google AI/gi, 'NIVII AI')
+      .replace(/Google's/gi, 'NIVII\'s')
+      .replace(/Google Assistant/gi, 'NIVII Assistant')
 
     // Split content by code blocks (```language or ```)
     const parts = processedContent.split(/(```[\s\S]*?```)/g)

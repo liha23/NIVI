@@ -131,7 +131,7 @@ const Register = ({ onSwitchToLogin, onRegister }) => {
             <div className="absolute -top-2 -right-2 w-6 h-6 bg-accent-emerald rounded-full border-4 border-neutral-900 animate-bounce-subtle" />
           </div>
           <h1 className="text-3xl font-bold text-gradient-primary mb-2">
-            Join NIVI AI
+            Join NIVII AI
           </h1>
           <p className="text-neutral-400 text-lg">Create your account to get started</p>
         </div>

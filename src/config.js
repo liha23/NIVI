@@ -1,7 +1,7 @@
 // Frontend configuration for AI Chat
 export const frontendConfig = {
   // API Configuration
-  API_BASE_URL: 'https://nivi-4l6r.vercel.app',
+  API_BASE_URL: 'https://api.nivii.app',
   
   // App Configuration
   APP_NAME: 'Gupsup AI',

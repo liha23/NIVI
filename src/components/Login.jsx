@@ -73,7 +73,7 @@ const Login = ({ onSwitchToRegister, onLogin }) => {
           <h1 className="text-3xl font-bold text-gradient-primary mb-2">
             Welcome Back
           </h1>
-          <p className="text-neutral-400 text-lg">Sign in to continue with NIVI AI</p>
+          <p className="text-neutral-400 text-lg">Sign in to continue with NIVII AI</p>
         </div>
 
         {/* Login Form */}

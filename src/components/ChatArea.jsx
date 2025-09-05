@@ -242,11 +242,6 @@ const ChatArea = ({
               <ChevronRight size={18} />
             </button>
             
-            {/* Status indicator */}
-            <div className="hidden md:flex items-center gap-2">
-              <div className="w-2 h-2 bg-accent-emerald rounded-full animate-pulse-soft" />
-              <span className="text-xs text-neutral-400 font-medium">Online</span>
-            </div>
           </div>
           
           {/* Center - Chat Title */}
@@ -255,10 +250,9 @@ const ChatArea = ({
               <div className="w-10 h-10 bg-gradient-to-br from-brand-500 to-accent-purple rounded-xl flex items-center justify-center shadow-glow">
                 <Zap className="w-5 h-5 text-white" />
               </div>
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-accent-emerald rounded-full border-2 border-neutral-900 animate-pulse-soft" />
             </div>
             <div className="text-center">
-              <h1 className="text-lg font-bold text-gradient-primary">NIVI AI</h1>
+              <h1 className="text-lg font-bold text-gradient-primary">NIVII AI</h1>
               {currentChatTitle && (
                 <p className="text-xs text-neutral-400 truncate max-w-48">
                   {currentChatTitle}
@@ -334,7 +328,7 @@ const ChatArea = ({
               </div>
               
               <h2 className="text-2xl font-bold text-gradient-primary mb-3">
-                Welcome to NIVI AI
+                Welcome to NIVII AI
               </h2>
               <p className="text-neutral-400 text-lg mb-8 max-w-md">
                 Your intelligent assistant is ready to help. Start a conversation by typing a message below.
@@ -457,7 +451,7 @@ const ChatArea = ({
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyDown={handleKeyPress}
-                  placeholder="Ask NIVI anything..."
+                  placeholder="Ask NIVII anything..."
                   className="w-full bg-transparent text-neutral-100 placeholder-neutral-400 resize-none outline-none min-h-[24px] max-h-[200px] py-1"
                   rows={1}
                   disabled={isLoading}

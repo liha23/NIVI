@@ -136,9 +136,12 @@ const ChatMessage = ({ message, onReply, onBookmark, onReaction, onMessageLike, 
 
       const cleanText = text
         .replace(/\*/g, '')
-        .replace(/Google/gi, 'NIVI')
-        .replace(/Gemini/gi, 'NIVI')
-        .replace(/\bNIVI\b/g, 'NIVI')
+        .replace(/Google/gi, 'NIVII')
+        .replace(/Gemini/gi, 'NIVII')
+        .replace(/Google AI/gi, 'NIVII AI')
+        .replace(/Google's/gi, 'NIVII\'s')
+        .replace(/Google Assistant/gi, 'NIVII Assistant')
+        .replace(/\bNIVII\b/g, 'NIVII')
 
       const utterance = new SpeechSynthesisUtterance(cleanText)
       utterance.rate = 1.0
@@ -343,7 +346,7 @@ const ChatMessage = ({ message, onReply, onBookmark, onReaction, onMessageLike, 
         {/* Header */}
         <div className="flex items-center gap-2 mb-2">
           <span className="font-semibold text-neutral-200">
-            {isBot ? 'NIVI AI' : 'You'}
+            {isBot ? 'NIVII AI' : 'You'}
           </span>
           {isBot && (
             <span className="px-2 py-0.5 bg-brand-500/20 text-brand-300 text-xs font-medium rounded-md border border-brand-500/30">

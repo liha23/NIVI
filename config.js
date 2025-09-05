@@ -10,8 +10,8 @@ export const config = {
   MODEL: 'gemini-2.0-flash',
   
   // App Configuration
-  APP_NAME: 'NIVI AI',
-  CREATOR_NAME: 'NIVI',
+  APP_NAME: 'NIVII AI',
+  CREATOR_NAME: 'NIVII',
   
   // UI Configuration
   MAX_MESSAGE_LENGTH: 1000,

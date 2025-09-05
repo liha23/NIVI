@@ -56,10 +56,19 @@ function App() {
       console.log('Loading chats from localStorage...')
       const savedChatHistory = localStorage.getItem('ai_chat_history')
       if (savedChatHistory) {
-        try {
-          const history = JSON.parse(savedChatHistory)
-          console.log('Loaded chat history from localStorage:', history.length, 'chats')
-          setChatHistory(history)
+                 try {
+           const history = JSON.parse(savedChatHistory)
+           console.log('Loaded chat history from localStorage:', history.length, 'chats')
+           
+           // Ensure all chat history items have proper timestamp fields
+           const formattedHistory = history.map(chat => ({
+             ...chat,
+             lastActivity: chat.lastActivity || chat.timestamp || new Date(),
+             createdAt: chat.createdAt || chat.timestamp || new Date(),
+             timestamp: chat.timestamp || new Date()
+           }))
+           
+           setChatHistory(formattedHistory)
           
           if (history.length > 0) {
             const mostRecentChat = history[0]
@@ -280,14 +289,16 @@ function App() {
         const data = await response.json()
         console.log('MongoDB response data:', data)
         
-        if (data.success && data.data) {
-          const chats = data.data.map(chat => ({
-            id: chat.chatId,
-            title: chat.title,
-            messageCount: chat.messageCount,
-            lastMessage: chat.lastMessage,
-            timestamp: new Date(chat.updatedAt)
-          }))
+                 if (data.success && data.data) {
+           const chats = data.data.map(chat => ({
+             id: chat.chatId,
+             title: chat.title,
+             messageCount: chat.messageCount,
+             lastMessage: chat.lastMessage,
+             timestamp: new Date(chat.updatedAt || chat.createdAt || new Date()),
+             lastActivity: new Date(chat.updatedAt || chat.createdAt || new Date()),
+             createdAt: new Date(chat.createdAt || chat.updatedAt || new Date())
+           }))
           console.log('Processed chats:', chats)
           setChatHistory(chats)
           
@@ -506,30 +517,34 @@ function App() {
     const welcomeMessage = getWelcomeMessage()
     const newChatId = Date.now()
     
-    if (isAuthenticated && token) {
-      // For authenticated users, create a temporary chat that will be saved to MongoDB
-      console.log('Creating new chat for authenticated user with temp ID:', newChatId)
-      setCurrentMessages([welcomeMessage])
-      setCurrentChatId(newChatId)
-      setLastSavedMessages([welcomeMessage]) // Prevent unnecessary saves
-      
-      const newChat = {
-        id: newChatId,
-        title: 'New Chat',
-        timestamp: new Date()
-      }
+         if (isAuthenticated && token) {
+       // For authenticated users, create a temporary chat that will be saved to MongoDB
+       console.log('Creating new chat for authenticated user with temp ID:', newChatId)
+       setCurrentMessages([welcomeMessage])
+       setCurrentChatId(newChatId)
+       setLastSavedMessages([welcomeMessage]) // Prevent unnecessary saves
+       
+       const newChat = {
+         id: newChatId,
+         title: 'New Chat',
+         timestamp: new Date(),
+         lastActivity: new Date(),
+         createdAt: new Date()
+       }
       setChatHistory(prev => [newChat, ...prev])
       
       // Don't immediately save - let the save effect handle it when messages change
       // This prevents the 404 error from trying to update a non-existent chat
-    } else {
-      // For non-authenticated users, create local chat
-      console.log('Creating new chat for non-authenticated user')
-      const newChat = {
-        id: newChatId,
-        title: 'New Chat',
-        timestamp: new Date()
-      }
+         } else {
+       // For non-authenticated users, create local chat
+       console.log('Creating new chat for non-authenticated user')
+       const newChat = {
+         id: newChatId,
+         title: 'New Chat',
+         timestamp: new Date(),
+         lastActivity: new Date(),
+         createdAt: new Date()
+       }
       
       setChatHistory(prev => [newChat, ...prev])
       setCurrentChatId(newChatId)
@@ -650,16 +665,21 @@ function App() {
     }
   }
 
-  const updateChatTitle = (chatId, firstMessage) => {
-    const title = firstMessage.length > 50 ? firstMessage.substring(0, 50) + '...' : firstMessage
-    setChatHistory(prev => 
-      prev.map(chat => 
-        chat.id === chatId 
-          ? { ...chat, title } 
-          : chat
-      )
-    )
-  }
+     const updateChatTitle = (chatId, firstMessage) => {
+     const title = firstMessage.length > 50 ? firstMessage.substring(0, 50) + '...' : firstMessage
+     setChatHistory(prev => 
+       prev.map(chat => 
+         chat.id === chatId 
+           ? { 
+               ...chat, 
+               title,
+               lastActivity: new Date(),
+               timestamp: new Date()
+             } 
+           : chat
+       )
+     )
+   }
 
   const sendMessage = async (message, attachedFiles = [], isEnhanceMode = false) => {
     if (!message.trim() || isLoading) return
@@ -894,6 +914,33 @@ Remember to be conversational and helpful!`
           const data = await response.json()
           if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
             let responseText = data.candidates[0].content.parts[0].text
+            
+            // Replace Google/Gemini references with NIVII
+            responseText = responseText
+              .replace(/Google/gi, 'NIVII')
+              .replace(/Gemini/gi, 'NIVII')
+              .replace(/Google AI/gi, 'NIVII AI')
+              .replace(/Google's/gi, "NIVII's")
+              .replace(/Google Assistant/gi, 'NIVII Assistant')
+              .replace(/Google Bard/gi, 'NIVII')
+              .replace(/Bard/gi, 'NIVII')
+              .replace(/Google's AI/gi, "NIVII's AI")
+              .replace(/Google AI Studio/gi, 'NIVII AI Studio')
+              .replace(/Google Cloud/gi, 'NIVII Cloud')
+              .replace(/Google Workspace/gi, 'NIVII Workspace')
+              .replace(/Google Search/gi, 'NIVII Search')
+              .replace(/Google Translate/gi, 'NIVII Translate')
+              .replace(/Google Maps/gi, 'NIVII Maps')
+              .replace(/Google Drive/gi, 'NIVII Drive')
+              .replace(/Google Photos/gi, 'NIVII Photos')
+              .replace(/Google Docs/gi, 'NIVII Docs')
+              .replace(/Google Sheets/gi, 'NIVII Sheets')
+              .replace(/Google Slides/gi, 'NIVII Slides')
+              .replace(/Google Meet/gi, 'NIVII Meet')
+              .replace(/Google Calendar/gi, 'NIVII Calendar')
+              .replace(/Google Gmail/gi, 'NIVII Gmail')
+              .replace(/Google Chrome/gi, 'NIVII Chrome')
+              .replace(/Google Play/gi, 'NIVII Play')
             
             // Ensure code formatting is properly applied
             responseText = responseText.replace(/```(\w+)?\n/g, '```$1\n')

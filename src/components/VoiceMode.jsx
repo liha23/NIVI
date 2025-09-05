@@ -127,10 +127,11 @@ const VoiceMode = ({ isOpen, onClose, onSendMessage, isLoading, currentTheme }) 
       // Clean the text for voice mode
       let cleanedText = text
         .replace(/\*/g, '') // Remove all asterisks
-        .replace(/Gemini/g, 'Gupsup') // Replace Gemini with Gupsup
-        .replace(/gemini/g, 'Gupsup') // Replace lowercase gemini with Gupsup
-        .replace(/Google/g, 'Gupsup') // Replace Google with Gupsup
-        .replace(/google/g, 'Gupsup') // Replace lowercase google with Gupsup
+        .replace(/Gemini/gi, 'NIVII') // Replace Gemini with NIVII
+        .replace(/Google/gi, 'NIVII') // Replace Google with NIVII
+        .replace(/Google AI/gi, 'NIVII AI') // Replace Google AI with NIVII AI
+        .replace(/Google's/gi, 'NIVII\'s') // Replace Google's with NIVII's
+        .replace(/Google Assistant/gi, 'NIVII Assistant') // Replace Google Assistant with NIVII Assistant
         .replace(/\s+/g, ' ') // Remove extra spaces
         .trim()
       

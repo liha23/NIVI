@@ -79,7 +79,7 @@ const SettingsModal = () => {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `nivi-ai-data-${new Date().toISOString().split('T')[0]}.json`
+    a.download = `nivii-ai-data-${new Date().toISOString().split('T')[0]}.json`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -103,7 +103,7 @@ const SettingsModal = () => {
               </div>
               <div>
                 <h2 className="text-xl font-bold text-gradient-primary">Settings</h2>
-                <p className="text-sm text-neutral-400">Customize your NIVI AI experience</p>
+                <p className="text-sm text-neutral-400">Customize your NIVII AI experience</p>
               </div>
             </div>
             <button

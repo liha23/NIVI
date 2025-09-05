@@ -34,8 +34,16 @@ const Sidebar = ({
   const [filterType, setFilterType] = useState('all') // all, today, week, month
   
   const formatDate = (date) => {
+    if (!date) return 'Just now'
+    
     const now = new Date()
     const chatDate = new Date(date)
+    
+    // Check if the date is valid
+    if (isNaN(chatDate.getTime())) {
+      return 'Just now'
+    }
+    
     const diffTime = Math.abs(now - chatDate)
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
     
@@ -211,7 +219,7 @@ const Sidebar = ({
                   <Zap className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-gradient-primary">NIVI AI</h2>
+                  <h2 className="text-lg font-bold text-gradient-primary">NIVII AI</h2>
                   <p className="text-xs text-neutral-400">Intelligent Assistant</p>
                 </div>
               </div>
