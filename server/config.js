@@ -6,6 +6,7 @@ export const config = {
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
   ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [
     'https://nivii.app',
+    'https://nivi-4l6r.vercel.app',
     'https://nivi.aadigarg.life', 
     'https://aadigarg.life'
   ]
