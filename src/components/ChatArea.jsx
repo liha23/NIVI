@@ -232,16 +232,22 @@ const ChatArea = ({
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-brand-500/5 to-transparent opacity-50" />
         
         <div className="relative flex items-center justify-between">
-          {/* Left Side - Mobile Toggle & Status */}
+          {/* Left Side - Sidebar Toggle & Status */}
           <div className="flex items-center gap-4">
+            {/* Sidebar Toggle Button - Always visible and prominent */}
             <button
               onClick={onToggleSidebar}
-              className="md:hidden p-2.5 rounded-xl bg-neutral-800/50 hover:bg-neutral-700 text-neutral-400 hover:text-neutral-100 transition-all duration-200 backdrop-blur-sm"
+              className="p-2.5 rounded-xl bg-gradient-to-r from-brand-500/20 to-accent-purple/20 hover:from-brand-500/30 hover:to-accent-purple/30 text-brand-400 hover:text-brand-300 transition-all duration-200 backdrop-blur-sm border border-brand-500/30 hover:border-brand-500/50 shadow-glow"
               title="Toggle sidebar"
             >
-              <ChevronRight size={18} />
+              <ChevronRight size={18} className={`transition-transform duration-200 ${isSidebarOpen ? 'rotate-180' : ''}`} />
             </button>
             
+            {/* Status Indicator */}
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-neutral-800/30 rounded-lg border border-neutral-700/50">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-xs text-neutral-400">Online</span>
+            </div>
           </div>
           
           {/* Center - Chat Title */}
