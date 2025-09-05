@@ -187,16 +187,6 @@ const Sidebar = ({
 
   return (
     <>
-      {/* Toggle Button when sidebar is closed - Desktop Only */}
-      {!isOpen && (
-        <button
-          onClick={onToggle}
-          className="fixed top-6 left-6 z-50 w-12 h-12 rounded-xl bg-neutral-900/80 backdrop-blur-xl hover:bg-neutral-800 text-neutral-400 hover:text-neutral-100 transition-all duration-300 flex items-center justify-center border border-neutral-800 shadow-strong glow-hover hidden md:flex group"
-          title="Open sidebar"
-        >
-          <ChevronRight size={20} className="group-hover:scale-110 transition-transform duration-200" />
-        </button>
-      )}
 
       {/* Mobile Backdrop */}
       {isOpen && (
