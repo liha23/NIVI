@@ -288,6 +288,34 @@ const ChatArea = ({
               >
                 <Download size={16} />
               </button>
+
+              {/* Debug: Inspect JWT Button */}
+              <button
+                onClick={() => {
+                  if (window.inspectJWTToken) {
+                    window.inspectJWTToken()
+                  } else {
+                    console.log('JWT Inspector not available')
+                  }
+                }}
+                className="p-2 rounded-lg bg-blue-800/50 hover:bg-blue-700 text-blue-400 hover:text-blue-100 transition-all duration-200 backdrop-blur-sm"
+                title="Inspect JWT token (Debug)"
+              >
+                <Settings size={16} />
+              </button>
+
+              {/* Debug: Clear Auth Button */}
+              <button
+                onClick={() => {
+                  localStorage.removeItem('token')
+                  localStorage.removeItem('user')
+                  window.location.reload()
+                }}
+                className="p-2 rounded-lg bg-red-800/50 hover:bg-red-700 text-red-400 hover:text-red-100 transition-all duration-200 backdrop-blur-sm"
+                title="Clear auth data (Debug)"
+              >
+                <LogOut size={16} />
+              </button>
             </div>
 
             {/* User Menu */}

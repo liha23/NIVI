@@ -230,6 +230,64 @@ function App() {
     }
   }, [currentMessages.length, currentChatId])
 
+  // Clear authentication data (for debugging auth issues)
+  const clearAuthData = () => {
+    console.log('Clearing authentication data...')
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    setUser(null)
+    setToken(null)
+    console.log('✅ Authentication data cleared')
+  }
+
+  // Debug function to inspect JWT token
+  const inspectJWTToken = () => {
+    if (!token) {
+      console.log('❌ No token found')
+      return
+    }
+    
+    console.log('🔍 JWT Token Analysis:')
+    console.log('Raw token:', token)
+    
+    try {
+      // Split the token into its parts
+      const parts = token.split('.')
+      if (parts.length !== 3) {
+        console.log('❌ Invalid JWT format')
+        return
+      }
+      
+      // Decode header (without verification)
+      const header = JSON.parse(atob(parts[0]))
+      console.log('📋 Header:', header)
+      
+      // Decode payload (without verification)
+      const payload = JSON.parse(atob(parts[1]))
+      console.log('📦 Payload:', payload)
+      
+      // Check if token is expired
+      const now = Math.floor(Date.now() / 1000)
+      if (payload.exp && payload.exp < now) {
+        console.log('⚠️ Token is EXPIRED!')
+        console.log('Expires at:', new Date(payload.exp * 1000).toISOString())
+        console.log('Current time:', new Date().toISOString())
+      } else if (payload.exp) {
+        console.log('✅ Token is valid')
+        console.log('Expires at:', new Date(payload.exp * 1000).toISOString())
+        console.log('Current time:', new Date().toISOString())
+      }
+      
+      console.log('🔐 Signature (last part):', parts[2])
+      
+    } catch (error) {
+      console.error('❌ Error decoding JWT:', error)
+    }
+  }
+
+  // Make inspectJWTToken available globally for debugging
+  window.inspectJWTToken = inspectJWTToken
+
   // Force save function for critical saves
   const forceSaveCurrentChat = async () => {
     if (isAuthenticated && token && currentChatId && currentMessages.length > 0) {
