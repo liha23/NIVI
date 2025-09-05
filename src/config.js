@@ -8,7 +8,7 @@ export const frontendConfig = {
   CREATOR_NAME: 'Gupsup',
   
   // Development vs Production
-  IS_PRODUCTION: true, // Set to false for local development
+  IS_PRODUCTION: false, // Set to false for local development
   
   // Fallback to localhost for development
   getApiUrl: () => {
