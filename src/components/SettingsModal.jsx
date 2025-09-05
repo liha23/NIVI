@@ -21,10 +21,12 @@ import {
   EyeOff,
   Save,
   RotateCcw,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  Brain
 } from 'lucide-react'
 import { useTheme } from '../contexts/ThemeContext'
 import { cookieUtils } from '../utils/cookies.js'
+import { getMemoryStats, clearMemoryData } from '../utils/memoryUtils'
 
 const SettingsModal = () => {
   const { currentTheme, themes, changeTheme, toggleSettings } = useTheme()
@@ -39,6 +41,8 @@ const SettingsModal = () => {
     showTimestamps: true,
     language: 'en'
   })
+  
+  const [memoryStats, setMemoryStats] = useState(null)
 
   const tabs = [
     { id: 'appearance', label: 'Appearance', icon: Palette },
@@ -60,6 +64,20 @@ const SettingsModal = () => {
     setSettings(prev => ({ ...prev, [key]: value }))
     // Save to localStorage or cookies
     cookieUtils.setCookie(`setting_${key}`, value)
+  }
+
+  // Load memory stats on component mount
+  React.useEffect(() => {
+    const stats = getMemoryStats()
+    setMemoryStats(stats)
+  }, [])
+
+  const handleClearMemory = () => {
+    if (confirm('Are you sure you want to clear all AI memory data? This will reset the AI\'s ability to remember previous conversations. This action cannot be undone.')) {
+      clearMemoryData()
+      setMemoryStats(getMemoryStats())
+      alert('AI memory data cleared successfully!')
+    }
   }
 
   const clearAllData = () => {
@@ -378,6 +396,38 @@ const SettingsModal = () => {
                         </div>
                         <div className="text-brand-400 group-hover:translate-x-1 transition-transform">→</div>
                       </button>
+
+                      {/* Memory Management Section */}
+                      <div className="p-4 bg-gradient-to-r from-brand-500/10 to-accent-purple/10 border border-brand-500/30 rounded-xl">
+                        <div className="flex items-center gap-3 mb-4">
+                          <Brain size={20} className="text-brand-400" />
+                          <h4 className="font-medium text-brand-200">AI Memory Management</h4>
+                        </div>
+                        <p className="text-sm text-neutral-400 mb-4">
+                          The AI can remember previous conversations to provide better contextual responses.
+                        </p>
+                        
+                        {memoryStats && (
+                          <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div className="bg-neutral-800/30 rounded-lg p-3">
+                              <div className="text-xs text-neutral-500 mb-1">Memory Summaries</div>
+                              <div className="text-lg font-semibold text-brand-400">{memoryStats.totalSummaries}</div>
+                            </div>
+                            <div className="bg-neutral-800/30 rounded-lg p-3">
+                              <div className="text-xs text-neutral-500 mb-1">Total Sessions</div>
+                              <div className="text-lg font-semibold text-brand-400">{memoryStats.totalSessions}</div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        <button
+                          onClick={handleClearMemory}
+                          className="w-full flex items-center justify-center gap-2 p-3 bg-error-500/20 border border-error-500/30 rounded-lg text-error-400 hover:bg-error-500/30 transition-colors"
+                        >
+                          <Trash2 size={16} />
+                          Clear AI Memory
+                        </button>
+                      </div>
 
                       <div className="p-4 bg-error-500/10 border border-error-500/30 rounded-xl">
                         <div className="flex items-center gap-3 mb-3">

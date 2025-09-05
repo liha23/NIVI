@@ -51,7 +51,8 @@ const ChatArea = ({
   onMessageReply,
   onMessageLike,
   onMessageDislike,
-  onRegenerateAnswer
+  onRegenerateAnswer,
+  memoryStats
 }) => {
   const { currentTheme, getCurrentThemeData } = useTheme()
   const [inputMessage, setInputMessage] = useState('')
@@ -248,6 +249,16 @@ const ChatArea = ({
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
               <span className="text-xs text-neutral-400">Online</span>
             </div>
+            
+            {/* Memory Indicator */}
+            {memoryStats && memoryStats.totalSummaries > 0 && (
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-brand-500/10 rounded-lg border border-brand-500/30">
+                <div className="w-2 h-2 bg-brand-400 rounded-full"></div>
+                <span className="text-xs text-brand-400">
+                  Memory: {memoryStats.totalSummaries} summaries
+                </span>
+              </div>
+            )}
           </div>
           
           {/* Center - Chat Title */}

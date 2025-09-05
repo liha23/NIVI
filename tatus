@@ -1,39 +1,5 @@
-warning: in the working copy of 'config.js', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'server/package-lock.json', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'server/package.json', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'src/App.jsx', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'src/components/ChatArea.jsx', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'src/components/ChatMessage.jsx', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'src/components/ChatMessage_new.jsx', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'src/components/ChatMessage_old.jsx', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'src/components/Login.jsx', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'src/components/Login_new.jsx', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'src/components/Register.jsx', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'src/components/Register_new.jsx', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'src/components/SettingsModal.jsx', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'src/components/Sidebar.jsx', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'src/components/Sidebar_new.jsx', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'src/components/Sidebar_old.jsx', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'src/components/VoiceMode.jsx', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'src/config.js', LF will be replaced by CRLF the next time Git touches it
-config.js
-package-lock.json
-package.json
-server/package-lock.json
-server/package.json
-src/App.jsx
-src/components/ChatArea.jsx
-src/components/ChatMessage.jsx
-src/components/ChatMessage_new.jsx
-src/components/ChatMessage_old.jsx
-src/components/Login.jsx
-src/components/Login_new.jsx
-src/components/Register.jsx
-src/components/Register_new.jsx
-src/components/SettingsModal.jsx
-src/components/Sidebar.jsx
-src/components/Sidebar_new.jsx
-src/components/Sidebar_old.jsx
-src/components/VoiceMode.jsx
-src/config.js
+[33m61f01df[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m fix sidebar btn and remove previous sidebar
+[33md3c2fd2[m fix sidebar btn
+[33mb9d89a3[m jwt err it
+[33m3a5210e[m mongodb cors
+[33m039b33c[m mongodb cors

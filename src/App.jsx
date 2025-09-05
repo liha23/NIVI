@@ -14,6 +14,13 @@ import { ThemeProvider } from './contexts/ThemeContext'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { keyboardShortcuts } from './utils/keyboardShortcuts'
 import { analyticsUtils } from './utils/analyticsUtils'
+import { 
+  prepareConversationContext, 
+  updateMemoryData, 
+  saveMemoryToStorage, 
+  loadMemoryFromStorage,
+  getMemoryStats 
+} from './utils/memoryUtils'
 
 function App() {
   console.log('App component rendering...')
@@ -36,8 +43,24 @@ function App() {
   const [messageLikes, setMessageLikes] = useState({})
   const [messageDislikes, setMessageDislikes] = useState({})
   const [replyToMessage, setReplyToMessage] = useState(null)
+  
+  // Memory management state
+  const [memoryData, setMemoryData] = useState(null)
+  const [memoryStats, setMemoryStats] = useState(null)
 
   console.log('Auth state:', { user, isAuthenticated, authLoading })
+
+  // Utility function to remove duplicate messages
+  const removeDuplicateMessages = (messages) => {
+    return messages.filter((msg, index, self) => 
+      index === self.findIndex(m => 
+        m.id === msg.id && 
+        m.content === msg.content && 
+        m.timestamp === msg.timestamp &&
+        m.type === msg.type
+      )
+    )
+  }
 
   // Single useEffect for all initialization and saving logic
   useEffect(() => {
@@ -84,8 +107,9 @@ function App() {
                   ...msg,
                   timestamp: msg.timestamp ? new Date(msg.timestamp).toISOString() : new Date().toISOString()
                 }))
-                console.log('Loaded messages for current chat:', formattedMessages.length, 'messages')
-                setCurrentMessages(formattedMessages.length > 0 ? formattedMessages : [getWelcomeMessage()])
+                const deduplicatedMessages = removeDuplicateMessages(formattedMessages)
+                console.log('Loaded messages for current chat:', deduplicatedMessages.length, 'messages')
+                setCurrentMessages(deduplicatedMessages.length > 0 ? deduplicatedMessages : [getWelcomeMessage()])
               } catch (error) {
                 console.error('Error loading from localStorage:', error)
                 setCurrentMessages([getWelcomeMessage()])
@@ -108,6 +132,14 @@ function App() {
       }
     }
   }, [isAuthenticated, token])
+
+  // Initialize memory system
+  useEffect(() => {
+    const loadedMemory = loadMemoryFromStorage()
+    setMemoryData(loadedMemory)
+    setMemoryStats(getMemoryStats(loadedMemory))
+    console.log('Memory system initialized:', getMemoryStats(loadedMemory))
+  }, [])
 
   // Single useEffect for saving data - with immediate save for important changes
   useEffect(() => {
@@ -404,8 +436,9 @@ function App() {
             ...msg,
             timestamp: msg.timestamp ? new Date(msg.timestamp).toISOString() : new Date().toISOString()
           }))
-          console.log('Loaded messages:', messages.length, 'messages')
-          const finalMessages = messages.length > 0 ? messages : [getWelcomeMessage()]
+          const deduplicatedMessages = removeDuplicateMessages(messages)
+          console.log('Loaded messages:', deduplicatedMessages.length, 'messages')
+          const finalMessages = deduplicatedMessages.length > 0 ? deduplicatedMessages : [getWelcomeMessage()]
           setCurrentMessages(finalMessages)
           setCurrentChatId(chatId)
           // Update lastSavedMessages to prevent unnecessary saves
@@ -639,7 +672,8 @@ function App() {
               ...msg,
               timestamp: msg.timestamp ? new Date(msg.timestamp).toISOString() : new Date().toISOString()
             }))
-            setCurrentMessages(formattedMessages.length > 0 ? formattedMessages : [getWelcomeMessage()])
+            const deduplicatedMessages = removeDuplicateMessages(formattedMessages)
+            setCurrentMessages(deduplicatedMessages.length > 0 ? deduplicatedMessages : [getWelcomeMessage()])
           } catch (error) {
             console.error('Error loading chat messages from localStorage:', error)
             setCurrentMessages([getWelcomeMessage()])
@@ -750,6 +784,18 @@ function App() {
       files: attachedFiles
     }
 
+    // Check for duplicate messages before adding
+    const isDuplicate = currentMessages.some(msg => 
+      msg.content === userMessage.content && 
+      msg.type === userMessage.type &&
+      Math.abs(new Date(msg.timestamp) - new Date(userMessage.timestamp)) < 1000 // Within 1 second
+    )
+    
+    if (isDuplicate) {
+      console.log('Duplicate message detected, skipping...')
+      return
+    }
+
     const updatedMessages = [...currentMessages, userMessage]
     setCurrentMessages(updatedMessages)
     setIsLoading(true)
@@ -793,6 +839,18 @@ function App() {
         content: response,
         timestamp: new Date().toISOString(),
         responseTime: responseTime
+      }
+
+      // Check for duplicate bot messages before adding
+      const isBotDuplicate = updatedMessages.some(msg => 
+        msg.content === botMessage.content && 
+        msg.type === botMessage.type &&
+        Math.abs(new Date(msg.timestamp) - new Date(botMessage.timestamp)) < 1000 // Within 1 second
+      )
+      
+      if (isBotDuplicate) {
+        console.log('Duplicate bot message detected, skipping...')
+        return response
       }
 
       const finalMessages = [...updatedMessages, botMessage]
@@ -865,24 +923,23 @@ function App() {
       return "Please configure your Gupsup AI API key in the config.js file. Replace 'YOUR_GEMINI_API_KEY_HERE' with your actual API key from Google AI Studio."
     }
 
-    // Prepare conversation history for context
-    const conversationHistory = currentMessages
-      .filter(msg => msg.type !== 'bot' || !msg.content.includes("Hello! I'm your AI assistant")) // Exclude welcome message
-      .slice(-10) // Only include last 10 messages for context (to avoid token limits)
-      .map(msg => ({
-        role: msg.type === 'user' ? 'user' : 'model',
-        parts: msg.files && msg.files.length > 0 
-          ? [
-              { text: msg.content },
-              ...msg.files.map(file => ({
-                inlineData: {
-                  mimeType: file.type,
-                  data: file.dataUrl ? file.dataUrl.split(',')[1] : null
-                }
-              })).filter(file => file.inlineData.data)
-            ]
-          : [{ text: msg.content }]
-      }))
+    // Prepare enhanced conversation context with memory management
+    const currentUserMessage = {
+      content: message,
+      type: 'user',
+      timestamp: new Date().toISOString()
+    }
+    
+    const contextData = prepareConversationContext(currentMessages, currentUserMessage, memoryData)
+    const conversationHistory = contextData.conversationHistory
+    
+    // Update memory data if summary was created
+    if (contextData.summary) {
+      const updatedMemory = updateMemoryData(memoryData, currentMessages, contextData.summary)
+      setMemoryData(updatedMemory)
+      saveMemoryToStorage(updatedMemory)
+      setMemoryStats(getMemoryStats(updatedMemory))
+    }
 
     // Prepare current message parts
     const currentMessageParts = [{ text: message }]
@@ -918,12 +975,21 @@ function App() {
       parts: currentMessageParts
     })
 
-    // Enhanced system prompt for better code formatting and follow-up questions
-    const systemPrompt = `You are a helpful AI assistant. When answering coding questions:
+    // Enhanced system prompt with memory awareness
+    let systemPrompt = `You are NIVII, a helpful AI assistant with enhanced memory capabilities. You can remember previous conversations and provide contextual responses.
+
+When answering questions:
 1. Format code using proper markdown code blocks with language specification (e.g., \`\`\`javascript, \`\`\`python, etc.)
 2. Provide clear explanations before and after code examples
-3. Always end your response with a follow-up question to encourage further discussion
-4. Use the conversation history to provide contextual responses
+3. Use conversation history to provide contextual and relevant responses
+4. Reference previous topics when relevant to show continuity
+5. Always end your response with a follow-up question to encourage further discussion
+
+Memory Guidelines:
+- Reference previous conversations when relevant
+- Build upon previously discussed topics
+- Maintain context across the conversation
+- Acknowledge when you're building on previous information
 
 Examples of good follow-up questions:
 - "Would you like me to explain any specific part of this code?"
@@ -931,8 +997,17 @@ Examples of good follow-up questions:
 - "Are there any specific use cases you'd like to explore?"
 - "Would you like to see more advanced examples of this concept?"
 - "Do you have any questions about how this works?"
+- "Would you like to continue with the previous topic we discussed?"
 
-Remember to be conversational and helpful!`
+Remember to be conversational, helpful, and contextually aware!`
+
+    // Add memory context to system prompt if available
+    if (contextData.summary && contextData.summary.relevantSummaries) {
+      systemPrompt += `\n\nRelevant Previous Context:\n`
+      contextData.summary.relevantSummaries.forEach((summary, index) => {
+        systemPrompt += `Previous Session ${index + 1}: Topics discussed - ${summary.topics.join(', ')}\n`
+      })
+    }
 
     // Retry logic with exponential backoff
     const maxRetries = 3
@@ -1325,6 +1400,7 @@ Remember to be conversational and helpful!`
           onMessageLike={handleMessageLike}
           onMessageDislike={handleMessageDislike}
           onRegenerateAnswer={handleRegenerateAnswer}
+          memoryStats={memoryStats}
         />
 
         {/* Modals */}
