@@ -1380,6 +1380,11 @@ Remember to be conversational, helpful, and contextually aware!`
           onNewChat={createNewChat}
           onDeleteChat={deleteChat}
           currentChatId={currentChatId}
+          onSearchMessages={handleSearchMessages}
+          onShowAnalytics={handleShowAnalytics}
+          onExportChat={handleExportChat}
+          onLogout={handleLogout}
+          user={user}
         />
         
         <ChatArea
@@ -1390,10 +1395,6 @@ Remember to be conversational, helpful, and contextually aware!`
           currentChatTitle={getCurrentChatTitle()}
           onToggleSidebar={toggleSidebar}
           user={user}
-          onLogout={handleLogout}
-          onExportChat={handleExportChat}
-          onShowAnalytics={handleShowAnalytics}
-          onSearchMessages={handleSearchMessages}
           onMessageReaction={handleMessageReaction}
           onMessageBookmark={handleMessageBookmark}
           onMessageReply={handleMessageReply}

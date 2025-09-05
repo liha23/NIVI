@@ -15,7 +15,10 @@ import {
   MoreHorizontal,
   Bot,
   Star,
-  Zap
+  Zap,
+  BarChart3,
+  Download,
+  LogOut
 } from 'lucide-react'
 import { useTheme } from '../contexts/ThemeContext'
 import SettingsModal from './SettingsModal'
@@ -27,7 +30,12 @@ const Sidebar = ({
   onSelectChat, 
   onNewChat, 
   onDeleteChat,
-  currentChatId 
+  currentChatId,
+  onSearchMessages,
+  onShowAnalytics,
+  onExportChat,
+  onLogout,
+  user
 }) => {
   const { toggleSettings, isSettingsOpen, getCurrentThemeData } = useTheme()
   const [searchQuery, setSearchQuery] = useState('')
@@ -305,14 +313,61 @@ const Sidebar = ({
 
           {/* Footer */}
           <div className="flex-shrink-0 p-4 border-t border-neutral-800/50">
-            <div className="flex items-center gap-2">
+            {/* Action Icons */}
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <button
+                onClick={onSearchMessages}
+                className="p-2.5 rounded-lg bg-neutral-800/30 hover:bg-neutral-700/50 text-neutral-400 hover:text-neutral-100 transition-all duration-200 backdrop-blur-sm group"
+                title="Search messages"
+              >
+                <Search size={18} className="group-hover:scale-110 transition-transform duration-200" />
+              </button>
+              
+              <button
+                onClick={onShowAnalytics}
+                className="p-2.5 rounded-lg bg-neutral-800/30 hover:bg-neutral-700/50 text-neutral-400 hover:text-neutral-100 transition-all duration-200 backdrop-blur-sm group"
+                title="Analytics"
+              >
+                <BarChart3 size={18} className="group-hover:scale-110 transition-transform duration-200" />
+              </button>
+              
+              <button
+                onClick={onExportChat}
+                className="p-2.5 rounded-lg bg-neutral-800/30 hover:bg-neutral-700/50 text-neutral-400 hover:text-neutral-100 transition-all duration-200 backdrop-blur-sm group"
+                title="Export chat"
+              >
+                <Download size={18} className="group-hover:scale-110 transition-transform duration-200" />
+              </button>
+              
               <button
                 onClick={toggleSettings}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800/50 rounded-lg transition-all duration-200 flex-1"
+                className="p-2.5 rounded-lg bg-blue-800/20 hover:bg-blue-700/30 text-blue-400 hover:text-blue-300 transition-all duration-200 backdrop-blur-sm group border border-blue-500/30"
+                title="Settings"
               >
-                <Settings size={16} />
-                Settings
+                <Settings size={18} className="group-hover:rotate-90 transition-transform duration-200" />
               </button>
+              
+              <button
+                onClick={onLogout}
+                className="p-2.5 rounded-lg bg-red-800/20 hover:bg-red-700/30 text-red-400 hover:text-red-300 transition-all duration-200 backdrop-blur-sm group border border-red-500/30"
+                title="Logout"
+              >
+                <LogOut size={18} className="group-hover:scale-110 transition-transform duration-200" />
+              </button>
+            </div>
+
+            {/* User Info and Settings */}
+            <div className="flex items-center gap-3">
+              {user && (
+                <div className="flex items-center gap-2 px-3 py-2 bg-neutral-800/30 rounded-lg border border-neutral-700/50 flex-1">
+                  <div className="w-6 h-6 bg-gradient-to-br from-brand-500 to-accent-purple rounded-lg flex items-center justify-center text-white text-xs font-bold">
+                    {user.username?.[0]?.toUpperCase() || 'U'}
+                  </div>
+                  <span className="text-sm text-neutral-200 truncate">
+                    {user.username}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>

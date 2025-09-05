@@ -18,9 +18,6 @@ import {
   File,
   X,
   Wand2, 
-  Search, 
-  BarChart3, 
-  Download, 
   Zap, 
   Settings,
   Maximize2,
@@ -42,10 +39,6 @@ const ChatArea = ({
   currentChatTitle,
   onToggleSidebar,
   user,
-  onLogout,
-  onExportChat,
-  onShowAnalytics,
-  onSearchMessages,
   onMessageReaction,
   onMessageBookmark,
   onMessageReply,
@@ -278,84 +271,19 @@ const ChatArea = ({
             </div>
           </div>
           
-          {/* Right Side - Actions & User */}
+          {/* Right Side - User Info */}
           <div className="flex items-center gap-2">
-            {/* Quick Actions */}
-            <div className="hidden sm:flex items-center gap-1">
-              <button
-                onClick={onSearchMessages}
-                className="p-2 rounded-lg bg-neutral-800/50 hover:bg-neutral-700 text-neutral-400 hover:text-neutral-100 transition-all duration-200 backdrop-blur-sm"
-                title="Search messages (Ctrl+F)"
-              >
-                <Search size={16} />
-              </button>
-              
-              <button
-                onClick={onShowAnalytics}
-                className="p-2 rounded-lg bg-neutral-800/50 hover:bg-neutral-700 text-neutral-400 hover:text-neutral-100 transition-all duration-200 backdrop-blur-sm"
-                title="Analytics"
-              >
-                <BarChart3 size={16} />
-              </button>
-              
-              <button
-                onClick={onExportChat}
-                className="p-2 rounded-lg bg-neutral-800/50 hover:bg-neutral-700 text-neutral-400 hover:text-neutral-100 transition-all duration-200 backdrop-blur-sm"
-                title="Export chat"
-              >
-                <Download size={16} />
-              </button>
-
-              {/* Debug: Inspect JWT Button */}
-              <button
-                onClick={() => {
-                  if (window.inspectJWTToken) {
-                    window.inspectJWTToken()
-                  } else {
-                    console.log('JWT Inspector not available')
-                  }
-                }}
-                className="p-2 rounded-lg bg-blue-800/50 hover:bg-blue-700 text-blue-400 hover:text-blue-100 transition-all duration-200 backdrop-blur-sm"
-                title="Inspect JWT token (Debug)"
-              >
-                <Settings size={16} />
-              </button>
-
-              {/* Debug: Clear Auth Button */}
-              <button
-                onClick={() => {
-                  localStorage.removeItem('token')
-                  localStorage.removeItem('user')
-                  window.location.reload()
-                }}
-                className="p-2 rounded-lg bg-red-800/50 hover:bg-red-700 text-red-400 hover:text-red-100 transition-all duration-200 backdrop-blur-sm"
-                title="Clear auth data (Debug)"
-              >
-                <LogOut size={16} />
-              </button>
-            </div>
-
-            {/* User Menu */}
-            <div className="flex items-center gap-2 ml-2">
-              {user && (
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-800/30 rounded-lg border border-neutral-700/50">
-                  <div className="w-6 h-6 bg-gradient-to-br from-brand-500 to-accent-purple rounded-lg flex items-center justify-center text-white text-xs font-bold">
-                    {user.username?.[0]?.toUpperCase() || 'U'}
-                  </div>
-                  <span className="text-sm text-neutral-200 hidden sm:block">
-                    {user.username}
-                  </span>
+            {/* User Info */}
+            {user && (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-800/30 rounded-lg border border-neutral-700/50">
+                <div className="w-6 h-6 bg-gradient-to-br from-brand-500 to-accent-purple rounded-lg flex items-center justify-center text-white text-xs font-bold">
+                  {user.username?.[0]?.toUpperCase() || 'U'}
                 </div>
-              )}
-              
-              <button
-                onClick={onLogout}
-                className="p-2 rounded-lg bg-neutral-800/50 hover:bg-error-500/20 text-neutral-400 hover:text-error-400 transition-all duration-200 backdrop-blur-sm"
-                title="Logout"
-              >
-                <LogOut size={16} />
-              </button>
-            </div>
+                <span className="text-sm text-neutral-200 hidden sm:block">
+                  {user.username}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </header>
