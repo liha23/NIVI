@@ -59,6 +59,25 @@ const Login = ({ onSwitchToRegister, onLogin }) => {
     }
   }
 
+  const handleGuestLogin = () => {
+    // Create guest user with temporary credentials
+    const guestUser = {
+      id: `guest_${Date.now()}`,
+      name: 'Guest User',
+      email: 'guest@nivii.ai',
+      isGuest: true
+    }
+    const guestToken = `guest_token_${Date.now()}`
+    
+    localStorage.setItem('token', guestToken)
+    localStorage.setItem('user', JSON.stringify(guestUser))
+    
+    onLogin({
+      user: guestUser,
+      token: guestToken
+    })
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -196,9 +215,10 @@ const Login = ({ onSwitchToRegister, onLogin }) => {
               </button>
               <button
                 type="button"
-                className="flex items-center justify-center gap-2 px-4 py-3 bg-neutral-800/50 hover:bg-neutral-800 border border-neutral-700/50 hover:border-neutral-600 rounded-xl transition-all duration-200 text-neutral-300 hover:text-neutral-100"
+                onClick={handleGuestLogin}
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-neutral-800/50 hover:bg-neutral-800 border border-neutral-700/50 hover:border-neutral-600 rounded-xl transition-all duration-200 text-neutral-300 hover:text-neutral-100 group"
               >
-                <User className="w-5 h-5" />
+                <User className="w-5 h-5 group-hover:scale-110 transition-transform" />
                 Guest
               </button>
             </div>

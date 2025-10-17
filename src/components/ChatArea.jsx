@@ -27,6 +27,7 @@ import {
 } from 'lucide-react'
 import ChatMessage from './ChatMessage'
 import TypingIndicator from './TypingIndicator'
+import QuickPrompts from './QuickPrompts'
 import { useTheme } from '../contexts/ThemeContext'
 import VoiceMode from './VoiceMode'
 import FileUploadModal from './FileUploadModal'
@@ -291,44 +292,14 @@ const ChatArea = ({
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto bg-gradient-to-b from-neutral-950 to-neutral-900">
         <div className="max-w-4xl mx-auto px-4 py-6">
-          {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-96 text-center">
-              <div className="relative mb-8">
-                <div className="w-24 h-24 bg-gradient-to-br from-brand-500 to-accent-purple rounded-3xl flex items-center justify-center shadow-glow-lg animate-float">
-                  <Zap className="w-12 h-12 text-white" />
-                </div>
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-accent-emerald rounded-full border-4 border-neutral-900 animate-bounce-subtle" />
-              </div>
-              
-              <h2 className="text-2xl font-bold text-gradient-primary mb-3">
-                Welcome to NIVII AI
-              </h2>
-              <p className="text-neutral-400 text-lg mb-8 max-w-md">
-                Your intelligent assistant is ready to help. Start a conversation by typing a message below.
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl">
-                {[
-                  { icon: Sparkles, title: "Creative Writing", desc: "Help with stories, poems, and content" },
-                  { icon: Search, title: "Research & Analysis", desc: "Deep insights and information gathering" },
-                  { icon: Bot, title: "Problem Solving", desc: "Step-by-step solutions and guidance" },
-                  { icon: Star, title: "Learning Support", desc: "Explanations and educational content" }
-                ].map(({ icon: Icon, title, desc }, index) => (
-                  <div
-                    key={index}
-                    className="p-4 bg-neutral-800/30 border border-neutral-700/50 rounded-xl hover:border-brand-500/30 hover:bg-neutral-800/50 transition-all duration-200 cursor-pointer group"
-                  >
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-8 h-8 bg-gradient-to-br from-brand-500/20 to-accent-purple/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-                        <Icon className="w-4 h-4 text-brand-400" />
-                      </div>
-                      <h3 className="font-medium text-neutral-200">{title}</h3>
-                    </div>
-                    <p className="text-sm text-neutral-500">{desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+          {messages.length === 0 || (messages.length === 1 && messages[0].content.includes("How can I help you today")) ? (
+            <QuickPrompts 
+              onSelectPrompt={(prompt) => {
+                setInputMessage(prompt)
+                textareaRef.current?.focus()
+              }}
+              isVisible={true}
+            />
           ) : (
             <div className="space-y-6">
               {messages.map((message, index) => (
