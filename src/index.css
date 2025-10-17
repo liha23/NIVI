@@ -135,22 +135,22 @@
 }
 
 @layer components {
-  /* Modern button system */
+  /* Premium button system with animations */
   .btn {
-    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-xl font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95;
   }
 
   .btn-primary {
-    @apply bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white shadow-medium hover:shadow-glow focus-visible:ring-brand-500 relative overflow-hidden;
+    @apply bg-gradient-to-br from-brand-500 via-accent-purple to-brand-600 hover:from-brand-600 hover:via-accent-purple hover:to-brand-700 text-white shadow-glow focus-visible:ring-brand-500 relative overflow-hidden;
   }
   
   .btn-primary::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
     transform: translateX(-100%);
-    transition: transform 0.6s ease;
+    transition: transform 0.7s ease;
   }
   
   .btn-primary:hover::before {
@@ -328,8 +328,59 @@
     @apply border-l border-neutral-800;
   }
 
-  /* Modern tooltips */
+  /* Premium tooltips */
   .tooltip {
-    @apply absolute z-50 px-2 py-1 text-xs font-medium text-white bg-neutral-800 rounded-md shadow-strong border border-neutral-700;
+    @apply absolute z-50 px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-br from-neutral-800 to-neutral-900 backdrop-blur-xl rounded-lg shadow-strong border border-neutral-700/50;
+  }
+
+  /* Premium utility classes */
+  .text-premium {
+    background: linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #06b6d4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .bg-premium {
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #3b82f6 100%);
+  }
+
+  .border-premium {
+    border: 2px solid transparent;
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #3b82f6 100%);
+    background-origin: border-box;
+  }
+
+  /* Shimmer animation class */
+  .shimmer {
+    @apply relative overflow-hidden;
+  }
+
+  .shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: translateX(-100%);
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  /* Glass panel */
+  .glass-panel {
+    @apply bg-gradient-to-br from-neutral-900/60 via-neutral-800/50 to-neutral-900/60 backdrop-blur-2xl border border-neutral-800/50 rounded-2xl shadow-medium;
+  }
+
+  /* Neon glow effect */
+  .neon-glow {
+    @apply shadow-glow animate-pulse-soft;
   }
 }

@@ -131,8 +131,10 @@ export default {
         'soft': '0 2px 8px rgba(0, 0, 0, 0.04)',
         'medium': '0 4px 16px rgba(0, 0, 0, 0.08)',
         'strong': '0 8px 32px rgba(0, 0, 0, 0.12)',
-        'glow': '0 0 20px rgba(59, 130, 246, 0.15)',
-        'glow-lg': '0 0 40px rgba(59, 130, 246, 0.2)',
+        'glow': '0 0 20px rgba(124, 58, 237, 0.3)',
+        'glow-hover': '0 0 30px rgba(124, 58, 237, 0.5)',
+        'glow-lg': '0 0 40px rgba(124, 58, 237, 0.4)',
+        'glow-accent': '0 0 20px rgba(168, 85, 247, 0.3)',
       },
       animation: {
         'fade-in': 'fadeIn 0.4s ease-out',
