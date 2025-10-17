@@ -25,19 +25,19 @@ export default {
           925: '#141414',
           950: '#0a0a0a',
         },
-        // Modern brand colors
+        // Premium brand colors (Purple-to-Blue gradient theme)
         brand: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
-          950: '#082f49',
+          50: '#faf5ff',
+          100: '#f3e8ff',
+          200: '#e9d5ff',
+          300: '#d8b4fe',
+          400: '#c084fc',
+          500: '#7c3aed',
+          600: '#6d28d9',
+          700: '#5b21b6',
+          800: '#4c1d95',
+          900: '#3b1775',
+          950: '#2e1065',
         },
         // Accent colors for modern UI
         accent: {
@@ -176,7 +176,7 @@ export default {
           '50%': { backgroundPosition: '100% 50%' },
         },
         gradientXY: {
-          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '0%, 100%': { backgroundPosition: '0% 50%', backgroundSize: '200% 200%' },
           '25%': { backgroundPosition: '100% 50%' },
           '50%': { backgroundPosition: '100% 100%' },
           '75%': { backgroundPosition: '0% 100%' },
