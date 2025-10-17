@@ -1369,8 +1369,15 @@ Remember to be conversational, helpful, and contextually aware!`
   
   return (
     <ThemeProvider>
-      <div className="h-screen bg-dark-950 overflow-hidden">
-
+      <div className="h-screen bg-neutral-950 overflow-hidden relative">
+        {/* Premium Background Effects */}
+        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-brand-500/8 rounded-full blur-3xl animate-float" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent-purple/8 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+          <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-accent-emerald/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }} />
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:32px_32px] opacity-30" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(14,165,233,0.03),transparent_50%)]" />
+        </div>
 
         <Sidebar
           isOpen={isSidebarOpen}
