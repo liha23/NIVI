@@ -439,19 +439,34 @@ const ChatArea = ({
               </div>
             </div>
 
-            {/* Character Counter */}
+            {/* Enhanced Stats Bar */}
             <div className="flex justify-between items-center mt-2 px-2">
-              <div className="text-xs text-neutral-500">
+              <div className="flex items-center gap-3 text-xs text-neutral-500">
                 {inputMessage.length > 0 && (
-                  <span className={inputMessage.length > 1000 ? 'text-warning-400' : ''}>
-                    {inputMessage.length}/1000
-                  </span>
+                  <>
+                    <span className={`transition-colors duration-200 ${
+                      inputMessage.length > 1000 
+                        ? 'text-warning-400 font-medium' 
+                        : inputMessage.length > 800 
+                        ? 'text-warning-500/70' 
+                        : 'text-neutral-500'
+                    }`}>
+                      {inputMessage.length} / 1000 chars
+                    </span>
+                    <span className="text-neutral-600">•</span>
+                    <span className="text-neutral-500">
+                      {inputMessage.trim().split(/\s+/).filter(word => word.length > 0).length} words
+                    </span>
+                  </>
                 )}
               </div>
               
-              <div className="text-xs text-neutral-500">
-                Press <kbd className="px-1 py-0.5 bg-neutral-700 rounded text-neutral-300">Enter</kbd> to send, 
-                <kbd className="px-1 py-0.5 bg-neutral-700 rounded text-neutral-300 ml-1">Shift+Enter</kbd> for new line
+              <div className="text-xs text-neutral-500 hidden sm:flex items-center gap-1">
+                <span>Press</span>
+                <kbd className="px-1.5 py-0.5 bg-neutral-800 border border-neutral-700 rounded text-neutral-300 font-mono text-xs">Enter</kbd>
+                <span>to send,</span>
+                <kbd className="px-1.5 py-0.5 bg-neutral-800 border border-neutral-700 rounded text-neutral-300 font-mono text-xs">Shift+Enter</kbd>
+                <span>for new line</span>
               </div>
             </div>
           </div>
