@@ -56,8 +56,7 @@ const SettingsModal = () => {
     { key: 'aurora', icon: Sparkles, gradient: 'from-indigo-900 to-purple-900' },
     { key: 'ocean', icon: Zap, gradient: 'from-blue-900 to-cyan-900' },
     { key: 'forest', icon: Globe, gradient: 'from-green-900 to-emerald-900' },
-    { key: 'sunset', icon: Sun, gradient: 'from-orange-900 to-pink-900' },
-    { key: 'light', icon: Sun, gradient: 'from-white to-gray-100' }
+    { key: 'sunset', icon: Sun, gradient: 'from-orange-900 to-pink-900' }
   ]
 
   const handleSettingChange = (key, value) => {
@@ -178,7 +177,7 @@ const SettingsModal = () => {
                             }`}
                           >
                             <div className={`w-full h-16 bg-gradient-to-br ${gradient} rounded-lg mb-3 flex items-center justify-center`}>
-                              <Icon className={`w-6 h-6 ${key === 'light' ? 'text-neutral-800' : 'text-white'}`} />
+                              <Icon className="w-6 h-6 text-white" />
                             </div>
                             
                             <div className="text-left">
