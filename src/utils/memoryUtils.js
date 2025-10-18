@@ -184,6 +184,11 @@ export function prepareConversationContext(currentMessages, currentUserMessage, 
     msg.type !== 'bot' || !msg.content.includes("Hello! I'm your AI assistant")
   )
   
+  console.log('📝 Preparing conversation context:', {
+    totalMessages: filteredMessages.length,
+    currentMessage: currentUserMessage.content.substring(0, 50) + '...'
+  })
+  
   // Check if we need to create a summary
   let summary = null
   let contextMessages = filteredMessages
@@ -193,6 +198,7 @@ export function prepareConversationContext(currentMessages, currentUserMessage, 
     const oldMessages = filteredMessages.slice(0, -MEMORY_CONFIG.CONTEXT_WINDOW_SIZE)
     const recentMessages = filteredMessages.slice(-MEMORY_CONFIG.CONTEXT_WINDOW_SIZE)
     
+    console.log('📊 Creating summary for', oldMessages.length, 'older messages')
     summary = createConversationSummary(oldMessages)
     contextMessages = recentMessages
   }
@@ -206,6 +212,7 @@ export function prepareConversationContext(currentMessages, currentUserMessage, 
     )
     
     if (relevantSummaries.length > 0) {
+      console.log('🔍 Found', relevantSummaries.length, 'relevant previous summaries')
       // Add relevant summary context
       summary = {
         ...summary,
@@ -216,6 +223,7 @@ export function prepareConversationContext(currentMessages, currentUserMessage, 
   
   // Select relevant messages for context
   const selectedMessages = selectRelevantContext(contextMessages, currentUserMessage)
+  console.log('✅ Selected', selectedMessages.length, 'messages for context')
   
   // Convert to API format, ensuring no duplicates
   const conversationHistory = selectedMessages
@@ -241,6 +249,12 @@ export function prepareConversationContext(currentMessages, currentUserMessage, 
           ]
         : [{ text: msg.content }]
     }))
+  
+  console.log('🤖 Conversation history prepared:', {
+    historyLength: conversationHistory.length,
+    hasSummary: !!summary,
+    contextSize: selectedMessages.length
+  })
   
   return {
     conversationHistory,
