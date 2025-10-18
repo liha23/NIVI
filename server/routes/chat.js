@@ -7,6 +7,16 @@ const router = express.Router()
 // Get all chats for a user with preview data
 router.get('/', auth, async (req, res) => {
   try {
+    // Check if MongoDB is connected
+    if (!req.mongoConnected) {
+      console.log('MongoDB not connected, returning empty chat list')
+      return res.json({
+        success: true,
+        data: [],
+        warning: 'Database connection unavailable. Using local storage.'
+      })
+    }
+    
     console.log('Getting chats for user:', req.user._id)
     
     const chats = await Chat.find({ 
@@ -26,7 +36,8 @@ router.get('/', auth, async (req, res) => {
     console.error('Get chats error:', error)
     res.status(500).json({
       success: false,
-      message: 'Server error while fetching chats'
+      message: 'Server error while fetching chats',
+      error: error.message
     })
   }
 })
@@ -34,7 +45,18 @@ router.get('/', auth, async (req, res) => {
 // Get specific chat with all messages
 router.get('/:chatId', auth, async (req, res) => {
   try {
+    // Check if MongoDB is connected
+    if (!req.mongoConnected) {
+      console.log('MongoDB not connected, returning 404')
+      return res.status(404).json({
+        success: false,
+        message: 'Chat not found',
+        warning: 'Database connection unavailable. Using local storage.'
+      })
+    }
+    
     const { chatId } = req.params
+    console.log('Fetching chat:', chatId, 'for user:', req.user._id)
     
     const chat = await Chat.findOne({
       userId: req.user._id,
@@ -43,12 +65,14 @@ router.get('/:chatId', auth, async (req, res) => {
     })
 
     if (!chat) {
+      console.log('Chat not found:', chatId)
       return res.status(404).json({
         success: false,
         message: 'Chat not found'
       })
     }
 
+    console.log('Chat found with', chat.messages.length, 'messages')
     res.json({
       success: true,
       data: chat
@@ -57,7 +81,8 @@ router.get('/:chatId', auth, async (req, res) => {
     console.error('Get chat error:', error)
     res.status(500).json({
       success: false,
-      message: 'Server error while fetching chat'
+      message: 'Server error while fetching chat',
+      error: error.message
     })
   }
 })
@@ -65,6 +90,16 @@ router.get('/:chatId', auth, async (req, res) => {
 // Create new chat
 router.post('/', auth, async (req, res) => {
   try {
+    // Check if MongoDB is connected
+    if (!req.mongoConnected) {
+      console.log('MongoDB not connected, cannot create chat')
+      return res.status(503).json({
+        success: false,
+        message: 'Database connection unavailable',
+        warning: 'Please use local storage for now'
+      })
+    }
+    
     const { title, messages } = req.body
     console.log('Creating new chat for user:', req.user._id, 'with title:', title, 'messages:', messages?.length)
 
@@ -84,7 +119,7 @@ router.post('/', auth, async (req, res) => {
     })
 
     await chat.save()
-    console.log('Chat saved successfully:', chat._id)
+    console.log('Chat saved successfully:', chat._id, 'with chatId:', chat.chatId)
 
     res.status(201).json({
       success: true,
@@ -95,7 +130,8 @@ router.post('/', auth, async (req, res) => {
     console.error('Create chat error:', error)
     res.status(500).json({
       success: false,
-      message: 'Server error while creating chat'
+      message: 'Server error while creating chat',
+      error: error.message
     })
   }
 })
@@ -103,9 +139,24 @@ router.post('/', auth, async (req, res) => {
 // Update chat (add messages, update title)
 router.put('/:chatId', auth, async (req, res) => {
   try {
+    // Check if MongoDB is connected
+    if (!req.mongoConnected) {
+      console.log('MongoDB not connected, cannot update chat')
+      return res.status(503).json({
+        success: false,
+        message: 'Database connection unavailable',
+        warning: 'Please use local storage for now'
+      })
+    }
+    
     const { chatId } = req.params
     const { title, messages, newMessage } = req.body
-    console.log('Updating chat:', chatId, 'for user:', req.user._id, 'with messages:', messages?.length)
+    console.log('Updating chat:', chatId, 'for user:', req.user._id)
+    console.log('Update data:', { 
+      hasTitle: !!title, 
+      messagesCount: messages?.length, 
+      hasNewMessage: !!newMessage 
+    })
 
     const chat = await Chat.findOne({
       userId: req.user._id,
@@ -114,14 +165,26 @@ router.put('/:chatId', auth, async (req, res) => {
     })
 
     if (!chat) {
-      console.log('Chat not found:', chatId)
-      return res.status(404).json({
-        success: false,
-        message: 'Chat not found'
+      console.log('Chat not found:', chatId, '- attempting to create it')
+      // If chat doesn't exist, create it instead of returning 404
+      const newChat = new Chat({
+        userId: req.user._id,
+        chatId: parseInt(chatId),
+        title: title || 'New Chat',
+        messages: messages || []
+      })
+      
+      await newChat.save()
+      console.log('Chat created with ID:', newChat.chatId)
+      
+      return res.json({
+        success: true,
+        message: 'Chat created successfully',
+        data: newChat
       })
     }
 
-    console.log('Found chat:', chat._id)
+    console.log('Found chat:', chat._id, 'current messages:', chat.messages.length)
 
     // Update title if provided
     if (title) {
@@ -132,17 +195,17 @@ router.put('/:chatId', auth, async (req, res) => {
     // Add new message if provided
     if (newMessage) {
       chat.messages.push(newMessage)
-      console.log('Added new message')
+      console.log('Added new message, total:', chat.messages.length)
     }
 
     // Replace all messages if provided
-    if (messages) {
+    if (messages && Array.isArray(messages)) {
       chat.messages = messages
       console.log('Replaced messages, new count:', messages.length)
     }
 
     await chat.save()
-    console.log('Chat updated successfully')
+    console.log('✅ Chat updated successfully, final message count:', chat.messages.length)
 
     res.json({
       success: true,
@@ -153,7 +216,8 @@ router.put('/:chatId', auth, async (req, res) => {
     console.error('Update chat error:', error)
     res.status(500).json({
       success: false,
-      message: 'Server error while updating chat'
+      message: 'Server error while updating chat',
+      error: error.message
     })
   }
 })
