@@ -4,8 +4,8 @@ export const frontendConfig = {
   API_BASE_URL: 'https://api.nivii.app',
   
   // App Configuration
-  APP_NAME: 'Gupsup AI',
-  CREATOR_NAME: 'Gupsup',
+  APP_NAME: 'NIVII AI',
+  CREATOR_NAME: 'Nivii',
   
   // Development vs Production
   IS_PRODUCTION: true, // Set to true for production deployment

@@ -251,7 +251,7 @@ export const config = {
   GEMINI_API_KEY: 'your_api_key_here',
   API_BASE_URL: 'https://generativelanguage.googleapis.com/v1beta',
   MODEL: 'gemini-2.0-flash',
-  CREATOR_NAME: 'Gupsup'
+  CREATOR_NAME: 'Nivii'
 }
 ```
 

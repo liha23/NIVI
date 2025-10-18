@@ -100,7 +100,7 @@ const Register = ({ onSwitchToLogin, onRegister }) => {
             <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-white" />
           </div>
           <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-sunset-pink to-sunset-purple bg-clip-text text-transparent">
-            Join Gupsup AI
+            Join NIVII AI
           </h1>
           <p className="text-gray-400 mt-1 md:mt-2 text-sm md:text-base">Create your account to start chatting</p>
         </div>

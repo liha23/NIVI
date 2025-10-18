@@ -184,7 +184,7 @@ const ChatArea = ({
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div className="text-center">
-              <h1 className="text-xl font-semibold text-white">Gupsup AI</h1>
+              <h1 className="text-xl font-semibold text-white">NIVII AI</h1>
             </div>
           </div>
           
