@@ -379,6 +379,13 @@ function App() {
         const data = await response.json()
         console.log('MongoDB response data:', data)
         
+        // Check for database warning (MongoDB not connected)
+        if (data.warning) {
+          console.warn('⚠️  MongoDB Warning:', data.warning)
+          createNewChat()
+          return
+        }
+        
                  if (data.success && data.data) {
            const chats = data.data.map(chat => ({
              id: chat.chatId,
@@ -930,11 +937,19 @@ function App() {
       timestamp: new Date().toISOString()
     }
     
+    console.log('🔄 Preparing conversation context with', currentMessages.length, 'current messages')
     const contextData = prepareConversationContext(currentMessages, currentUserMessage, memoryData)
     const conversationHistory = contextData.conversationHistory
+    console.log('📨 Conversation history prepared:', {
+      historyLength: conversationHistory.length,
+      contextSize: contextData.contextSize,
+      totalMessages: contextData.totalMessages,
+      hasSummary: !!contextData.summary
+    })
     
     // Update memory data if summary was created
     if (contextData.summary) {
+      console.log('💾 Updating memory with new summary')
       const updatedMemory = updateMemoryData(memoryData, currentMessages, contextData.summary)
       setMemoryData(updatedMemory)
       saveMemoryToStorage(updatedMemory)
@@ -973,6 +988,12 @@ function App() {
     conversationHistory.push({
       role: 'user',
       parts: currentMessageParts
+    })
+    
+    console.log('🚀 Sending to API:', {
+      conversationHistoryLength: conversationHistory.length,
+      hasFiles: attachedFiles.length > 0,
+      messagePreview: message.substring(0, 50) + '...'
     })
 
     // Enhanced system prompt with memory awareness
@@ -1369,7 +1390,7 @@ Remember to be conversational, helpful, and contextually aware!`
   
   return (
     <ThemeProvider>
-      <div className="h-screen bg-neutral-950 overflow-hidden relative">
+      <div className="h-screen overflow-hidden relative" style={{ backgroundColor: 'var(--color-background)' }}>
         {/* Premium Animated Background Effects */}
         <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
           {/* Floating gradient orbs */}
