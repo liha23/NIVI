@@ -1,9 +1,14 @@
 {
-  "name": "ai-chat-server",
+  "name": "nivii-ai-server",
   "version": "1.0.0",
-  "description": "AI Chat Server with MongoDB",
+  "description": "NIVII AI Server - Backend API for NIVII AI Assistant with MongoDB, authentication, and advanced features",
   "type": "module",
   "main": "server.js",
+  "homepage": "https://nivii.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/liha23/NIVI"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js"
@@ -24,7 +29,18 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "keywords": ["ai", "chat", "mongodb", "express", "api"],
+  "keywords": [
+    "nivii",
+    "ai",
+    "chatbot",
+    "assistant",
+    "mongodb",
+    "express",
+    "api",
+    "authentication",
+    "jwt",
+    "backend"
+  ],
   "author": "Nivii",
   "license": "MIT"
 }

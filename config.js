@@ -103,23 +103,6 @@ export const config = {
       success: '#10b981',
       warning: '#f59e0b',
       error: '#ef4444'
-    },
-    light: {
-      name: 'Light',
-      description: 'Clean modern light theme',
-      primary: '#0ea5e9',
-      secondary: '#8b5cf6',
-      background: '#ffffff',
-      surface: '#fafafa',
-      surfaceHover: '#f5f5f5',
-      border: '#e5e5e5',
-      text: '#0a0a0a',
-      textSecondary: '#525252',
-      textMuted: '#737373',
-      accent: '#3b82f6',
-      success: '#10b981',
-      warning: '#f59e0b',
-      error: '#ef4444'
     }
   },
   DEFAULT_THEME: 'midnight'

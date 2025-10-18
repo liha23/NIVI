@@ -108,7 +108,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
                     <span className="text-white text-sm font-semibold">N</span>
                   </div>
                   <div>
-                    <p className="text-sm font-medium">Gupsup</p>
+                    <p className="text-sm font-medium">Nivii</p>
                     <p className="text-xs" style={{ color: themes[currentTheme]?.textSecondary }}>
                       Creator
                     </p>
