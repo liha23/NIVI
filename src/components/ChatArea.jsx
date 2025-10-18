@@ -224,7 +224,10 @@ const ChatArea = ({
     }`}>
       
       {/* Premium Header with Glassmorphism */}
-      <header className="relative bg-gradient-to-br from-neutral-900/95 via-neutral-900/90 to-neutral-800/95 backdrop-blur-2xl border-b border-neutral-800/50 px-6 py-4 flex-shrink-0 shadow-medium">
+      <header className="relative backdrop-blur-2xl px-6 py-4 flex-shrink-0 shadow-medium" style={{ 
+        background: `linear-gradient(to bottom right, var(--color-surface), var(--color-surface))`,
+        borderBottom: `1px solid var(--color-border)`
+      }}>
         {/* Animated Background gradient */}
         <div className="absolute inset-0 bg-gradient-to-r from-brand-500/5 via-accent-purple/5 to-brand-500/5 opacity-50 animate-gradient-x" />
         
@@ -246,7 +249,10 @@ const ChatArea = ({
             </button>
             
             {/* Premium Status Indicator */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gradient-to-br from-neutral-800/40 to-neutral-900/40 backdrop-blur-sm rounded-xl border border-neutral-700/50">
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 backdrop-blur-sm rounded-xl" style={{
+              background: `linear-gradient(to bottom right, var(--color-surface-hover), var(--color-surface))`,
+              border: `1px solid var(--color-border)`
+            }}>
               <div className="relative">
                 <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
                 <div className="absolute inset-0 w-2 h-2 bg-emerald-400 rounded-full animate-ping opacity-75"></div>
@@ -283,7 +289,7 @@ const ChatArea = ({
                 NIVII AI
               </h1>
               {currentChatTitle && (
-                <p className="text-xs text-neutral-400 truncate max-w-48">
+                <p className="text-xs truncate max-w-48" style={{ color: 'var(--color-text-secondary)' }}>
                   {currentChatTitle}
                 </p>
               )}
@@ -298,8 +304,9 @@ const ChatArea = ({
                 const isLightTheme = currentTheme === 'light'
                 changeTheme(isLightTheme ? 'midnight' : 'light')
               }}
-              className="relative p-2.5 rounded-xl bg-gradient-to-br from-brand-500/20 via-accent-purple/15 to-brand-600/20 hover:from-brand-500/30 hover:via-accent-purple/25 hover:to-brand-600/30 text-brand-400 hover:text-brand-300 transition-all duration-300 backdrop-blur-sm border border-brand-500/40 hover:border-brand-500/60 shadow-glow hover:shadow-glow-hover hover:scale-105 active:scale-95 overflow-hidden group"
+              className="relative p-2.5 rounded-xl bg-gradient-to-br from-brand-500/20 via-accent-purple/15 to-brand-600/20 hover:from-brand-500/30 hover:via-accent-purple/25 hover:to-brand-600/30 hover:text-brand-300 transition-all duration-300 backdrop-blur-sm border border-brand-500/40 hover:border-brand-500/60 shadow-glow hover:shadow-glow-hover hover:scale-105 active:scale-95 overflow-hidden group"
               title={currentTheme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+              style={{ color: 'var(--color-primary)' }}
             >
               {/* Shimmer effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
@@ -312,11 +319,14 @@ const ChatArea = ({
             
             {/* User Info */}
             {user && (
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-br from-neutral-800/40 to-neutral-900/40 backdrop-blur-sm rounded-xl border border-neutral-700/50 hover:border-brand-500/30 transition-all duration-300">
+              <div className="flex items-center gap-2 px-3 py-1.5 backdrop-blur-sm rounded-xl hover:border-brand-500/30 transition-all duration-300" style={{
+                background: `linear-gradient(to bottom right, var(--color-surface-hover), var(--color-surface))`,
+                border: `1px solid var(--color-border)`
+              }}>
                 <div className="w-7 h-7 bg-gradient-to-br from-brand-500 via-accent-purple to-brand-600 rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-glow">
                   {user.username?.[0]?.toUpperCase() || 'U'}
                 </div>
-                <span className="text-sm font-medium text-neutral-200 hidden sm:block">
+                <span className="text-sm font-medium hidden sm:block" style={{ color: 'var(--color-text)' }}>
                   {user.username}
                 </span>
               </div>
@@ -326,7 +336,9 @@ const ChatArea = ({
       </header>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto bg-gradient-to-b from-neutral-950 to-neutral-900">
+      <div className="flex-1 overflow-y-auto" style={{ 
+        background: `linear-gradient(to bottom, var(--color-background), var(--color-surface))`
+      }}>
         <div className="max-w-4xl mx-auto px-4 py-6">
           {messages.length === 0 || (messages.length === 1 && messages[0].content.includes("How can I help you today")) ? (
             <QuickPrompts 
@@ -366,7 +378,10 @@ const ChatArea = ({
       </div>
 
       {/* Modern Input Area */}
-      <div className="flex-shrink-0 bg-neutral-900/95 backdrop-blur-xl border-t border-neutral-800/50 p-4">
+      <div className="flex-shrink-0 backdrop-blur-xl p-4" style={{ 
+        backgroundColor: 'var(--color-surface)',
+        borderTop: `1px solid var(--color-border)`
+      }}>
         <div className="max-w-4xl mx-auto">
           {/* Attached Files */}
           {attachedFiles.length > 0 && (
@@ -417,11 +432,18 @@ const ChatArea = ({
             {/* Gradient glow effect */}
             <div className="absolute -inset-0.5 bg-gradient-to-r from-brand-500/20 via-accent-purple/20 to-brand-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
-            <div className="relative flex items-end gap-3 p-4 bg-gradient-to-br from-neutral-800/60 via-neutral-800/50 to-neutral-900/60 backdrop-blur-2xl border border-neutral-700/50 rounded-2xl focus-within:border-brand-500/60 focus-within:ring-2 focus-within:ring-brand-500/30 focus-within:shadow-glow transition-all duration-300 group">
+            <div className="relative flex items-end gap-3 p-4 backdrop-blur-2xl rounded-2xl focus-within:border-brand-500/60 focus-within:ring-2 focus-within:ring-brand-500/30 focus-within:shadow-glow transition-all duration-300 group" style={{
+              background: `linear-gradient(to bottom right, var(--color-surface-hover), var(--color-surface))`,
+              border: `1px solid var(--color-border)`
+            }}>
               {/* Premium Attachment Button */}
               <button
                 onClick={() => setIsFileUploadOpen(true)}
-                className="flex-shrink-0 p-2.5 rounded-xl bg-gradient-to-br from-neutral-700/40 to-neutral-800/40 hover:from-brand-500/20 hover:to-accent-purple/20 text-neutral-400 hover:text-brand-400 transition-all duration-300 border border-neutral-700/50 hover:border-brand-500/50 hover:shadow-glow backdrop-blur-sm"
+                className="flex-shrink-0 p-2.5 rounded-xl bg-gradient-to-br from-neutral-700/40 to-neutral-800/40 hover:from-brand-500/20 hover:to-accent-purple/20 hover:text-brand-400 transition-all duration-300 hover:border-brand-500/50 hover:shadow-glow backdrop-blur-sm"
+                style={{
+                  color: 'var(--color-text-secondary)',
+                  border: `1px solid var(--color-border)`
+                }}
                 title="Attach files"
               >
                 <Paperclip size={18} />
@@ -435,7 +457,11 @@ const ChatArea = ({
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyDown={handleKeyPress}
                   placeholder="Ask NIVII anything... ✨"
-                  className="w-full bg-transparent text-neutral-100 placeholder-neutral-400/80 resize-none outline-none min-h-[24px] max-h-[200px] py-1 text-[15px] leading-relaxed"
+                  className="w-full bg-transparent resize-none outline-none min-h-[24px] max-h-[200px] py-1 text-[15px] leading-relaxed"
+                  style={{
+                    color: 'var(--color-text)',
+                    caretColor: 'var(--color-text)'
+                  }}
                   rows={1}
                   disabled={isLoading}
                 />
@@ -447,7 +473,11 @@ const ChatArea = ({
                 <button
                   onClick={enhancePrompt}
                   disabled={!inputMessage.trim() || isEnhancing || isLoading}
-                  className="flex-shrink-0 p-2.5 rounded-xl bg-gradient-to-br from-neutral-700/40 to-neutral-800/40 hover:from-accent-purple/20 hover:to-brand-500/20 text-neutral-400 hover:text-accent-purple transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed border border-neutral-700/50 hover:border-accent-purple/50 backdrop-blur-sm"
+                  className="flex-shrink-0 p-2.5 rounded-xl bg-gradient-to-br from-neutral-700/40 to-neutral-800/40 hover:from-accent-purple/20 hover:to-brand-500/20 hover:text-accent-purple transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:border-accent-purple/50 backdrop-blur-sm"
+                  style={{
+                    color: 'var(--color-text-secondary)',
+                    border: `1px solid var(--color-border)`
+                  }}
                   title="Enhance prompt with AI"
                 >
                   <Wand2 size={18} className={isEnhancing ? 'animate-spin' : ''} />
@@ -459,8 +489,12 @@ const ChatArea = ({
                   className={`flex-shrink-0 p-2.5 rounded-xl transition-all duration-300 border backdrop-blur-sm ${
                     isRecording
                       ? 'bg-error-500/20 text-error-400 hover:bg-error-500/30 border-error-500/50'
-                      : 'bg-gradient-to-br from-neutral-700/40 to-neutral-800/40 hover:from-brand-500/20 hover:to-accent-cyan/20 text-neutral-400 hover:text-brand-400 border-neutral-700/50 hover:border-brand-500/50'
+                      : 'bg-gradient-to-br from-neutral-700/40 to-neutral-800/40 hover:from-brand-500/20 hover:to-accent-cyan/20 hover:text-brand-400 hover:border-brand-500/50'
                   }`}
+                  style={!isRecording ? {
+                    color: 'var(--color-text-secondary)',
+                    borderColor: 'var(--color-border)'
+                  } : {}}
                   title={isRecording ? 'Stop recording' : 'Start voice input'}
                 >
                   {isRecording ? <MicOff size={18} /> : <Mic size={18} />}

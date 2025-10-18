@@ -1369,7 +1369,7 @@ Remember to be conversational, helpful, and contextually aware!`
   
   return (
     <ThemeProvider>
-      <div className="h-screen bg-neutral-950 overflow-hidden relative">
+      <div className="h-screen overflow-hidden relative" style={{ backgroundColor: 'var(--color-background)' }}>
         {/* Premium Animated Background Effects */}
         <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
           {/* Floating gradient orbs */}

@@ -159,14 +159,14 @@ const Sidebar = ({
         
         <div className="flex-1 min-w-0">
           <div className={`font-medium text-sm truncate transition-colors duration-300 ${
-            isActive ? 'text-brand-100' : 'text-neutral-200 group-hover:text-neutral-100'
-          }`}>
+            isActive ? 'text-brand-100' : ''
+          }`} style={!isActive ? { color: 'var(--color-text)' } : {}}>
             {truncateText(chat.title)}
           </div>
           {chat.lastMessage && (
             <div className={`text-xs truncate mt-0.5 transition-colors duration-300 ${
-              isActive ? 'text-brand-200/70' : 'text-neutral-400 group-hover:text-neutral-300'
-            }`}>
+              isActive ? 'text-brand-200/70' : ''
+            }`} style={!isActive ? { color: 'var(--color-text-secondary)' } : {}}>
               {truncateText(chat.lastMessage, 40)}
             </div>
           )}
@@ -204,18 +204,24 @@ const Sidebar = ({
       {/* Mobile Backdrop */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-neutral-950/60 backdrop-blur-sm z-20 md:hidden"
+          className="fixed inset-0 backdrop-blur-sm z-20 md:hidden"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
           onClick={onToggle}
         />
       )}
 
       {/* Premium Sidebar with Glassmorphism */}
-      <div className={`fixed left-0 top-0 h-screen bg-gradient-to-br from-neutral-900/95 via-neutral-900/90 to-neutral-800/95 backdrop-blur-2xl border-r border-neutral-800/50 shadow-strong transition-all duration-300 ease-in-out z-30 ${
+      <div className={`fixed left-0 top-0 h-screen backdrop-blur-2xl shadow-strong transition-all duration-300 ease-in-out z-30 ${
         isOpen ? 'w-full md:w-80 translate-x-0' : 'w-0 -translate-x-full overflow-hidden'
-      }`}>
+      }`} style={{
+        background: `linear-gradient(to bottom right, var(--color-surface), var(--color-surface))`,
+        borderRight: `1px solid var(--color-border)`
+      }}>
         <div className="flex flex-col h-full overflow-hidden">
           {/* Premium Header */}
-          <div className="flex-shrink-0 p-6 border-b border-neutral-800/50 bg-gradient-to-r from-brand-500/5 via-accent-purple/5 to-brand-500/5">
+          <div className="flex-shrink-0 p-6 bg-gradient-to-r from-brand-500/5 via-accent-purple/5 to-brand-500/5" style={{
+            borderBottom: `1px solid var(--color-border)`
+          }}>
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 {/* Premium Logo with Glow */}
@@ -228,12 +234,17 @@ const Sidebar = ({
                 </div>
                 <div>
                   <h2 className="text-lg font-bold bg-gradient-to-r from-brand-400 via-accent-purple to-accent-cyan bg-clip-text text-transparent">NIVII AI</h2>
-                  <p className="text-xs text-neutral-400 font-medium">Intelligent Assistant</p>
+                  <p className="text-xs font-medium" style={{ color: 'var(--color-text-secondary)' }}>Intelligent Assistant</p>
                 </div>
               </div>
               <button
                 onClick={onToggle}
-                className="p-2.5 rounded-xl bg-neutral-800/30 hover:bg-neutral-700/50 text-neutral-400 hover:text-neutral-100 transition-all duration-300 group border border-neutral-700/30 hover:border-neutral-600/50"
+                className="p-2.5 rounded-xl bg-neutral-800/30 hover:bg-neutral-700/50 transition-all duration-300 group"
+                style={{
+                  color: 'var(--color-text-secondary)',
+                  border: `1px solid var(--color-border)`,
+                  backgroundColor: 'var(--color-surface-hover)'
+                }}
               >
                 <ChevronLeft size={18} className="group-hover:scale-110 transition-transform duration-200" />
               </button>
@@ -256,16 +267,21 @@ const Sidebar = ({
           </div>
 
           {/* Search and Filters */}
-          <div className="flex-shrink-0 p-4 space-y-4 border-b border-neutral-800/50">
+          <div className="flex-shrink-0 p-4 space-y-4" style={{ borderBottom: `1px solid var(--color-border)` }}>
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400" size={16} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: 'var(--color-text-secondary)' }} size={16} />
               <input
                 type="text"
                 placeholder="Search conversations..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-neutral-800/50 border border-neutral-700/50 rounded-lg text-neutral-100 placeholder-neutral-400 focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/20 focus:outline-none transition-all duration-200"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/20 focus:outline-none transition-all duration-200"
+                style={{
+                  backgroundColor: 'var(--color-surface-hover)',
+                  border: `1px solid var(--color-border)`,
+                  color: 'var(--color-text)'
+                }}
               />
             </div>
 
