@@ -59,21 +59,46 @@ const Login = ({ onSwitchToRegister, onLogin }) => {
     }
   }
 
+  const handleGuestLogin = () => {
+    // Create guest user with temporary credentials
+    const guestUser = {
+      id: `guest_${Date.now()}`,
+      name: 'Guest User',
+      email: 'guest@nivii.ai',
+      isGuest: true
+    }
+    const guestToken = `guest_token_${Date.now()}`
+    
+    localStorage.setItem('token', guestToken)
+    localStorage.setItem('user', JSON.stringify(guestUser))
+    
+    onLogin({
+      user: guestUser,
+      token: guestToken
+    })
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Logo and Title */}
+        {/* Premium Logo and Title */}
         <div className="text-center mb-8">
-          <div className="relative mx-auto w-20 h-20 mb-6">
-            <div className="w-full h-full bg-gradient-to-br from-brand-500 to-accent-purple rounded-3xl flex items-center justify-center shadow-glow-lg animate-float">
-              <Zap className="w-10 h-10 text-white" />
+          <div className="relative mx-auto w-20 h-20 mb-6 group">
+            {/* Logo glow effect */}
+            <div className="absolute -inset-2 bg-gradient-to-br from-brand-500 via-accent-purple to-brand-600 rounded-3xl blur-xl opacity-75 group-hover:opacity-100 transition-opacity duration-300 animate-pulse-soft"></div>
+            
+            {/* Premium Logo */}
+            <div className="relative w-full h-full bg-gradient-to-br from-brand-500 via-accent-purple to-brand-600 rounded-3xl flex items-center justify-center shadow-glow-lg animate-float overflow-hidden">
+              {/* Shine effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+              <Sparkles className="w-10 h-10 text-white relative z-10" />
             </div>
-            <div className="absolute -top-2 -right-2 w-6 h-6 bg-accent-emerald rounded-full border-4 border-neutral-900 animate-bounce-subtle" />
+            <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-accent-emerald to-accent-cyan rounded-full border-4 border-neutral-900 animate-bounce-subtle shadow-glow" />
           </div>
-          <h1 className="text-3xl font-bold text-gradient-primary mb-2">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-brand-400 via-accent-purple to-accent-cyan bg-clip-text text-transparent mb-2">
             Welcome Back
           </h1>
-          <p className="text-neutral-400 text-lg">Sign in to continue with NIVII AI</p>
+          <p className="text-neutral-400 text-lg">Sign in to continue with <span className="text-premium font-semibold">NIVII AI</span></p>
         </div>
 
         {/* Login Form */}
@@ -196,9 +221,10 @@ const Login = ({ onSwitchToRegister, onLogin }) => {
               </button>
               <button
                 type="button"
-                className="flex items-center justify-center gap-2 px-4 py-3 bg-neutral-800/50 hover:bg-neutral-800 border border-neutral-700/50 hover:border-neutral-600 rounded-xl transition-all duration-200 text-neutral-300 hover:text-neutral-100"
+                onClick={handleGuestLogin}
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-neutral-800/50 hover:bg-neutral-800 border border-neutral-700/50 hover:border-neutral-600 rounded-xl transition-all duration-200 text-neutral-300 hover:text-neutral-100 group"
               >
-                <User className="w-5 h-5" />
+                <User className="w-5 h-5 group-hover:scale-110 transition-transform" />
                 Guest
               </button>
             </div>

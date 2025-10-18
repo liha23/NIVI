@@ -1369,8 +1369,24 @@ Remember to be conversational, helpful, and contextually aware!`
   
   return (
     <ThemeProvider>
-      <div className="h-screen bg-dark-950 overflow-hidden">
-
+      <div className="h-screen bg-neutral-950 overflow-hidden relative">
+        {/* Premium Animated Background Effects */}
+        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+          {/* Floating gradient orbs */}
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br from-brand-500/10 to-accent-purple/10 rounded-full blur-3xl animate-float" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gradient-to-br from-accent-purple/8 to-accent-cyan/8 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+          <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-gradient-to-br from-accent-cyan/6 to-brand-500/6 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }} />
+          
+          {/* Grid pattern */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.02)_1px,transparent_1px)] bg-[size:32px_32px] opacity-40" />
+          
+          {/* Radial gradients */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(124,58,237,0.05),transparent_50%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(59,130,246,0.04),transparent_50%)]" />
+          
+          {/* Animated gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-brand-500/5 via-transparent to-accent-purple/5 animate-gradient-xy opacity-30" />
+        </div>
 
         <Sidebar
           isOpen={isSidebarOpen}

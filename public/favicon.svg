@@ -1,7 +1,34 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
-  <path d="M5 3v4"/>
-  <path d="M19 17v4"/>
-  <path d="M3 5h4"/>
-  <path d="M17 19h4"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Outer circle with gradient -->
+  <circle cx="50" cy="50" r="45" fill="url(#logoGradient)" opacity="0.15"/>
+  
+  <!-- Main icon - AI Brain/Neural Network inspired -->
+  <path d="M50 20 L65 35 L80 30 L75 45 L85 55 L75 65 L80 80 L65 75 L50 90 L35 75 L20 80 L25 65 L15 55 L25 45 L20 30 L35 35 Z" 
+        fill="url(#logoGradient)" filter="url(#glow)" stroke="url(#logoGradient)" stroke-width="2"/>
+  
+  <!-- Center star accent -->
+  <circle cx="50" cy="50" r="8" fill="white" opacity="0.9"/>
+  <path d="M50 42 L52 48 L58 48 L53 52 L55 58 L50 54 L45 58 L47 52 L42 48 L48 48 Z" 
+        fill="url(#logoGradient)" opacity="0.8"/>
+  
+  <!-- Connection lines -->
+  <line x1="35" y1="35" x2="50" y2="50" stroke="url(#logoGradient)" stroke-width="2" opacity="0.6"/>
+  <line x1="65" y1="35" x2="50" y2="50" stroke="url(#logoGradient)" stroke-width="2" opacity="0.6"/>
+  <line x1="35" y1="75" x2="50" y2="50" stroke="url(#logoGradient)" stroke-width="2" opacity="0.6"/>
+  <line x1="65" y1="75" x2="50" y2="50" stroke="url(#logoGradient)" stroke-width="2" opacity="0.6"/>
 </svg>

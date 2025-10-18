@@ -141,25 +141,30 @@ const Sidebar = ({
     
     return (
       <div
-        className={`group relative flex items-center gap-3 px-3 py-3 mx-2 rounded-xl cursor-pointer transition-all duration-200 ${
+        className={`group relative flex items-center gap-3 px-3 py-3 mx-2 rounded-xl cursor-pointer transition-all duration-300 ${
           isActive 
-            ? 'bg-gradient-to-r from-brand-500/20 to-brand-600/20 border border-brand-500/30 shadow-lg' 
-            : 'hover:bg-neutral-800/50 hover:border-neutral-700 border border-transparent'
+            ? 'bg-gradient-to-br from-brand-500/20 via-accent-purple/15 to-brand-600/20 border border-brand-500/40 shadow-glow backdrop-blur-sm' 
+            : 'hover:bg-gradient-to-br hover:from-neutral-800/40 hover:to-neutral-800/30 hover:border-neutral-700/50 border border-transparent backdrop-blur-sm'
         }`}
         onClick={() => onSelectChat(chat.id)}
       >
-        <div className={`flex-shrink-0 w-2 h-2 rounded-full ${
-          isActive ? 'bg-brand-400' : 'bg-neutral-600'
+        {/* Active indicator glow */}
+        {isActive && (
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-500/10 via-accent-purple/10 to-brand-600/10 rounded-xl blur-sm -z-10" />
+        )}
+        
+        <div className={`flex-shrink-0 w-2 h-2 rounded-full transition-all duration-300 ${
+          isActive ? 'bg-brand-400 shadow-glow-accent' : 'bg-neutral-600 group-hover:bg-neutral-500'
         }`} />
         
         <div className="flex-1 min-w-0">
-          <div className={`font-medium text-sm truncate ${
+          <div className={`font-medium text-sm truncate transition-colors duration-300 ${
             isActive ? 'text-brand-100' : 'text-neutral-200 group-hover:text-neutral-100'
           }`}>
             {truncateText(chat.title)}
           </div>
           {chat.lastMessage && (
-            <div className={`text-xs truncate mt-0.5 ${
+            <div className={`text-xs truncate mt-0.5 transition-colors duration-300 ${
               isActive ? 'text-brand-200/70' : 'text-neutral-400 group-hover:text-neutral-300'
             }`}>
               {truncateText(chat.lastMessage, 40)}
@@ -168,8 +173,8 @@ const Sidebar = ({
         </div>
 
         <div className="flex-shrink-0 flex items-center gap-1">
-          <span className={`text-xs ${
-            isActive ? 'text-brand-200/70' : 'text-neutral-500'
+          <span className={`text-xs transition-colors duration-300 ${
+            isActive ? 'text-brand-300/80' : 'text-neutral-500 group-hover:text-neutral-400'
           }`}>
             {formatDate(chat.lastActivity || chat.createdAt)}
           </span>
@@ -179,10 +184,10 @@ const Sidebar = ({
               e.stopPropagation()
               onDeleteChat(chat.id)
             }}
-            className={`opacity-0 group-hover:opacity-100 p-1.5 rounded-lg transition-all duration-200 ${
+            className={`opacity-0 group-hover:opacity-100 p-1.5 rounded-lg transition-all duration-300 hover:scale-110 active:scale-95 ${
               isActive 
-                ? 'hover:bg-brand-500/20 text-brand-200 hover:text-brand-100' 
-                : 'hover:bg-neutral-700 text-neutral-400 hover:text-neutral-200'
+                ? 'hover:bg-brand-500/20 text-brand-200 hover:text-brand-100 border border-brand-500/20' 
+                : 'hover:bg-neutral-700/50 text-neutral-400 hover:text-error-400 border border-neutral-700/30'
             }`}
             title="Delete chat"
           >
@@ -204,42 +209,49 @@ const Sidebar = ({
         />
       )}
 
-      {/* Sidebar */}
-      <div className={`fixed left-0 top-0 h-screen bg-neutral-900/95 backdrop-blur-xl border-r border-neutral-800 transition-all duration-300 ease-in-out z-30 ${
+      {/* Premium Sidebar with Glassmorphism */}
+      <div className={`fixed left-0 top-0 h-screen bg-gradient-to-br from-neutral-900/95 via-neutral-900/90 to-neutral-800/95 backdrop-blur-2xl border-r border-neutral-800/50 shadow-strong transition-all duration-300 ease-in-out z-30 ${
         isOpen ? 'w-full md:w-80 translate-x-0' : 'w-0 -translate-x-full overflow-hidden'
       }`}>
         <div className="flex flex-col h-full overflow-hidden">
-          {/* Header */}
-          <div className="flex-shrink-0 p-6 border-b border-neutral-800/50">
+          {/* Premium Header */}
+          <div className="flex-shrink-0 p-6 border-b border-neutral-800/50 bg-gradient-to-r from-brand-500/5 via-accent-purple/5 to-brand-500/5">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-brand-500 to-accent-purple rounded-xl flex items-center justify-center shadow-glow">
-                  <Zap className="w-5 h-5 text-white" />
+                {/* Premium Logo with Glow */}
+                <div className="relative group">
+                  <div className="absolute -inset-1 bg-gradient-to-br from-brand-500 via-accent-purple to-brand-600 rounded-xl blur-md opacity-75 group-hover:opacity-100 transition-opacity duration-300 animate-pulse-soft"></div>
+                  <div className="relative w-10 h-10 bg-gradient-to-br from-brand-500 via-accent-purple to-brand-600 rounded-xl flex items-center justify-center shadow-glow overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                    <Sparkles className="w-5 h-5 text-white relative z-10" />
+                  </div>
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-gradient-primary">NIVII AI</h2>
-                  <p className="text-xs text-neutral-400">Intelligent Assistant</p>
+                  <h2 className="text-lg font-bold bg-gradient-to-r from-brand-400 via-accent-purple to-accent-cyan bg-clip-text text-transparent">NIVII AI</h2>
+                  <p className="text-xs text-neutral-400 font-medium">Intelligent Assistant</p>
                 </div>
               </div>
               <button
                 onClick={onToggle}
-                className="p-2.5 rounded-xl hover:bg-neutral-800 text-neutral-400 hover:text-neutral-100 transition-all duration-200 group"
+                className="p-2.5 rounded-xl bg-neutral-800/30 hover:bg-neutral-700/50 text-neutral-400 hover:text-neutral-100 transition-all duration-300 group border border-neutral-700/30 hover:border-neutral-600/50"
               >
                 <ChevronLeft size={18} className="group-hover:scale-110 transition-transform duration-200" />
               </button>
             </div>
             
-            {/* New Chat Button */}
+            {/* Premium New Chat Button */}
             <button
               onClick={(e) => {
                 e.preventDefault()
                 console.log('New chat button clicked')
                 onNewChat()
               }}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white rounded-xl transition-all duration-200 font-medium shadow-medium hover:shadow-strong hover:scale-[1.02] group"
+              className="relative w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-gradient-to-br from-brand-500 via-accent-purple to-brand-600 hover:from-brand-600 hover:via-accent-purple hover:to-brand-700 text-white rounded-xl transition-all duration-300 font-medium shadow-glow hover:shadow-glow-hover hover:scale-[1.02] active:scale-95 group overflow-hidden"
             >
-              <Plus size={18} className="group-hover:rotate-90 transition-transform duration-200" />
-              New Conversation
+              {/* Shimmer effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <Plus size={18} className="relative z-10 group-hover:rotate-90 transition-transform duration-300" />
+              <span className="relative z-10">New Conversation</span>
             </button>
           </div>
 
