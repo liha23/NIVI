@@ -23,7 +23,9 @@ import {
   Maximize2,
   Minimize2,
   MoreVertical,
-  Star
+  Star,
+  Moon,
+  Sun
 } from 'lucide-react'
 import ChatMessage from './ChatMessage'
 import TypingIndicator from './TypingIndicator'
@@ -48,7 +50,7 @@ const ChatArea = ({
   onRegenerateAnswer,
   memoryStats
 }) => {
-  const { currentTheme, getCurrentThemeData } = useTheme()
+  const { currentTheme, getCurrentThemeData, changeTheme } = useTheme()
   const [inputMessage, setInputMessage] = useState('')
   const [isListening, setIsListening] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
@@ -288,8 +290,26 @@ const ChatArea = ({
             </div>
           </div>
           
-          {/* Right Side - Premium User Info */}
+          {/* Right Side - Premium User Info & Theme Toggle */}
           <div className="flex items-center gap-2">
+            {/* Theme Toggle Button */}
+            <button
+              onClick={() => {
+                const isLightTheme = currentTheme === 'light'
+                changeTheme(isLightTheme ? 'midnight' : 'light')
+              }}
+              className="relative p-2.5 rounded-xl bg-gradient-to-br from-brand-500/20 via-accent-purple/15 to-brand-600/20 hover:from-brand-500/30 hover:via-accent-purple/25 hover:to-brand-600/30 text-brand-400 hover:text-brand-300 transition-all duration-300 backdrop-blur-sm border border-brand-500/40 hover:border-brand-500/60 shadow-glow hover:shadow-glow-hover hover:scale-105 active:scale-95 overflow-hidden group"
+              title={currentTheme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+            >
+              {/* Shimmer effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              {currentTheme === 'light' ? (
+                <Moon size={18} className="relative z-10" />
+              ) : (
+                <Sun size={18} className="relative z-10" />
+              )}
+            </button>
+            
             {/* User Info */}
             {user && (
               <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-br from-neutral-800/40 to-neutral-900/40 backdrop-blur-sm rounded-xl border border-neutral-700/50 hover:border-brand-500/30 transition-all duration-300">
