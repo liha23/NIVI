@@ -1,9 +1,14 @@
 {
-  "name": "ai-chat",
+  "name": "nivii-ai",
   "version": "1.0.0",
-  "description": "Dark themed AI chatbot using Gemini API",
+  "description": "NIVII AI - Your Premium AI Assistant powered by Google Gemini API. A modern, feature-rich chatbot with advanced capabilities including memory, voice mode, analytics, and more.",
   "type": "module",
   "main": "index.js",
+  "homepage": "https://nivii.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/liha23/NIVI"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -26,10 +31,19 @@
     "vite": "^7.1.3"
   },
   "keywords": [
+    "nivii",
     "ai",
     "chatbot",
+    "assistant",
     "gemini",
-    "react"
+    "google-ai",
+    "react",
+    "artificial-intelligence",
+    "conversation",
+    "voice-mode",
+    "memory-system",
+    "analytics",
+    "premium-ai"
   ],
   "author": "Nivii",
   "license": "MIT"

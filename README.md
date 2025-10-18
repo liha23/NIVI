@@ -1,6 +1,6 @@
-# AI Chat - Dark Themed Gemini Chatbot
+# NIVII AI - Your Premium AI Assistant
 
-A beautiful, modern dark-themed AI chatbot powered by Google's Gemini API. Built with React, Tailwind CSS, and Vite.
+NIVII AI is a beautiful, modern, feature-rich AI assistant powered by Google's Gemini API. Built with React, Tailwind CSS, and Vite, NIVII offers advanced capabilities including memory systems, voice mode, analytics, and more.
 
 ## Features
 
@@ -107,7 +107,7 @@ const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/m
 ### Creator Recognition
 The chatbot has built-in recognition for questions about its creator. When users ask variations of "who made you", it responds with:
 
-> "Gupsup is my creator! I was built with love and care by Gupsup using the Gemini API. How can I assist you today?"
+> "Nivii is my creator! I was built with love and care by Nivii using the NIVII AI technology. How can I assist you today?"
 
 ### Error Handling
 - Graceful handling of API errors
@@ -177,7 +177,7 @@ MIT License - feel free to use this project for personal or commercial purposes.
 
 ## Creator
 
-Built with ❤️ by **Gupsup**
+Built with ❤️ by **Nivii**
 
 ---
 
