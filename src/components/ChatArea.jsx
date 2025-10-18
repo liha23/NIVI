@@ -221,49 +221,65 @@ const ChatArea = ({
       isSidebarOpen ? 'ml-0 md:ml-80' : 'ml-0'
     }`}>
       
-      {/* Modern Header */}
-      <header className="relative bg-neutral-900/95 backdrop-blur-xl border-b border-neutral-800/50 px-6 py-4 flex-shrink-0">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-brand-500/5 to-transparent opacity-50" />
+      {/* Premium Header with Glassmorphism */}
+      <header className="relative bg-gradient-to-br from-neutral-900/95 via-neutral-900/90 to-neutral-800/95 backdrop-blur-2xl border-b border-neutral-800/50 px-6 py-4 flex-shrink-0 shadow-medium">
+        {/* Animated Background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-r from-brand-500/5 via-accent-purple/5 to-brand-500/5 opacity-50 animate-gradient-x" />
+        
+        {/* Glow effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-brand-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         
         <div className="relative flex items-center justify-between">
           {/* Left Side - Sidebar Toggle & Status */}
-          <div className="flex items-center gap-4">
-            {/* Sidebar Toggle Button - Always visible and prominent */}
+          <div className="flex items-center gap-3">
+            {/* Premium Sidebar Toggle Button */}
             <button
               onClick={onToggleSidebar}
-              className="p-2.5 rounded-xl bg-gradient-to-r from-brand-500/20 to-accent-purple/20 hover:from-brand-500/30 hover:to-accent-purple/30 text-brand-400 hover:text-brand-300 transition-all duration-200 backdrop-blur-sm border border-brand-500/30 hover:border-brand-500/50 shadow-glow"
+              className="relative p-2.5 rounded-xl bg-gradient-to-br from-brand-500/20 via-accent-purple/15 to-brand-600/20 hover:from-brand-500/30 hover:via-accent-purple/25 hover:to-brand-600/30 text-brand-400 hover:text-brand-300 transition-all duration-300 backdrop-blur-sm border border-brand-500/40 hover:border-brand-500/60 shadow-glow hover:shadow-glow-hover hover:scale-105 active:scale-95 overflow-hidden group"
               title="Toggle sidebar"
             >
-              <ChevronRight size={18} className={`transition-transform duration-200 ${isSidebarOpen ? 'rotate-180' : ''}`} />
+              {/* Shimmer effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <ChevronRight size={18} className={`relative z-10 transition-transform duration-300 ${isSidebarOpen ? 'rotate-180' : ''}`} />
             </button>
             
-            {/* Status Indicator */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-neutral-800/30 rounded-lg border border-neutral-700/50">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span className="text-xs text-neutral-400">Online</span>
+            {/* Premium Status Indicator */}
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gradient-to-br from-neutral-800/40 to-neutral-900/40 backdrop-blur-sm rounded-xl border border-neutral-700/50">
+              <div className="relative">
+                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                <div className="absolute inset-0 w-2 h-2 bg-emerald-400 rounded-full animate-ping opacity-75"></div>
+              </div>
+              <span className="text-xs font-medium bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">Online</span>
             </div>
             
-            {/* Memory Indicator */}
+            {/* Premium Memory Indicator */}
             {memoryStats && memoryStats.totalSummaries > 0 && (
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-brand-500/10 rounded-lg border border-brand-500/30">
-                <div className="w-2 h-2 bg-brand-400 rounded-full"></div>
-                <span className="text-xs text-brand-400">
-                  Memory: {memoryStats.totalSummaries} summaries
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gradient-to-br from-brand-500/10 to-accent-purple/10 backdrop-blur-sm rounded-xl border border-brand-500/30">
+                <Star size={14} className="text-brand-400" />
+                <span className="text-xs font-medium text-brand-400">
+                  {memoryStats.totalSummaries} memories
                 </span>
               </div>
             )}
           </div>
           
-          {/* Center - Chat Title */}
+          {/* Center - Premium Logo & Chat Title */}
           <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-3">
-            <div className="relative">
-              <div className="w-10 h-10 bg-gradient-to-br from-brand-500 to-accent-purple rounded-xl flex items-center justify-center shadow-glow">
-                <Zap className="w-5 h-5 text-white" />
+            <div className="relative group">
+              {/* Logo glow effect */}
+              <div className="absolute -inset-1 bg-gradient-to-br from-brand-500 via-accent-purple to-brand-600 rounded-xl blur-md opacity-75 group-hover:opacity-100 transition-opacity duration-300 animate-pulse-soft"></div>
+              
+              {/* Premium Logo */}
+              <div className="relative w-10 h-10 bg-gradient-to-br from-brand-500 via-accent-purple to-brand-600 rounded-xl flex items-center justify-center shadow-glow-accent overflow-hidden">
+                {/* Shine effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                <Sparkles className="w-5 h-5 text-white relative z-10" />
               </div>
             </div>
             <div className="text-center">
-              <h1 className="text-lg font-bold text-gradient-primary">NIVII AI</h1>
+              <h1 className="text-lg font-bold bg-gradient-to-r from-brand-400 via-accent-purple to-accent-cyan bg-clip-text text-transparent">
+                NIVII AI
+              </h1>
               {currentChatTitle && (
                 <p className="text-xs text-neutral-400 truncate max-w-48">
                   {currentChatTitle}
@@ -272,15 +288,15 @@ const ChatArea = ({
             </div>
           </div>
           
-          {/* Right Side - User Info */}
+          {/* Right Side - Premium User Info */}
           <div className="flex items-center gap-2">
             {/* User Info */}
             {user && (
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-800/30 rounded-lg border border-neutral-700/50">
-                <div className="w-6 h-6 bg-gradient-to-br from-brand-500 to-accent-purple rounded-lg flex items-center justify-center text-white text-xs font-bold">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-br from-neutral-800/40 to-neutral-900/40 backdrop-blur-sm rounded-xl border border-neutral-700/50 hover:border-brand-500/30 transition-all duration-300">
+                <div className="w-7 h-7 bg-gradient-to-br from-brand-500 via-accent-purple to-brand-600 rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-glow">
                   {user.username?.[0]?.toUpperCase() || 'U'}
                 </div>
-                <span className="text-sm text-neutral-200 hidden sm:block">
+                <span className="text-sm font-medium text-neutral-200 hidden sm:block">
                   {user.username}
                 </span>
               </div>
@@ -376,39 +392,42 @@ const ChatArea = ({
             </div>
           )}
 
-          {/* Input Container */}
+          {/* Premium Input Container with Glassmorphism */}
           <div className="relative">
-            <div className="flex items-end gap-3 p-3 bg-neutral-800/50 border border-neutral-700/50 rounded-2xl focus-within:border-brand-500/50 focus-within:ring-2 focus-within:ring-brand-500/20 transition-all duration-200 backdrop-blur-sm">
-              {/* Attachment Button */}
+            {/* Gradient glow effect */}
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-brand-500/20 via-accent-purple/20 to-brand-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            
+            <div className="relative flex items-end gap-3 p-4 bg-gradient-to-br from-neutral-800/60 via-neutral-800/50 to-neutral-900/60 backdrop-blur-2xl border border-neutral-700/50 rounded-2xl focus-within:border-brand-500/60 focus-within:ring-2 focus-within:ring-brand-500/30 focus-within:shadow-glow transition-all duration-300 group">
+              {/* Premium Attachment Button */}
               <button
                 onClick={() => setIsFileUploadOpen(true)}
-                className="flex-shrink-0 p-2 rounded-xl bg-neutral-700/50 hover:bg-neutral-600 text-neutral-400 hover:text-neutral-100 transition-all duration-200"
+                className="flex-shrink-0 p-2.5 rounded-xl bg-gradient-to-br from-neutral-700/40 to-neutral-800/40 hover:from-brand-500/20 hover:to-accent-purple/20 text-neutral-400 hover:text-brand-400 transition-all duration-300 border border-neutral-700/50 hover:border-brand-500/50 hover:shadow-glow backdrop-blur-sm"
                 title="Attach files"
               >
                 <Paperclip size={18} />
               </button>
 
-              {/* Text Input */}
+              {/* Enhanced Text Input */}
               <div className="flex-1 relative">
                 <textarea
                   ref={textareaRef}
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyDown={handleKeyPress}
-                  placeholder="Ask NIVII anything..."
-                  className="w-full bg-transparent text-neutral-100 placeholder-neutral-400 resize-none outline-none min-h-[24px] max-h-[200px] py-1"
+                  placeholder="Ask NIVII anything... ✨"
+                  className="w-full bg-transparent text-neutral-100 placeholder-neutral-400/80 resize-none outline-none min-h-[24px] max-h-[200px] py-1 text-[15px] leading-relaxed"
                   rows={1}
                   disabled={isLoading}
                 />
               </div>
 
-              {/* Action Buttons */}
+              {/* Premium Action Buttons */}
               <div className="flex items-center gap-2">
-                {/* Enhance Button */}
+                {/* AI Enhance Button */}
                 <button
                   onClick={enhancePrompt}
                   disabled={!inputMessage.trim() || isEnhancing || isLoading}
-                  className="flex-shrink-0 p-2 rounded-xl bg-neutral-700/50 hover:bg-neutral-600 text-neutral-400 hover:text-brand-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-shrink-0 p-2.5 rounded-xl bg-gradient-to-br from-neutral-700/40 to-neutral-800/40 hover:from-accent-purple/20 hover:to-brand-500/20 text-neutral-400 hover:text-accent-purple transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed border border-neutral-700/50 hover:border-accent-purple/50 backdrop-blur-sm"
                   title="Enhance prompt with AI"
                 >
                   <Wand2 size={18} className={isEnhancing ? 'animate-spin' : ''} />
@@ -417,24 +436,26 @@ const ChatArea = ({
                 {/* Voice Input Button */}
                 <button
                   onClick={toggleVoiceRecognition}
-                  className={`flex-shrink-0 p-2 rounded-xl transition-all duration-200 ${
+                  className={`flex-shrink-0 p-2.5 rounded-xl transition-all duration-300 border backdrop-blur-sm ${
                     isRecording
-                      ? 'bg-error-500/20 text-error-400 hover:bg-error-500/30'
-                      : 'bg-neutral-700/50 hover:bg-neutral-600 text-neutral-400 hover:text-brand-400'
+                      ? 'bg-error-500/20 text-error-400 hover:bg-error-500/30 border-error-500/50'
+                      : 'bg-gradient-to-br from-neutral-700/40 to-neutral-800/40 hover:from-brand-500/20 hover:to-accent-cyan/20 text-neutral-400 hover:text-brand-400 border-neutral-700/50 hover:border-brand-500/50'
                   }`}
                   title={isRecording ? 'Stop recording' : 'Start voice input'}
                 >
                   {isRecording ? <MicOff size={18} /> : <Mic size={18} />}
                 </button>
 
-                {/* Send Button */}
+                {/* Premium Send Button */}
                 <button
                   onClick={handleSendMessage}
                   disabled={!inputMessage.trim() || isLoading}
-                  className="flex-shrink-0 p-2 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:from-neutral-600 disabled:to-neutral-600 shadow-medium hover:shadow-strong hover:scale-105"
+                  className="relative flex-shrink-0 p-2.5 rounded-xl bg-gradient-to-br from-brand-500 via-accent-purple to-brand-600 hover:from-brand-600 hover:via-accent-purple hover:to-brand-700 text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:from-neutral-600 disabled:to-neutral-700 shadow-glow hover:shadow-glow-hover hover:scale-105 active:scale-95 overflow-hidden group"
                   title="Send message (Enter)"
                 >
-                  <Send size={18} />
+                  {/* Shimmer effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                  <Send size={18} className="relative z-10" />
                 </button>
               </div>
             </div>
