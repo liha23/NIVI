@@ -90,51 +90,6 @@ function App() {
     
     console.log('Initialization useEffect triggered:', { isAuthenticated, token: !!token, urlChatId, isInitialized })
     
-    // Check if there's a shared chat in the URL (legacy support)
-    const urlParams = new URLSearchParams(window.location.search)
-    const shareParam = urlParams.get('share')
-    
-    if (shareParam) {
-      try {
-        const shareData = JSON.parse(atob(shareParam))
-        console.log('Loading shared chat:', shareData.chatId)
-        
-        // Create a new chat with the shared messages
-        const sharedChatId = nanoid(12)
-        const sharedMessages = shareData.messages || []
-        
-        setCurrentChatId(sharedChatId)
-        setCurrentMessages(sharedMessages)
-        setLastSavedMessages([...sharedMessages])
-        
-        const sharedChat = {
-          id: sharedChatId,
-          title: 'Shared Chat',
-          timestamp: new Date(shareData.timestamp || new Date()),
-          lastActivity: new Date(),
-          createdAt: new Date(shareData.timestamp || new Date())
-        }
-        
-        setChatHistory([sharedChat])
-        
-        // Save to localStorage for non-authenticated users
-        if (!isAuthenticated) {
-          localStorage.setItem(`chat_${sharedChatId}`, JSON.stringify(sharedMessages))
-          localStorage.setItem('ai_chat_history', JSON.stringify([sharedChat]))
-        }
-        
-        // Navigate to the new chat URL
-        navigate(`/${sharedChatId}`, { replace: true })
-        
-        setIsInitialized(true)
-        console.log('✅ Shared chat loaded successfully')
-        return // Don't continue with normal initialization
-      } catch (error) {
-        console.error('Error loading shared chat:', error)
-        // Continue with normal initialization
-      }
-    }
-    
     // Initialize app state
     if (isAuthenticated && token) {
       // Load chats from MongoDB for authenticated users

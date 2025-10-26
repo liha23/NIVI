@@ -1,13 +1,10 @@
 import React, { useState } from 'react'
-import { X, Download, Share2, Copy, FileText, FileJson, File, Link, Twitter, Facebook, Linkedin } from 'lucide-react'
+import { X, Download, FileText, FileJson, File } from 'lucide-react'
 import { exportUtils } from '../utils/exportUtils'
 
 const ExportModal = ({ isOpen, onClose, messages, chatTitle, chatId }) => {
   const [exportFormat, setExportFormat] = useState('markdown')
   const [isExporting, setIsExporting] = useState(false)
-  const [shareLink, setShareLink] = useState('')
-  const [showShareOptions, setShowShareOptions] = useState(false)
-  const [copied, setCopied] = useState(false)
 
   if (!isOpen) return null
 
@@ -43,34 +40,7 @@ const ExportModal = ({ isOpen, onClose, messages, chatTitle, chatId }) => {
     }
   }
 
-  const generateShareLink = () => {
-    const link = exportUtils.generateShareLink(chatId, messages)
-    setShareLink(link)
-    setShowShareOptions(true)
-  }
 
-  const copyShareLink = async () => {
-    try {
-      await exportUtils.copyToClipboard(shareLink)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch (error) {
-      console.error('Failed to copy link:', error)
-    }
-  }
-
-  const shareToSocial = (platform) => {
-    const text = `Check out this AI chat conversation: ${chatTitle}`
-    const url = encodeURIComponent(shareLink)
-    
-    const shareUrls = {
-      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${url}`,
-      facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
-      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`
-    }
-    
-    window.open(shareUrls[platform], '_blank', 'width=600,height=400')
-  }
 
   const exportFormats = [
     {
@@ -174,74 +144,6 @@ const ExportModal = ({ isOpen, onClose, messages, chatTitle, chatId }) => {
               <Download size={18} />
               {isExporting ? 'Exporting...' : `Export as ${exportFormats.find(f => f.id === exportFormat)?.name}`}
             </button>
-
-            {/* Divider */}
-            <div className="flex items-center">
-              <div className="flex-1 border-t border-dark-600"></div>
-              <span className="px-3 text-sm text-gray-500">or</span>
-              <div className="flex-1 border-t border-dark-600"></div>
-            </div>
-
-            {/* Share Options */}
-            <div>
-              <h3 className="text-sm font-medium text-gray-400 mb-3">Share Chat</h3>
-              
-              {!showShareOptions ? (
-                <button
-                  onClick={generateShareLink}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium transition-all"
-                >
-                  <Share2 size={18} />
-                  Generate Share Link
-                </button>
-              ) : (
-                <div className="space-y-3">
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={shareLink}
-                      readOnly
-                      className="flex-1 px-3 py-2 bg-dark-800 border border-dark-600 rounded-lg text-white text-sm"
-                    />
-                    <button
-                      onClick={copyShareLink}
-                      className="px-3 py-2 bg-dark-700 hover:bg-dark-600 text-white rounded-lg transition-colors"
-                    >
-                      <Copy size={16} />
-                    </button>
-                  </div>
-                  
-                  {copied && (
-                    <p className="text-sm text-green-500 text-center">Link copied to clipboard!</p>
-                  )}
-
-                  {/* Social Share Buttons */}
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => shareToSocial('twitter')}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
-                    >
-                      <Twitter size={16} />
-                      Twitter
-                    </button>
-                    <button
-                      onClick={() => shareToSocial('facebook')}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                    >
-                      <Facebook size={16} />
-                      Facebook
-                    </button>
-                    <button
-                      onClick={() => shareToSocial('linkedin')}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg transition-colors"
-                    >
-                      <Linkedin size={16} />
-                      LinkedIn
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </div>
