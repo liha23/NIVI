@@ -33,6 +33,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [lastSavedMessages, setLastSavedMessages] = useState([])
   const [responseCache, setResponseCache] = useState(new Map()) // Simple cache for responses
+  const [isCreatingChat, setIsCreatingChat] = useState(false) // Prevent duplicate chat creation
+  const [isDeletingChat, setIsDeletingChat] = useState(false) // Prevent duplicate deletion
   
   // New feature states
   const [showExportModal, setShowExportModal] = useState(false)
@@ -63,6 +65,13 @@ function App() {
     )
   }
 
+  // Utility function to remove duplicate chats
+  const removeDuplicateChats = (chats) => {
+    return chats.filter((chat, index, self) => 
+      index === self.findIndex(c => c.id === chat.id)
+    )
+  }
+
   // Single useEffect for all initialization and saving logic
   useEffect(() => {
     console.log('Initialization useEffect triggered:', { isAuthenticated, token: !!token })
@@ -80,22 +89,25 @@ function App() {
       console.log('Loading chats from localStorage...')
       const savedChatHistory = localStorage.getItem('ai_chat_history')
       if (savedChatHistory) {
-                 try {
-           const history = JSON.parse(savedChatHistory)
-           console.log('Loaded chat history from localStorage:', history.length, 'chats')
-           
-           // Ensure all chat history items have proper timestamp fields
-           const formattedHistory = history.map(chat => ({
-             ...chat,
-             lastActivity: chat.lastActivity || chat.timestamp || new Date(),
-             createdAt: chat.createdAt || chat.timestamp || new Date(),
-             timestamp: chat.timestamp || new Date()
-           }))
-           
-           setChatHistory(formattedHistory)
+        try {
+          const history = JSON.parse(savedChatHistory)
+          console.log('Loaded chat history from localStorage:', history.length, 'chats')
           
-          if (history.length > 0) {
-            const mostRecentChat = history[0]
+          // Ensure all chat history items have proper timestamp fields
+          const formattedHistory = history.map(chat => ({
+            ...chat,
+            lastActivity: chat.lastActivity || chat.timestamp || new Date(),
+            createdAt: chat.createdAt || chat.timestamp || new Date(),
+            timestamp: chat.timestamp || new Date()
+          }))
+          
+          // Deduplicate chats
+          const uniqueChats = removeDuplicateChats(formattedHistory)
+          console.log('Unique chats after deduplication:', uniqueChats.length)
+          setChatHistory(uniqueChats)
+          
+          if (uniqueChats.length > 0) {
+            const mostRecentChat = uniqueChats[0]
             console.log('Setting current chat to most recent:', mostRecentChat.id)
             setCurrentChatId(mostRecentChat.id)
             
@@ -387,22 +399,25 @@ function App() {
           return
         }
         
-                 if (data.success && data.data) {
-           const chats = data.data.map(chat => ({
-             id: chat.chatId,
-             title: chat.title,
-             messageCount: chat.messageCount,
-             lastMessage: chat.lastMessage,
-             timestamp: new Date(chat.updatedAt || chat.createdAt || new Date()),
-             lastActivity: new Date(chat.updatedAt || chat.createdAt || new Date()),
-             createdAt: new Date(chat.createdAt || chat.updatedAt || new Date())
-           }))
+        if (data.success && data.data) {
+          const chats = data.data.map(chat => ({
+            id: chat.chatId,
+            title: chat.title,
+            messageCount: chat.messageCount,
+            lastMessage: chat.lastMessage,
+            timestamp: new Date(chat.updatedAt || chat.createdAt || new Date()),
+            lastActivity: new Date(chat.updatedAt || chat.createdAt || new Date()),
+            createdAt: new Date(chat.createdAt || chat.updatedAt || new Date())
+          }))
           console.log('Processed chats:', chats)
-          setChatHistory(chats)
+          // Deduplicate chats before setting
+          const uniqueChats = removeDuplicateChats(chats)
+          console.log('Unique chats after deduplication:', uniqueChats.length)
+          setChatHistory(uniqueChats)
           
-          if (chats.length > 0) {
-            console.log('Loading first chat:', chats[0].id)
-            await loadChatFromMongoDB(chats[0].id)
+          if (uniqueChats.length > 0) {
+            console.log('Loading first chat:', uniqueChats[0].id)
+            await loadChatFromMongoDB(uniqueChats[0].id)
           } else {
             console.log('No chats found, creating new chat')
             createNewChat()
@@ -518,8 +533,8 @@ function App() {
         console.log('Update chat response data:', data)
         
         if (data.success) {
-          setChatHistory(prev => 
-            prev.map(chat => 
+          setChatHistory(prev => {
+            const updated = prev.map(chat => 
               chat.id === currentChatId 
                 ? { 
                     ...chat, 
@@ -530,7 +545,8 @@ function App() {
                   }
                 : chat
             )
-          )
+            return removeDuplicateChats(updated)
+          })
           
           console.log('✅ Chat history updated with latest data')
           console.log('✅ Chat updated successfully in MongoDB')
@@ -573,13 +589,14 @@ function App() {
             }
             
             // Update chat history with the new MongoDB chatId
-            setChatHistory(prev => 
-              prev.map(chat => 
+            setChatHistory(prev => {
+              const updated = prev.map(chat => 
                 chat.id === currentChatId 
                   ? { ...newChat, id: newChatId } // Use MongoDB chatId
                   : chat
               )
-            )
+              return removeDuplicateChats(updated)
+            })
             
             // Update the current chat ID to the MongoDB ID
             setCurrentChatId(newChatId)
@@ -611,47 +628,63 @@ function App() {
   }
 
   const createNewChat = () => {
+    // Prevent creating multiple chats simultaneously
+    if (isCreatingChat) {
+      console.log('Already creating a chat, ignoring duplicate call')
+      return
+    }
+    
+    setIsCreatingChat(true)
     console.log('Creating new chat...')
     
     const welcomeMessage = getWelcomeMessage()
     const newChatId = Date.now()
     
-         if (isAuthenticated && token) {
-       // For authenticated users, create a temporary chat that will be saved to MongoDB
-       console.log('Creating new chat for authenticated user with temp ID:', newChatId)
-       setCurrentMessages([welcomeMessage])
-       setCurrentChatId(newChatId)
-       setLastSavedMessages([welcomeMessage]) // Prevent unnecessary saves
-       
-       const newChat = {
-         id: newChatId,
-         title: 'New Chat',
-         timestamp: new Date(),
-         lastActivity: new Date(),
-         createdAt: new Date()
-       }
-      setChatHistory(prev => [newChat, ...prev])
+    if (isAuthenticated && token) {
+      // For authenticated users, create a temporary chat that will be saved to MongoDB
+      console.log('Creating new chat for authenticated user with temp ID:', newChatId)
+      setCurrentMessages([welcomeMessage])
+      setCurrentChatId(newChatId)
+      setLastSavedMessages([welcomeMessage]) // Prevent unnecessary saves
+      
+      const newChat = {
+        id: newChatId,
+        title: 'New Chat',
+        timestamp: new Date(),
+        lastActivity: new Date(),
+        createdAt: new Date()
+      }
+      setChatHistory(prev => {
+        const updated = [newChat, ...prev]
+        return removeDuplicateChats(updated)
+      })
       
       // Don't immediately save - let the save effect handle it when messages change
       // This prevents the 404 error from trying to update a non-existent chat
-         } else {
-       // For non-authenticated users, create local chat
-       console.log('Creating new chat for non-authenticated user')
-       const newChat = {
-         id: newChatId,
-         title: 'New Chat',
-         timestamp: new Date(),
-         lastActivity: new Date(),
-         createdAt: new Date()
-       }
+    } else {
+      // For non-authenticated users, create local chat
+      console.log('Creating new chat for non-authenticated user')
+      const newChat = {
+        id: newChatId,
+        title: 'New Chat',
+        timestamp: new Date(),
+        lastActivity: new Date(),
+        createdAt: new Date()
+      }
       
-      setChatHistory(prev => [newChat, ...prev])
+      setChatHistory(prev => {
+        const updated = [newChat, ...prev]
+        return removeDuplicateChats(updated)
+      })
       setCurrentChatId(newChatId)
       setCurrentMessages([welcomeMessage])
       setLastSavedMessages([welcomeMessage]) // Prevent unnecessary saves
       
       localStorage.setItem(`chat_${newChatId}`, JSON.stringify([welcomeMessage]))
     }
+    
+    // Reset the flag after a short delay to allow the next creation
+    setTimeout(() => setIsCreatingChat(false), 500)
   }
 
   const selectChat = async (chatId) => {
@@ -697,8 +730,17 @@ function App() {
   }
 
   const deleteChat = async (chatId) => {
+    // Prevent deleting multiple chats simultaneously
+    if (isDeletingChat) {
+      console.log('Already deleting a chat, ignoring duplicate call')
+      return
+    }
+    
+    setIsDeletingChat(true)
     console.log('Deleting chat:', chatId, 'Current chat ID:', currentChatId)
     console.log('Auth state:', { isAuthenticated, hasToken: !!token, hasUser: !!user })
+    
+    const shouldCreateNewChat = currentChatId === chatId
     
     if (isAuthenticated && token && user) {
       try {
@@ -719,12 +761,14 @@ function App() {
           
           if (data.success) {
             console.log('✅ Chat deleted successfully from MongoDB')
-            setChatHistory(prev => prev.filter(chat => chat.id !== chatId))
+            setChatHistory(prev => removeDuplicateChats(prev.filter(chat => chat.id !== chatId)))
             
             // If the deleted chat was the current chat, create a new one
-            if (currentChatId === chatId) {
+            if (shouldCreateNewChat) {
               console.log('Deleted chat was current chat, creating new one...')
+              setIsDeletingChat(false)
               createNewChat()
+              return
             }
           } else {
             console.error('Failed to delete chat:', data.message)
@@ -732,11 +776,13 @@ function App() {
         } else if (response.status === 401) {
           // Token is invalid, treat as unauthenticated
           console.log('Token invalid, treating as unauthenticated user')
-          setChatHistory(prev => prev.filter(chat => chat.id !== chatId))
+          setChatHistory(prev => removeDuplicateChats(prev.filter(chat => chat.id !== chatId)))
           localStorage.removeItem(`chat_${chatId}`)
           
-          if (currentChatId === chatId) {
+          if (shouldCreateNewChat) {
+            setIsDeletingChat(false)
             createNewChat()
+            return
           }
         } else {
           const errorText = await response.text()
@@ -745,41 +791,48 @@ function App() {
       } catch (error) {
         console.error('Error deleting chat from MongoDB:', error)
         // Fallback to localStorage deletion on error
-        setChatHistory(prev => prev.filter(chat => chat.id !== chatId))
+        setChatHistory(prev => removeDuplicateChats(prev.filter(chat => chat.id !== chatId)))
         localStorage.removeItem(`chat_${chatId}`)
         
-        if (currentChatId === chatId) {
+        if (shouldCreateNewChat) {
+          setIsDeletingChat(false)
           createNewChat()
+          return
         }
       }
     } else {
       // For non-authenticated users
       console.log('User not authenticated, deleting from localStorage only')
-      setChatHistory(prev => prev.filter(chat => chat.id !== chatId))
+      setChatHistory(prev => removeDuplicateChats(prev.filter(chat => chat.id !== chatId)))
       localStorage.removeItem(`chat_${chatId}`)
       
       // If the deleted chat was the current chat, create a new one
-      if (currentChatId === chatId) {
+      if (shouldCreateNewChat) {
+        setIsDeletingChat(false)
         createNewChat()
+        return
       }
     }
+    
+    setIsDeletingChat(false)
   }
 
-     const updateChatTitle = (chatId, firstMessage) => {
-     const title = firstMessage.length > 50 ? firstMessage.substring(0, 50) + '...' : firstMessage
-     setChatHistory(prev => 
-       prev.map(chat => 
-         chat.id === chatId 
-           ? { 
-               ...chat, 
-               title,
-               lastActivity: new Date(),
-               timestamp: new Date()
-             } 
-           : chat
-       )
-     )
-   }
+  const updateChatTitle = (chatId, firstMessage) => {
+    const title = firstMessage.length > 50 ? firstMessage.substring(0, 50) + '...' : firstMessage
+    setChatHistory(prev => {
+      const updated = prev.map(chat => 
+        chat.id === chatId 
+          ? { 
+              ...chat, 
+              title,
+              lastActivity: new Date(),
+              timestamp: new Date()
+            } 
+          : chat
+      )
+      return removeDuplicateChats(updated)
+    })
+  }
 
   const sendMessage = async (message, attachedFiles = [], isEnhanceMode = false) => {
     if (!message.trim() || isLoading) return

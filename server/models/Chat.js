@@ -52,7 +52,7 @@ const chatSchema = new mongoose.Schema({
 })
 
 // Index for faster queries
-chatSchema.index({ userId: 1, chatId: 1 })
+chatSchema.index({ userId: 1, chatId: 1 }, { unique: true }) // Ensure unique chatId per user
 chatSchema.index({ userId: 1, createdAt: -1 })
 chatSchema.index({ userId: 1, updatedAt: -1 })
 
