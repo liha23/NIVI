@@ -75,7 +75,7 @@ router.get('/:chatId', auth, async (req, res) => {
     
     const chat = await Chat.findOne({
       userId: req.user._id,
-      chatId: parseInt(chatId),
+      chatId: chatId,
       isActive: true
     })
 
@@ -115,20 +115,12 @@ router.post('/', auth, async (req, res) => {
       })
     }
     
-    const { title, messages } = req.body
-    console.log('Creating new chat for user:', req.user._id, 'with title:', title, 'messages:', messages?.length)
-
-    // Get the next chat ID
-    const lastChat = await Chat.findOne({ 
-      userId: req.user._id 
-    }).sort({ chatId: -1 })
-    
-    const nextChatId = lastChat ? lastChat.chatId + 1 : 1
-    console.log('Next chat ID:', nextChatId)
+    const { title, messages, chatId } = req.body
+    console.log('Creating new chat for user:', req.user._id, 'with title:', title, 'messages:', messages?.length, 'chatId:', chatId)
 
     const chat = new Chat({
       userId: req.user._id,
-      chatId: nextChatId,
+      chatId: chatId, // Use provided chatId or let model generate one via default
       title: title || 'New Chat',
       messages: messages || []
     })
@@ -139,12 +131,9 @@ router.post('/', auth, async (req, res) => {
     } catch (saveError) {
       // Handle duplicate key error
       if (saveError.code === 11000) {
-        console.error('Duplicate chatId detected, retrying with new ID...')
-        // Find the highest chatId and increment
-        const latestChat = await Chat.findOne({ 
-          userId: req.user._id 
-        }).sort({ chatId: -1 })
-        chat.chatId = latestChat ? latestChat.chatId + 1 : 1
+        console.error('Duplicate chatId detected, generating new ID...')
+        // Generate a new chatId and retry
+        chat.chatId = undefined // Let the model generate a new one
         await chat.save()
         console.log('Chat saved with new ID:', chat.chatId)
       } else {
@@ -191,7 +180,7 @@ router.put('/:chatId', auth, async (req, res) => {
 
     const chat = await Chat.findOne({
       userId: req.user._id,
-      chatId: parseInt(chatId),
+      chatId: chatId,
       isActive: true
     })
 
@@ -200,7 +189,7 @@ router.put('/:chatId', auth, async (req, res) => {
       // If chat doesn't exist, create it instead of returning 404
       const newChat = new Chat({
         userId: req.user._id,
-        chatId: parseInt(chatId),
+        chatId: chatId,
         title: title || 'New Chat',
         messages: messages || []
       })
@@ -215,7 +204,7 @@ router.put('/:chatId', auth, async (req, res) => {
           // Find the existing chat and update it
           const existingChat = await Chat.findOne({
             userId: req.user._id,
-            chatId: parseInt(chatId)
+            chatId: chatId
           })
           if (existingChat) {
             existingChat.title = title || existingChat.title
@@ -305,7 +294,7 @@ router.post('/:chatId/messages', auth, async (req, res) => {
 
     const chat = await Chat.findOne({
       userId: req.user._id,
-      chatId: parseInt(chatId),
+      chatId: chatId,
       isActive: true
     })
 
@@ -343,7 +332,7 @@ router.delete('/:chatId', auth, async (req, res) => {
     const chat = await Chat.findOneAndUpdate(
       {
         userId: req.user._id,
-        chatId: parseInt(chatId),
+        chatId: chatId,
         isActive: true
       },
       { isActive: false },
@@ -377,14 +366,16 @@ router.delete('/:chatId', auth, async (req, res) => {
 // Clear all chats for a user
 router.delete('/', auth, async (req, res) => {
   try {
-    await Chat.updateMany(
-      { userId: req.user._id },
-      { isActive: false }
+    // Hard delete all chats for the user (as per requirement)
+    const result = await Chat.deleteMany(
+      { userId: req.user._id }
     )
+
+    console.log(`✅ Deleted ${result.deletedCount} chats for user:`, req.user._id)
 
     res.json({
       success: true,
-      message: 'All chats cleared successfully'
+      message: `All chats cleared successfully (${result.deletedCount} chats deleted)`
     })
   } catch (error) {
     console.error('Clear chats error:', error)

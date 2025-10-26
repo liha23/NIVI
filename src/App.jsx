@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Send, Bot, User, Trash2, Sparkles, Download, BarChart3, Search, Bookmark, X } from 'lucide-react'
+import { nanoid } from 'nanoid'
 import ChatMessage from './components/ChatMessage'
 import TypingIndicator from './components/TypingIndicator'
 import Sidebar from './components/Sidebar'
@@ -78,6 +79,50 @@ function App() {
     
     // Clear lastSavedMessages on initialization to allow fresh loading
     setLastSavedMessages([])
+    
+    // Check if there's a shared chat in the URL
+    const urlParams = new URLSearchParams(window.location.search)
+    const shareParam = urlParams.get('share')
+    
+    if (shareParam) {
+      try {
+        const shareData = JSON.parse(atob(shareParam))
+        console.log('Loading shared chat:', shareData.chatId)
+        
+        // Create a new chat with the shared messages
+        const sharedChatId = nanoid(12)
+        const sharedMessages = shareData.messages || []
+        
+        setCurrentChatId(sharedChatId)
+        setCurrentMessages(sharedMessages)
+        setLastSavedMessages([...sharedMessages])
+        
+        const sharedChat = {
+          id: sharedChatId,
+          title: 'Shared Chat',
+          timestamp: new Date(shareData.timestamp || new Date()),
+          lastActivity: new Date(),
+          createdAt: new Date(shareData.timestamp || new Date())
+        }
+        
+        setChatHistory([sharedChat])
+        
+        // Save to localStorage for non-authenticated users
+        if (!isAuthenticated) {
+          localStorage.setItem(`chat_${sharedChatId}`, JSON.stringify(sharedMessages))
+          localStorage.setItem('ai_chat_history', JSON.stringify([sharedChat]))
+        }
+        
+        // Clean up the URL
+        window.history.replaceState({}, document.title, window.location.pathname)
+        
+        console.log('✅ Shared chat loaded successfully')
+        return // Don't continue with normal initialization
+      } catch (error) {
+        console.error('Error loading shared chat:', error)
+        // Continue with normal initialization
+      }
+    }
     
     // Initialize app state
     if (isAuthenticated && token) {
@@ -564,6 +609,7 @@ function App() {
             'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({
+            chatId: currentChatId, // Send the chatId from frontend
             title: 'New Chat',
             messages: currentMessages
           })
@@ -576,34 +622,35 @@ function App() {
           console.log('Create chat response data:', data)
           
           if (data.success) {
-            const newChatId = data.data.chatId
-            console.log('New chat created with ID:', newChatId)
-            setCurrentChatId(newChatId)
+            const returnedChatId = data.data.chatId
+            console.log('Chat created with ID:', returnedChatId)
+            
+            // Verify the chatId matches what we sent
+            if (returnedChatId !== currentChatId) {
+              console.warn('⚠️ Returned chatId differs from sent chatId:', { sent: currentChatId, returned: returnedChatId })
+              setCurrentChatId(returnedChatId)
+            }
             
             const newChat = {
-              id: newChatId,
+              id: returnedChatId,
               title: data.data.title,
               messageCount: data.data.messageCount,
               lastMessage: data.data.lastMessage,
               timestamp: new Date(data.data.createdAt)
             }
             
-            // Update chat history with the new MongoDB chatId
+            // Update chat history with the MongoDB chatId
             setChatHistory(prev => {
               const updated = prev.map(chat => 
                 chat.id === currentChatId 
-                  ? { ...newChat, id: newChatId } // Use MongoDB chatId
+                  ? { ...newChat, id: returnedChatId }
                   : chat
               )
               return removeDuplicateChats(updated)
             })
             
-            // Update the current chat ID to the MongoDB ID
-            setCurrentChatId(newChatId)
-            
-            console.log('✅ Chat history updated with MongoDB ID:', newChatId)
-            
-            console.log('✅ Chat created successfully in MongoDB with ID:', newChatId)
+            console.log('✅ Chat history updated with ID:', returnedChatId)
+            console.log('✅ Chat created successfully in MongoDB')
             
             // Update lastSavedMessages to prevent unnecessary saves
             setLastSavedMessages([...currentMessages])
@@ -638,11 +685,11 @@ function App() {
     console.log('Creating new chat...')
     
     const welcomeMessage = getWelcomeMessage()
-    const newChatId = Date.now()
+    const newChatId = nanoid(12) // Generate unique 12-character ID
     
     if (isAuthenticated && token) {
       // For authenticated users, create a temporary chat that will be saved to MongoDB
-      console.log('Creating new chat for authenticated user with temp ID:', newChatId)
+      console.log('Creating new chat for authenticated user with ID:', newChatId)
       setCurrentMessages([welcomeMessage])
       setCurrentChatId(newChatId)
       setLastSavedMessages([welcomeMessage]) // Prevent unnecessary saves

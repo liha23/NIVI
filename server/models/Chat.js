@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { nanoid } from 'nanoid'
 
 const messageSchema = new mongoose.Schema({
   id: {
@@ -27,8 +28,10 @@ const chatSchema = new mongoose.Schema({
     required: true
   },
   chatId: {
-    type: Number,
-    required: true
+    type: String,
+    required: true,
+    default: () => nanoid(12), // Generate 12-character unique ID
+    unique: true // Global unique constraint
   },
   title: {
     type: String,
@@ -52,7 +55,7 @@ const chatSchema = new mongoose.Schema({
 })
 
 // Index for faster queries
-chatSchema.index({ userId: 1, chatId: 1 }, { unique: true }) // Ensure unique chatId per user
+chatSchema.index({ chatId: 1 }, { unique: true }) // Ensure globally unique chatId
 chatSchema.index({ userId: 1, createdAt: -1 })
 chatSchema.index({ userId: 1, updatedAt: -1 })
 
