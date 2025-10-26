@@ -1439,6 +1439,7 @@ Remember to be conversational, helpful, and contextually aware!`
             <div className="relative max-w-md w-full">
               <button
                 onClick={() => setShowAuthModal(false)}
+                aria-label="Close authentication modal"
                 className="absolute -top-4 -right-4 p-2 bg-neutral-800 hover:bg-neutral-700 rounded-full transition-colors z-10"
               >
                 <X className="w-5 h-5 text-white" />

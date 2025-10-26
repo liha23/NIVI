@@ -299,16 +299,16 @@ const ChatArea = ({
           {/* Right Side - Premium User Info or Login Button */}
           <div className="flex items-center gap-2">
             {/* User Info if authenticated */}
-            {user && isAuthenticated ? (
+            {isAuthenticated ? (
               <div className="flex items-center gap-2 px-3 py-1.5 backdrop-blur-sm rounded-xl hover:border-brand-500/30 transition-all duration-300" style={{
                 background: `linear-gradient(to bottom right, var(--color-surface-hover), var(--color-surface))`,
                 border: `1px solid var(--color-border)`
               }}>
                 <div className="w-7 h-7 bg-gradient-to-br from-brand-500 via-accent-purple to-brand-600 rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-glow">
-                  {user.username?.[0]?.toUpperCase() || 'U'}
+                  {user?.username?.[0]?.toUpperCase() || 'U'}
                 </div>
                 <span className="text-sm font-medium hidden sm:block" style={{ color: 'var(--color-text)' }}>
-                  {user.username}
+                  {user?.username || 'User'}
                 </span>
               </div>
             ) : (
