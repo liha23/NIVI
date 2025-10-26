@@ -298,8 +298,8 @@ const ChatArea = ({
           
           {/* Right Side - Premium User Info or Login Button */}
           <div className="flex items-center gap-2">
-            {/* User Info if authenticated */}
-            {isAuthenticated ? (
+            {/* User Info if authenticated (but not for guest users) */}
+            {isAuthenticated && !user?.isGuest ? (
               <div className="flex items-center gap-2 px-3 py-1.5 backdrop-blur-sm rounded-xl hover:border-brand-500/30 transition-all duration-300" style={{
                 background: `linear-gradient(to bottom right, var(--color-surface-hover), var(--color-surface))`,
                 border: `1px solid var(--color-border)`
@@ -312,7 +312,7 @@ const ChatArea = ({
                 </span>
               </div>
             ) : (
-              /* Login Button for guest users */
+              /* Login Button for guest users and unauthenticated users */
               <button
                 onClick={onShowAuth}
                 className="relative px-4 py-2 rounded-xl bg-gradient-to-r from-brand-500 via-accent-purple to-brand-600 hover:from-brand-600 hover:via-accent-purple hover:to-brand-700 text-white font-medium transition-all duration-300 shadow-glow hover:shadow-glow-hover hover:scale-105 active:scale-95 overflow-hidden group"
