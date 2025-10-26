@@ -178,70 +178,16 @@ router.put('/:chatId', auth, async (req, res) => {
       hasNewMessage: !!newMessage 
     })
 
-    const chat = await Chat.findOne({
-      userId: req.user._id,
-      chatId: chatId,
-      isActive: true
-    })
-
-    if (!chat) {
-      console.log('Chat not found:', chatId, '- attempting to create it')
-      // If chat doesn't exist, create it instead of returning 404
-      const newChat = new Chat({
-        userId: req.user._id,
-        chatId: chatId,
-        title: title || 'New Chat',
-        messages: messages || []
-      })
-      
-      try {
-        await newChat.save()
-        console.log('Chat created with ID:', newChat.chatId)
-      } catch (saveError) {
-        // Handle duplicate key error
-        if (saveError.code === 11000) {
-          console.error('Duplicate chatId detected during update, finding existing chat...')
-          // Find the existing chat and update it
-          const existingChat = await Chat.findOne({
-            userId: req.user._id,
-            chatId: chatId
-          })
-          if (existingChat) {
-            existingChat.title = title || existingChat.title
-            existingChat.messages = messages || existingChat.messages
-            await existingChat.save()
-            return res.json({
-              success: true,
-              message: 'Chat updated successfully',
-              data: existingChat
-            })
-          }
-        }
-        throw saveError
-      }
-      
-      return res.json({
-        success: true,
-        message: 'Chat created successfully',
-        data: newChat
-      })
-    }
-
-    console.log('Found chat:', chat._id, 'current messages:', chat.messages.length)
-
-    // Update title if provided
+    // Prepare update object
+    const updateData = {}
+    
+    // Handle title update
     if (title) {
-      chat.title = title
-      console.log('Updated title to:', title)
+      updateData.title = title
+      console.log('Will update title to:', title)
     }
 
-    // Add new message if provided
-    if (newMessage) {
-      chat.messages.push(newMessage)
-      console.log('Added new message, total:', chat.messages.length)
-    }
-
-    // Replace all messages if provided
+    // Handle message updates
     if (messages && Array.isArray(messages)) {
       // Deduplicate messages based on id, content, and timestamp
       const uniqueMessages = []
@@ -257,11 +203,73 @@ router.put('/:chatId', auth, async (req, res) => {
         }
       }
       
-      chat.messages = uniqueMessages
-      console.log('Replaced messages, new count:', uniqueMessages.length, '(original:', messages.length, ')')
+      updateData.messages = uniqueMessages
+      console.log('Will replace messages, new count:', uniqueMessages.length, '(original:', messages.length, ')')
+    } else if (newMessage) {
+      // If only adding a new message, use $push operator
+      updateData.$push = { messages: newMessage }
+      console.log('Will add new message')
     }
 
-    await chat.save()
+    // Use findOneAndUpdate for atomic operation to avoid version conflicts
+    let chat = await Chat.findOneAndUpdate(
+      {
+        userId: req.user._id,
+        chatId: chatId,
+        isActive: true
+      },
+      updateData,
+      { 
+        new: true, // Return the updated document
+        runValidators: true // Run schema validators
+      }
+    )
+
+    if (!chat) {
+      console.log('Chat not found:', chatId, '- attempting to create it')
+      // If chat doesn't exist, create it instead of returning 404
+      const newChat = new Chat({
+        userId: req.user._id,
+        chatId: chatId,
+        title: title || 'New Chat',
+        messages: messages || []
+      })
+      
+      try {
+        await newChat.save()
+        console.log('Chat created with ID:', newChat.chatId)
+        chat = newChat
+      } catch (saveError) {
+        // Handle duplicate key error
+        if (saveError.code === 11000) {
+          console.error('Duplicate chatId detected during update, retrying with findOneAndUpdate...')
+          // Race condition: chat was created between our findOneAndUpdate and save
+          // Retry the update operation
+          chat = await Chat.findOneAndUpdate(
+            {
+              userId: req.user._id,
+              chatId: chatId
+            },
+            updateData,
+            { 
+              new: true,
+              runValidators: true
+            }
+          )
+          
+          if (chat) {
+            console.log('Successfully updated chat after duplicate key error')
+            return res.json({
+              success: true,
+              message: 'Chat updated successfully',
+              data: chat
+            })
+          }
+        }
+        throw saveError
+      }
+    }
+
     console.log('✅ Chat updated successfully, final message count:', chat.messages.length)
 
     res.json({
@@ -292,11 +300,21 @@ router.post('/:chatId/messages', auth, async (req, res) => {
       })
     }
 
-    const chat = await Chat.findOne({
-      userId: req.user._id,
-      chatId: chatId,
-      isActive: true
-    })
+    // Use findOneAndUpdate with $push for atomic operation to avoid version conflicts
+    const chat = await Chat.findOneAndUpdate(
+      {
+        userId: req.user._id,
+        chatId: chatId,
+        isActive: true
+      },
+      {
+        $push: { messages: message }
+      },
+      {
+        new: true, // Return the updated document
+        runValidators: true // Run schema validators
+      }
+    )
 
     if (!chat) {
       return res.status(404).json({
@@ -304,10 +322,6 @@ router.post('/:chatId/messages', auth, async (req, res) => {
         message: 'Chat not found'
       })
     }
-
-    // Add the new message
-    chat.messages.push(message)
-    await chat.save()
 
     res.json({
       success: true,
