@@ -46,7 +46,9 @@ const ChatArea = ({
   onMessageLike,
   onMessageDislike,
   onRegenerateAnswer,
-  memoryStats
+  memoryStats,
+  onShowAuth,
+  isAuthenticated
 }) => {
   const { currentTheme, getCurrentThemeData } = useTheme()
   const [inputMessage, setInputMessage] = useState('')
@@ -294,21 +296,34 @@ const ChatArea = ({
             </div>
           </div>
           
-          {/* Right Side - Premium User Info */}
+          {/* Right Side - Premium User Info or Login Button */}
           <div className="flex items-center gap-2">
-            {/* User Info */}
-            {user && (
+            {/* User Info if authenticated */}
+            {isAuthenticated ? (
               <div className="flex items-center gap-2 px-3 py-1.5 backdrop-blur-sm rounded-xl hover:border-brand-500/30 transition-all duration-300" style={{
                 background: `linear-gradient(to bottom right, var(--color-surface-hover), var(--color-surface))`,
                 border: `1px solid var(--color-border)`
               }}>
                 <div className="w-7 h-7 bg-gradient-to-br from-brand-500 via-accent-purple to-brand-600 rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-glow">
-                  {user.username?.[0]?.toUpperCase() || 'U'}
+                  {user?.username?.[0]?.toUpperCase() || 'U'}
                 </div>
                 <span className="text-sm font-medium hidden sm:block" style={{ color: 'var(--color-text)' }}>
-                  {user.username}
+                  {user?.username || 'User'}
                 </span>
               </div>
+            ) : (
+              /* Login Button for guest users */
+              <button
+                onClick={onShowAuth}
+                className="relative px-4 py-2 rounded-xl bg-gradient-to-r from-brand-500 via-accent-purple to-brand-600 hover:from-brand-600 hover:via-accent-purple hover:to-brand-700 text-white font-medium transition-all duration-300 shadow-glow hover:shadow-glow-hover hover:scale-105 active:scale-95 overflow-hidden group"
+              >
+                {/* Shimmer effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <span className="relative z-10 flex items-center gap-2">
+                  <User size={16} />
+                  <span className="hidden sm:inline">Login</span>
+                </span>
+              </button>
             )}
           </div>
         </div>

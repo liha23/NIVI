@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Send, Bot, User, Trash2, Sparkles, Download, BarChart3, Search, Bookmark } from 'lucide-react'
+import { Send, Bot, User, Trash2, Sparkles, Download, BarChart3, Search, Bookmark, X } from 'lucide-react'
 import ChatMessage from './components/ChatMessage'
 import TypingIndicator from './components/TypingIndicator'
 import Sidebar from './components/Sidebar'
@@ -38,6 +38,7 @@ function App() {
   const [showExportModal, setShowExportModal] = useState(false)
   const [showAnalyticsModal, setShowAnalyticsModal] = useState(false)
   const [showSearchModal, setShowSearchModal] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
   const [bookmarkedMessages, setBookmarkedMessages] = useState([])
   const [messageReactions, setMessageReactions] = useState({})
   const [messageLikes, setMessageLikes] = useState({})
@@ -1374,18 +1375,6 @@ Remember to be conversational, helpful, and contextually aware!`
     )
   }
 
-  // Show authentication page if not authenticated
-  if (!isAuthenticated) {
-    return (
-      <ThemeProvider>
-        <AuthPage onAuthSuccess={(authData) => {
-          console.log('Auth success:', authData)
-          login(authData)
-        }} />
-      </ThemeProvider>
-    )
-  }
-
   console.log('Showing main app...')
   
   return (
@@ -1439,9 +1428,31 @@ Remember to be conversational, helpful, and contextually aware!`
           onMessageDislike={handleMessageDislike}
           onRegenerateAnswer={handleRegenerateAnswer}
           memoryStats={memoryStats}
+          onShowAuth={() => setShowAuthModal(true)}
+          isAuthenticated={isAuthenticated}
         />
 
         {/* Modals */}
+        {/* Auth Modal for Guest Users */}
+        {showAuthModal && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="relative max-w-md w-full">
+              <button
+                onClick={() => setShowAuthModal(false)}
+                aria-label="Close authentication modal"
+                className="absolute -top-4 -right-4 p-2 bg-neutral-800 hover:bg-neutral-700 rounded-full transition-colors z-10"
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
+              <AuthPage onAuthSuccess={(authData) => {
+                console.log('Auth success:', authData)
+                login(authData)
+                setShowAuthModal(false)
+              }} />
+            </div>
+          </div>
+        )}
+
         <ExportModal
           isOpen={showExportModal}
           onClose={() => setShowExportModal(false)}
