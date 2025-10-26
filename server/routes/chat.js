@@ -181,12 +181,6 @@ router.put('/:chatId', auth, async (req, res) => {
     // Prepare update object
     const updateData = {}
     
-    // Handle title update
-    if (title) {
-      updateData.title = title
-      console.log('Will update title to:', title)
-    }
-
     // Handle message updates
     if (messages && Array.isArray(messages)) {
       // Deduplicate messages based on id, content, and timestamp
@@ -205,11 +199,28 @@ router.put('/:chatId', auth, async (req, res) => {
       
       updateData.messages = uniqueMessages
       console.log('Will replace messages, new count:', uniqueMessages.length, '(original:', messages.length, ')')
+      
+      // Handle title update when replacing messages
+      if (title) {
+        updateData.title = title
+        console.log('Will update title to:', title)
+      }
     } else if (newMessage) {
       // If only adding a new message, use $push operator
       updateData.$push = { messages: newMessage }
       console.log('Will add new message')
+      
+      // When using $push, we need to use $set for other fields
+      if (title) {
+        updateData.$set = { title: title }
+        console.log('Will update title to:', title)
+      }
+    } else if (title) {
+      // Only updating title
+      updateData.title = title
+      console.log('Will update title to:', title)
     }
+
 
     // Use findOneAndUpdate for atomic operation to avoid version conflicts
     let chat = await Chat.findOneAndUpdate(
