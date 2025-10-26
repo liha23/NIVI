@@ -82,8 +82,8 @@ function App() {
 
   // Single useEffect for all initialization and saving logic
   useEffect(() => {
-    // Skip if already initialized and no auth state change
-    if (isInitialized && currentChatId) {
+    // Skip if already initialized
+    if (isInitialized) {
       console.log('Already initialized, skipping...')
       return
     }
@@ -288,7 +288,7 @@ function App() {
         }
       }
     }
-  }, [urlChatId, isInitialized])
+  }, [urlChatId, isInitialized, currentChatId, isAuthenticated, token])
 
   // Initialize memory system
   useEffect(() => {
