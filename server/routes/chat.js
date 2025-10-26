@@ -366,14 +366,16 @@ router.delete('/:chatId', auth, async (req, res) => {
 // Clear all chats for a user
 router.delete('/', auth, async (req, res) => {
   try {
-    await Chat.updateMany(
-      { userId: req.user._id },
-      { isActive: false }
+    // Hard delete all chats for the user (as per requirement)
+    const result = await Chat.deleteMany(
+      { userId: req.user._id }
     )
+
+    console.log(`✅ Deleted ${result.deletedCount} chats for user:`, req.user._id)
 
     res.json({
       success: true,
-      message: 'All chats cleared successfully'
+      message: `All chats cleared successfully (${result.deletedCount} chats deleted)`
     })
   } catch (error) {
     console.error('Clear chats error:', error)
