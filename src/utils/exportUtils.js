@@ -119,28 +119,5 @@ export const exportUtils = {
 
     // Save the PDF
     pdf.save(`${chatTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.pdf`)
-  },
-
-  // Generate shareable link
-  generateShareLink: (chatId, messages) => {
-    // Use the clean URL format: nivii.app/{chatId}
-    return `${window.location.origin}/${chatId}`
-  },
-
-  // Copy to clipboard
-  copyToClipboard: async (text) => {
-    try {
-      await navigator.clipboard.writeText(text)
-      return true
-    } catch (err) {
-      // Fallback for older browsers
-      const textArea = document.createElement('textarea')
-      textArea.value = text
-      document.body.appendChild(textArea)
-      textArea.select()
-      document.execCommand('copy')
-      document.body.removeChild(textArea)
-      return true
-    }
   }
 }
