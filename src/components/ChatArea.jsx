@@ -23,7 +23,8 @@ import {
   Maximize2,
   Minimize2,
   MoreVertical,
-  Star
+  Star,
+  Share2
 } from 'lucide-react'
 import ChatMessage from './ChatMessage'
 import TypingIndicator from './TypingIndicator'
@@ -31,6 +32,7 @@ import QuickPrompts from './QuickPrompts'
 import { useTheme } from '../contexts/ThemeContext'
 import VoiceMode from './VoiceMode'
 import FileUploadModal from './FileUploadModal'
+import { exportUtils } from '../utils/exportUtils'
 
 const ChatArea = ({ 
   messages, 
@@ -38,6 +40,7 @@ const ChatArea = ({
   isLoading, 
   isSidebarOpen,
   currentChatTitle,
+  currentChatId,
   onToggleSidebar,
   user,
   onMessageReaction,
@@ -59,6 +62,7 @@ const ChatArea = ({
   const [attachedFiles, setAttachedFiles] = useState([])
   const [isEnhancing, setIsEnhancing] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
+  const [showShareCopied, setShowShareCopied] = useState(false)
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
   const recognitionRef = useRef(null)
@@ -145,7 +149,20 @@ const ChatArea = ({
     const k = 1024
     const sizes = ['Bytes', 'KB', 'MB', 'GB']
     const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
+  }
+
+  const handleShareChat = async () => {
+    if (!currentChatId) return
+    
+    try {
+      const shareLink = exportUtils.generateShareLink(currentChatId, messages)
+      await exportUtils.copyToClipboard(shareLink)
+      setShowShareCopied(true)
+      setTimeout(() => setShowShareCopied(false), 2000)
+    } catch (error) {
+      console.error('Failed to copy share link:', error)
+    }
   }
 
   const enhancePrompt = async () => {
@@ -298,6 +315,22 @@ const ChatArea = ({
           
           {/* Right Side - Premium User Info or Login Button */}
           <div className="flex items-center gap-2">
+            {/* Share Button */}
+            <button
+              onClick={handleShareChat}
+              disabled={!currentChatId}
+              className="relative p-2 rounded-xl bg-gradient-to-br from-brand-500/10 to-accent-purple/10 hover:from-brand-500/20 hover:to-accent-purple/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
+              style={{ border: `1px solid var(--color-border)` }}
+              title="Share chat"
+            >
+              <Share2 size={18} style={{ color: 'var(--color-text)' }} />
+              {showShareCopied && (
+                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-green-500 text-white text-xs rounded whitespace-nowrap">
+                  Link copied!
+                </div>
+              )}
+            </button>
+            
             {/* User Info if authenticated (but not for guest users) */}
             {isAuthenticated && !user?.isGuest ? (
               <div className="flex items-center gap-2 px-3 py-1.5 backdrop-blur-sm rounded-xl hover:border-brand-500/30 transition-all duration-300" style={{

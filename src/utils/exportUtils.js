@@ -123,14 +123,8 @@ export const exportUtils = {
 
   // Generate shareable link
   generateShareLink: (chatId, messages) => {
-    const shareData = {
-      chatId,
-      messages: messages.slice(0, 10), // Limit to first 10 messages for sharing
-      timestamp: new Date().toISOString()
-    }
-    
-    const encodedData = btoa(JSON.stringify(shareData))
-    return `${window.location.origin}${window.location.pathname}?share=${encodedData}`
+    // Use the clean URL format: nivii.app/{chatId}
+    return `${window.location.origin}/${chatId}`
   },
 
   // Copy to clipboard

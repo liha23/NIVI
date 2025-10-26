@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate, useParams, useLocation, Routes, Route } from 'react-router-dom'
 import { Send, Bot, User, Trash2, Sparkles, Download, BarChart3, Search, Bookmark, X } from 'lucide-react'
 import { nanoid } from 'nanoid'
 import ChatMessage from './components/ChatMessage'
@@ -25,6 +26,11 @@ import {
 
 function App() {
   console.log('App component rendering...')
+  
+  const navigate = useNavigate()
+  const params = useParams()
+  const location = useLocation()
+  const urlChatId = params['*']?.split('/')[0] || null // Extract chatId from URL path
   
   const { user, token, isAuthenticated, logout, login, isLoading: authLoading } = useAuth()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -75,12 +81,12 @@ function App() {
 
   // Single useEffect for all initialization and saving logic
   useEffect(() => {
-    console.log('Initialization useEffect triggered:', { isAuthenticated, token: !!token })
+    console.log('Initialization useEffect triggered:', { isAuthenticated, token: !!token, urlChatId })
     
     // Clear lastSavedMessages on initialization to allow fresh loading
     setLastSavedMessages([])
     
-    // Check if there's a shared chat in the URL
+    // Check if there's a shared chat in the URL (legacy support)
     const urlParams = new URLSearchParams(window.location.search)
     const shareParam = urlParams.get('share')
     
@@ -113,8 +119,8 @@ function App() {
           localStorage.setItem('ai_chat_history', JSON.stringify([sharedChat]))
         }
         
-        // Clean up the URL
-        window.history.replaceState({}, document.title, window.location.pathname)
+        // Navigate to the new chat URL
+        navigate(`/${sharedChatId}`, { replace: true })
         
         console.log('✅ Shared chat loaded successfully')
         return // Don't continue with normal initialization
@@ -133,6 +139,90 @@ function App() {
       // Load from localStorage for non-authenticated users
       console.log('Loading chats from localStorage...')
       const savedChatHistory = localStorage.getItem('ai_chat_history')
+      
+      // If there's a chatId in the URL, try to load that specific chat
+      if (urlChatId) {
+        console.log('URL contains chatId:', urlChatId)
+        const savedMessages = localStorage.getItem(`chat_${urlChatId}`)
+        
+        if (savedMessages) {
+          try {
+            const messages = JSON.parse(savedMessages)
+            const formattedMessages = messages.map(msg => ({
+              ...msg,
+              timestamp: msg.timestamp ? new Date(msg.timestamp).toISOString() : new Date().toISOString()
+            }))
+            const deduplicatedMessages = removeDuplicateMessages(formattedMessages)
+            console.log('Loaded messages for URL chat:', deduplicatedMessages.length, 'messages')
+            setCurrentMessages(deduplicatedMessages.length > 0 ? deduplicatedMessages : [getWelcomeMessage()])
+            setCurrentChatId(urlChatId)
+            setLastSavedMessages(deduplicatedMessages.length > 0 ? [...deduplicatedMessages] : [getWelcomeMessage()])
+            
+            // Load chat history
+            if (savedChatHistory) {
+              try {
+                const history = JSON.parse(savedChatHistory)
+                const formattedHistory = history.map(chat => ({
+                  ...chat,
+                  lastActivity: chat.lastActivity || chat.timestamp || new Date(),
+                  createdAt: chat.createdAt || chat.timestamp || new Date(),
+                  timestamp: chat.timestamp || new Date()
+                }))
+                const uniqueChats = removeDuplicateChats(formattedHistory)
+                setChatHistory(uniqueChats)
+              } catch (error) {
+                console.error('Error loading chat history:', error)
+              }
+            }
+            
+            return // Successfully loaded chat from URL
+          } catch (error) {
+            console.error('Error loading chat from URL:', error)
+          }
+        } else {
+          console.log('Chat not found in localStorage, creating new chat')
+          // Chat doesn't exist, create a new one with this ID
+          const newChat = {
+            id: urlChatId,
+            title: 'New Chat',
+            timestamp: new Date(),
+            lastActivity: new Date(),
+            createdAt: new Date()
+          }
+          const welcomeMessage = [getWelcomeMessage()]
+          setCurrentChatId(urlChatId)
+          setCurrentMessages(welcomeMessage)
+          setLastSavedMessages([...welcomeMessage])
+          localStorage.setItem(`chat_${urlChatId}`, JSON.stringify(welcomeMessage))
+          
+          // Add to chat history
+          if (savedChatHistory) {
+            try {
+              const history = JSON.parse(savedChatHistory)
+              const formattedHistory = history.map(chat => ({
+                ...chat,
+                lastActivity: chat.lastActivity || chat.timestamp || new Date(),
+                createdAt: chat.createdAt || chat.timestamp || new Date(),
+                timestamp: chat.timestamp || new Date()
+              }))
+              const uniqueChats = removeDuplicateChats([newChat, ...formattedHistory])
+              setChatHistory(uniqueChats)
+              localStorage.setItem('ai_chat_history', JSON.stringify(uniqueChats))
+            } catch (error) {
+              console.error('Error updating chat history:', error)
+              setChatHistory([newChat])
+              localStorage.setItem('ai_chat_history', JSON.stringify([newChat]))
+            }
+          } else {
+            setChatHistory([newChat])
+            localStorage.setItem('ai_chat_history', JSON.stringify([newChat]))
+          }
+          
+          return
+        }
+      }
+      
+      // No URL chatId, load from saved history
       if (savedChatHistory) {
         try {
           const history = JSON.parse(savedChatHistory)
@@ -156,6 +246,9 @@ function App() {
             console.log('Setting current chat to most recent:', mostRecentChat.id)
             setCurrentChatId(mostRecentChat.id)
             
+            // Navigate to the chat URL
+            navigate(`/${mostRecentChat.id}`, { replace: true })
+            
             const savedMessages = localStorage.getItem(`chat_${mostRecentChat.id}`)
             if (savedMessages) {
               try {
@@ -168,6 +261,7 @@ function App() {
                 const deduplicatedMessages = removeDuplicateMessages(formattedMessages)
                 console.log('Loaded messages for current chat:', deduplicatedMessages.length, 'messages')
                 setCurrentMessages(deduplicatedMessages.length > 0 ? deduplicatedMessages : [getWelcomeMessage()])
+                setLastSavedMessages(deduplicatedMessages.length > 0 ? [...deduplicatedMessages] : [getWelcomeMessage()])
               } catch (error) {
                 console.error('Error loading from localStorage:', error)
                 setCurrentMessages([getWelcomeMessage()])
@@ -189,7 +283,7 @@ function App() {
         createNewChat()
       }
     }
-  }, [isAuthenticated, token])
+  }, [isAuthenticated, token, urlChatId])
 
   // Initialize memory system
   useEffect(() => {
@@ -461,8 +555,22 @@ function App() {
           setChatHistory(uniqueChats)
           
           if (uniqueChats.length > 0) {
-            console.log('Loading first chat:', uniqueChats[0].id)
-            await loadChatFromMongoDB(uniqueChats[0].id)
+            // If there's a chatId in the URL, try to load that chat
+            if (urlChatId) {
+              const chatExists = uniqueChats.find(chat => chat.id === urlChatId)
+              if (chatExists) {
+                console.log('Loading chat from URL:', urlChatId)
+                await loadChatFromMongoDB(urlChatId)
+              } else {
+                console.log('Chat from URL not found, loading first chat')
+                await loadChatFromMongoDB(uniqueChats[0].id)
+                navigate(`/${uniqueChats[0].id}`, { replace: true })
+              }
+            } else {
+              console.log('Loading first chat:', uniqueChats[0].id)
+              await loadChatFromMongoDB(uniqueChats[0].id)
+              navigate(`/${uniqueChats[0].id}`, { replace: true })
+            }
           } else {
             console.log('No chats found, creating new chat')
             createNewChat()
@@ -706,6 +814,9 @@ function App() {
         return removeDuplicateChats(updated)
       })
       
+      // Navigate to the new chat URL
+      navigate(`/${newChatId}`)
+      
       // Don't immediately save - let the save effect handle it when messages change
       // This prevents the 404 error from trying to update a non-existent chat
     } else {
@@ -728,6 +839,9 @@ function App() {
       setLastSavedMessages([welcomeMessage]) // Prevent unnecessary saves
       
       localStorage.setItem(`chat_${newChatId}`, JSON.stringify([welcomeMessage]))
+      
+      // Navigate to the new chat URL
+      navigate(`/${newChatId}`)
     }
     
     // Reset the flag after a short delay to allow the next creation
@@ -736,6 +850,9 @@ function App() {
 
   const selectChat = async (chatId) => {
     console.log('Selecting chat:', chatId)
+    
+    // Navigate to the selected chat URL
+    navigate(`/${chatId}`)
     
     // Set current chat ID immediately for UI feedback
     setCurrentChatId(chatId)
@@ -1519,6 +1636,7 @@ Remember to be conversational, helpful, and contextually aware!`
           isLoading={isLoading}
           isSidebarOpen={isSidebarOpen}
           currentChatTitle={getCurrentChatTitle()}
+          currentChatId={currentChatId}
           onToggleSidebar={toggleSidebar}
           user={user}
           onMessageReaction={handleMessageReaction}
@@ -1583,7 +1701,9 @@ const AppWrapper = () => {
   return (
     <AuthProvider>
       <ErrorBoundary>
-        <App />
+        <Routes>
+          <Route path="/*" element={<App />} />
+        </Routes>
       </ErrorBoundary>
     </AuthProvider>
   )
