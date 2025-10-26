@@ -212,38 +212,7 @@ function App() {
     }
   }, [isAuthenticated, token])
 
-  // Separate effect to handle URL changes after initialization
-  useEffect(() => {
-    if (!isInitialized || !urlChatId) return
-    
-    // If URL chatId is different from current, load that chat
-    if (urlChatId && urlChatId !== currentChatId) {
-      console.log('URL changed to different chat:', urlChatId)
-      
-      if (isAuthenticated && token) {
-        // For authenticated users, load from MongoDB
-        loadChatFromMongoDB(urlChatId)
-      } else {
-        // For non-authenticated users, load from localStorage
-        const savedMessages = localStorage.getItem(`chat_${urlChatId}`)
-        if (savedMessages) {
-          try {
-            const messages = JSON.parse(savedMessages)
-            const formattedMessages = messages.map(msg => ({
-              ...msg,
-              timestamp: msg.timestamp ? new Date(msg.timestamp).toISOString() : new Date().toISOString()
-            }))
-            const deduplicatedMessages = removeDuplicateMessages(formattedMessages)
-            setCurrentMessages(deduplicatedMessages.length > 0 ? deduplicatedMessages : [getWelcomeMessage()])
-            setCurrentChatId(urlChatId)
-            setLastSavedMessages(deduplicatedMessages.length > 0 ? [...deduplicatedMessages] : [getWelcomeMessage()])
-          } catch (error) {
-            console.error('Error loading chat from URL:', error)
-          }
-        }
-      }
-    }
-  }, [urlChatId, isInitialized, currentChatId, isAuthenticated, token])
+
 
   // Initialize memory system
   useEffect(() => {
