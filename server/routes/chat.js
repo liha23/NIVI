@@ -28,9 +28,24 @@ router.get('/', auth, async (req, res) => {
 
     console.log('Found chats:', chats.length)
     
+    // Remove duplicates based on chatId (keep the most recent one)
+    const uniqueChats = []
+    const seenChatIds = new Set()
+    
+    for (const chat of chats) {
+      if (!seenChatIds.has(chat.chatId)) {
+        seenChatIds.add(chat.chatId)
+        uniqueChats.push(chat)
+      } else {
+        console.log('Duplicate chatId found:', chat.chatId, 'Skipping...')
+      }
+    }
+    
+    console.log('Unique chats after deduplication:', uniqueChats.length)
+    
     res.json({
       success: true,
-      data: chats
+      data: uniqueChats
     })
   } catch (error) {
     console.error('Get chats error:', error)
@@ -118,8 +133,24 @@ router.post('/', auth, async (req, res) => {
       messages: messages || []
     })
 
-    await chat.save()
-    console.log('Chat saved successfully:', chat._id, 'with chatId:', chat.chatId)
+    try {
+      await chat.save()
+      console.log('Chat saved successfully:', chat._id, 'with chatId:', chat.chatId)
+    } catch (saveError) {
+      // Handle duplicate key error
+      if (saveError.code === 11000) {
+        console.error('Duplicate chatId detected, retrying with new ID...')
+        // Find the highest chatId and increment
+        const latestChat = await Chat.findOne({ 
+          userId: req.user._id 
+        }).sort({ chatId: -1 })
+        chat.chatId = latestChat ? latestChat.chatId + 1 : 1
+        await chat.save()
+        console.log('Chat saved with new ID:', chat.chatId)
+      } else {
+        throw saveError
+      }
+    }
 
     res.status(201).json({
       success: true,
@@ -174,8 +205,31 @@ router.put('/:chatId', auth, async (req, res) => {
         messages: messages || []
       })
       
-      await newChat.save()
-      console.log('Chat created with ID:', newChat.chatId)
+      try {
+        await newChat.save()
+        console.log('Chat created with ID:', newChat.chatId)
+      } catch (saveError) {
+        // Handle duplicate key error
+        if (saveError.code === 11000) {
+          console.error('Duplicate chatId detected during update, finding existing chat...')
+          // Find the existing chat and update it
+          const existingChat = await Chat.findOne({
+            userId: req.user._id,
+            chatId: parseInt(chatId)
+          })
+          if (existingChat) {
+            existingChat.title = title || existingChat.title
+            existingChat.messages = messages || existingChat.messages
+            await existingChat.save()
+            return res.json({
+              success: true,
+              message: 'Chat updated successfully',
+              data: existingChat
+            })
+          }
+        }
+        throw saveError
+      }
       
       return res.json({
         success: true,
@@ -200,8 +254,22 @@ router.put('/:chatId', auth, async (req, res) => {
 
     // Replace all messages if provided
     if (messages && Array.isArray(messages)) {
-      chat.messages = messages
-      console.log('Replaced messages, new count:', messages.length)
+      // Deduplicate messages based on id, content, and timestamp
+      const uniqueMessages = []
+      const seenMessages = new Set()
+      
+      for (const msg of messages) {
+        const msgKey = `${msg.id}-${msg.content}-${msg.timestamp}`
+        if (!seenMessages.has(msgKey)) {
+          seenMessages.add(msgKey)
+          uniqueMessages.push(msg)
+        } else {
+          console.log('Duplicate message detected, skipping:', msg.id)
+        }
+      }
+      
+      chat.messages = uniqueMessages
+      console.log('Replaced messages, new count:', uniqueMessages.length, '(original:', messages.length, ')')
     }
 
     await chat.save()

@@ -53,13 +53,19 @@ const Sidebar = ({
     }
     
     const diffTime = Math.abs(now - chatDate)
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    const diffMinutes = Math.floor(diffTime / (1000 * 60))
+    const diffHours = Math.floor(diffTime / (1000 * 60 * 60))
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
     
-    if (diffDays === 1) return 'Today'
-    if (diffDays === 2) return 'Yesterday'
-    if (diffDays <= 7) return `${diffDays - 1}d ago`
-    if (diffDays <= 30) return `${Math.ceil(diffDays / 7)}w ago`
-    return `${Math.ceil(diffDays / 30)}m ago`
+    // More granular time formatting
+    if (diffMinutes < 1) return 'Just now'
+    if (diffMinutes < 60) return `${diffMinutes}m ago`
+    if (diffHours < 24) return `${diffHours}h ago`
+    if (diffDays === 0) return 'Today'
+    if (diffDays === 1) return 'Yesterday'
+    if (diffDays < 7) return `${diffDays}d ago`
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`
+    return `${Math.floor(diffDays / 30)}mo ago`
   }
 
   const truncateText = (text, maxLength = 32) => {
@@ -77,15 +83,15 @@ const Sidebar = ({
     
     const now = new Date()
     const chatDate = new Date(chat.lastActivity || chat.createdAt)
-    const diffDays = Math.ceil((now - chatDate) / (1000 * 60 * 60 * 24))
+    const diffDays = Math.floor((now - chatDate) / (1000 * 60 * 60 * 24))
     
     switch (filterType) {
       case 'today':
-        return diffDays <= 1
+        return diffDays === 0
       case 'week':
-        return diffDays <= 7
+        return diffDays < 7
       case 'month':
-        return diffDays <= 30
+        return diffDays < 30
       default:
         return true
     }
@@ -103,12 +109,12 @@ const Sidebar = ({
     chats.forEach(chat => {
       const now = new Date()
       const chatDate = new Date(chat.lastActivity || chat.createdAt)
-      const diffDays = Math.ceil((now - chatDate) / (1000 * 60 * 60 * 24))
+      const diffDays = Math.floor((now - chatDate) / (1000 * 60 * 60 * 24))
 
-      if (diffDays === 1) groups.today.push(chat)
-      else if (diffDays === 2) groups.yesterday.push(chat)
-      else if (diffDays <= 7) groups.week.push(chat)
-      else if (diffDays <= 30) groups.month.push(chat)
+      if (diffDays === 0) groups.today.push(chat)
+      else if (diffDays === 1) groups.yesterday.push(chat)
+      else if (diffDays < 7) groups.week.push(chat)
+      else if (diffDays < 30) groups.month.push(chat)
       else groups.older.push(chat)
     })
 
